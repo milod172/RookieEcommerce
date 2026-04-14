@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="NovaFashion.API/NovaFashion.API.csproj" />
+  <Project Path="NovaFashion.CustomerSite/NovaFashion.CustomerSite.csproj" />
+  <Project Path="NovaFashion.SharedViewModels/NovaFashion.SharedViewModels.csproj" />
+</Solution>
