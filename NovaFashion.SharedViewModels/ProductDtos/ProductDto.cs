@@ -1,8 +1,6 @@
-﻿using NovaFashion.API.Shared.Abstractions;
-
-namespace NovaFashion.API.Entities
+﻿namespace NovaFashion.SharedViewModels.ProductDtos
 {
-    public class Product : IHasKey<Guid>, IHasAudit
+    public class ProductDto
     {
         public Guid Id { get; set; }
         public string ProductName { get; set; } = string.Empty;

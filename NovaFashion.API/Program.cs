@@ -1,5 +1,10 @@
+
+using System.Text.Json;
+using FastEndpoints;
+using Microsoft.AspNetCore.Http.Json;
 using NovaFashion.API;
 using NovaFashion.API.Configuration;
+using NovaFashion_API;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 var appSettings = new AppSettings();
 builder.Configuration.Bind(appSettings);
 
+
 builder.Services.AddControllers();
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+    
+});
+
+
+builder.Services.AddFastEndpoints();
 builder.Services.AddOpenApi();
 builder.Services
     .AddApiServices(builder.Configuration)
@@ -24,6 +38,8 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader());
 });
 
+
+   
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -44,5 +60,11 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseFastEndpoints(c =>
+{
+    c.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+    c.Serializer.Options.AddSerializerContextsFromNovaFashion_API();
+    c.Binding.ReflectionCache.AddFromNovaFashionAPI();
+});
 
 app.Run();
