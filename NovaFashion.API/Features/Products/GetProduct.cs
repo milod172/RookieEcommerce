@@ -4,41 +4,33 @@ using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Pagination;
+using NovaFashion.API.Shared.Validators;
 using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.Products
 {
-    public class GetProductValidator : Validator<PaginationQuery>
-    {
-        public GetProductValidator()
-        {
-            RuleFor(x => x.SortBy).Must(x => x == "Id asc" || x == "Id desc")
-                                  .WithMessage("SortBy must be 'Id desc' or 'Id asc'");
-        }
-    }
-
     public class GetProduct : Endpoint<PaginationQuery,PaginationList<ProductDto>>
     {
         private readonly AppDbContext _context;
-
         public GetProduct(AppDbContext context)
         {
             _context = context;
         }
-
         public override void Configure()
         {
-            Get("/api/products");
+            Get("");
+            Group<ProductGroup>();
             AllowAnonymous(); 
             //RequireAuthorization()
+            Validator<PaginationQueryValidator>();
             Description(x => x
-                .WithName("Get Products")
+                .WithName("GetProducts")
                 .Produces<PaginationList<ProductDto>>(StatusCodes.Status200OK));
 
         }
         public override async Task HandleAsync(PaginationQuery req, CancellationToken ct)
         {
-            var products =  _context.Products
+            var query =  _context.Products
                 .AsNoTracking()
                 .Select(p => new ProductDto
                 {
@@ -51,18 +43,13 @@ namespace NovaFashion.API.Features.Products
                     ModifiedBy = p.ModifiedBy
                 });
 
-            //Sorting
+          
             if (!string.IsNullOrEmpty(req.SortBy))
             {
-                products = req.SortBy.ToLower() switch
-                {
-                    "id desc" => products.OrderByDescending(x => x.Id),
-                    "id asc" => products.OrderBy(x => x.Id),
-                    _ => products.OrderByDescending(x => x.Id)
-                };
+                query = query.ApplySorting(req.SortBy);
             }
 
-            var pageResult = await products.PaginateAsync(
+            var pageResult = await query.PaginateAsync(
                 req.PageNumber, 
                 req.PageSize, 
                 ct);

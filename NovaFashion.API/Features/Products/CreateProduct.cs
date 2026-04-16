@@ -1,8 +1,8 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using NovaFashion.SharedViewModels.ProductDtos;
-using NovaFashion.API.Entities;
 using NovaFashion.API.Persistence;
+using NovaFashion.API.Entities;
 
 namespace NovaFashion.API.Features.Products
 {
@@ -10,18 +10,29 @@ namespace NovaFashion.API.Features.Products
     {
         public string ProductName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public decimal? UnitPrice { get; set; }
+        public string? Details { get; set; } = string.Empty;
+        public int TotalQuantity { get; set; } = 0;
     }
 
     public class CreateProductValidator : Validator<CreateProductRequest>
     {
         public CreateProductValidator()
         {
-            RuleFor(x => x.ProductName).NotEmpty().WithMessage("Product name is required.");
-            RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.");
+            RuleFor(x => x.ProductName)
+                .NotEmpty().WithMessage("Product name is required.");
+            RuleFor(x => x.Description)
+                .NotEmpty().WithMessage("Description is required.")
+                .MaximumLength(500).WithMessage("Description cannot exceed 500 characters.");
+            RuleFor(x => x.Details)
+                .MaximumLength(1000).WithMessage("Details cannot exceed 1000 characters.");
+            RuleFor(x => x.UnitPrice)
+                .GreaterThan(0).WithMessage("Price must be greater than 0")
+                .LessThanOrEqualTo(1_000_000_000).WithMessage("Price is too large");
         }
     }
 
-    public class CreateProduct : Endpoint<CreateProductRequest, ProductDto>
+    public class CreateProduct : Endpoint<CreateProductRequest>
     {
         private readonly AppDbContext _context;
 
@@ -31,12 +42,13 @@ namespace NovaFashion.API.Features.Products
         }
         public override void Configure()
         {
-            Post("/api/products");
+            Post("");
+            Group<ProductGroup>();
             AllowAnonymous(); 
             //RequireAuthorization()
             Description(x => x
-                .WithName("Create Product")
-                .Produces<ProductDto>(StatusCodes.Status201Created)
+                .WithName("CreateProduct")
+                .Produces(StatusCodes.Status201Created)
                 .Produces(StatusCodes.Status400BadRequest));
         }
 
@@ -49,7 +61,7 @@ namespace NovaFashion.API.Features.Products
             };
 
             _context.Products.Add(product);
-            var result = await _context.SaveChangesAsync(ct);
+            await _context.SaveChangesAsync(ct);
             
 
             var response = new ProductDto
@@ -61,10 +73,7 @@ namespace NovaFashion.API.Features.Products
                 CreatedBy = product.CreatedBy
             };
 
-            await Send.CreatedAtAsync("",
-            null,
-            response,
-            cancellation: ct);
+            await Send.CreatedAtAsync("GetProductDetails", product.Id, response,cancellation: ct);
         }
     }
 }

@@ -26,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Persistence\Configurations\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\NovaFashion.SharedViewModels\NovaFashion.SharedViewModels.csproj" />
   </ItemGroup>
 

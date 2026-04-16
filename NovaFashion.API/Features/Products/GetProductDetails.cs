@@ -4,38 +4,43 @@ using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.Products
 {
-    public class DeleteProduct : EndpointWithoutRequest
+    public class GetProductDetails : EndpointWithoutRequest<ProductDto>
     {
         private readonly AppDbContext _context;
-        public DeleteProduct(AppDbContext context)
+
+        public GetProductDetails(AppDbContext context)
         {
             _context = context;
         }
 
         public override void Configure()
         {
-            Delete("{id}");
-            AllowAnonymous();
+            Get("{id}");
             Group<ProductGroup>();
+            AllowAnonymous();
             //RequireAuthorization()
             Description(x => x
-                .WithName("DeleteProduct")
-                .Produces<ProductDto>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status400BadRequest));
+                .WithName("GetProductDetails")
+                .Produces<ProductDto>(StatusCodes.Status200OK));
         }
 
         public override async Task HandleAsync(CancellationToken ct)
         {
             var product = _context.Products.Find(Route<Guid>("id"));
-            if (product == null)
-            {
+
+            if (product == null) { 
                 await Send.NotFoundAsync(ct);
                 return;
             }
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync(ct);
-            
-            await Send.OkAsync(null, ct);
+
+            var productDto = new ProductDto
+            {
+                Id = product.Id,
+                ProductName = product.ProductName,
+                Description = product.Description
+            };
+
+            await Send.OkAsync(productDto, ct);
         }
     }
 }

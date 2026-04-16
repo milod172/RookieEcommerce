@@ -65,6 +65,7 @@ app.UseFastEndpoints(c =>
     c.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
     c.Serializer.Options.AddSerializerContextsFromNovaFashion_API();
     c.Binding.ReflectionCache.AddFromNovaFashionAPI();
+    c.Endpoints.RoutePrefix = "api";
 });
 
 app.Run();

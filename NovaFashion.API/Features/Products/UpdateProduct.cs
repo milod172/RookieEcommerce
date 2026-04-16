@@ -30,11 +30,12 @@ namespace NovaFashion.API.Features.Products
         }
         public override void Configure()
         {
-            Put("/api/products/{id}");
+            Put("{id}");
+            Group<ProductGroup>();
             AllowAnonymous();
             //RequireAuthorization()
             Description(x => x
-                .WithName("Update Product")
+                .WithName("UpdateProduct")
                 .Produces<ProductDto>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status400BadRequest));
         }
