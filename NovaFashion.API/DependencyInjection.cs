@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using NovaFashion.API.Persistence;
-using NovaFashion.API.Persistence.Interceptors;
+using NovaFashion.API.Features.Products;
+using NovaFashion.API.Infrastructure.Persistence;
+using NovaFashion.API.Infrastructure.Persistence.Interceptors;
+using NovaFashion.API.Shared.Services;
 
 namespace NovaFashion.API
 {
@@ -25,7 +27,9 @@ namespace NovaFashion.API
         {
             // Register all FluentValidation validators from the current executing assembly
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), lifetime: ServiceLifetime.Transient);
-
+            
+            // Register Cloudinary service
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
             return services;
         }
 
@@ -39,12 +43,14 @@ namespace NovaFashion.API
                 options.AddInterceptors(serviceProvider.GetRequiredService<AuditInterceptor>());
             });
 
-            ////Dùng cho Background Service
+            ////Background Service
             //services.AddDbContextFactory<AppDbContext>((serviceProvider, options) =>
             //{
             //    options.UseSqlServer(connectionString);
             //    options.AddInterceptors(serviceProvider.GetRequiredService<AuditInterceptor>());
             //}, ServiceLifetime.Scoped);
+
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             return services;
         }

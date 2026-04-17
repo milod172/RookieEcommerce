@@ -1,17 +1,11 @@
 ﻿using FastEndpoints;
-using NovaFashion.API.Persistence;
+using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.Products
 {
-    public class DeleteProduct : EndpointWithoutRequest
+    public class DeleteProduct(IProductRepository productRepository) : EndpointWithoutRequest
     {
-        private readonly AppDbContext _context;
-        public DeleteProduct(AppDbContext context)
-        {
-            _context = context;
-        }
-
         public override void Configure()
         {
             Delete("{id}");
@@ -26,14 +20,14 @@ namespace NovaFashion.API.Features.Products
 
         public override async Task HandleAsync(CancellationToken ct)
         {
-            var product = _context.Products.Find(Route<Guid>("id"));
+            var product = await productRepository.FindAsync(Route<Guid>("id"), ct);
             if (product == null)
             {
                 await Send.NotFoundAsync(ct);
                 return;
             }
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync(ct);
+            await productRepository.DeleteAsync(product, ct);
+            
             
             await Send.OkAsync(null, ct);
         }

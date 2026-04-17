@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using NovaFashion.API.Shared.Abstractions;
 using NovaFashion.API.Shared.Extensions;
 
-namespace NovaFashion.API.Persistence.Interceptors
+namespace NovaFashion.API.Infrastructure.Persistence.Interceptors
 {
     public class AuditInterceptor() : SaveChangesInterceptor
     {

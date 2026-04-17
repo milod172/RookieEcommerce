@@ -1,18 +1,34 @@
 ﻿using FastEndpoints;
-using NovaFashion.API.Persistence;
+using NovaFashion.API.Entities;
+using NovaFashion.API.Infrastructure.Persistence;
+using NovaFashion.API.Shared.Pagination;
 using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.Products
 {
-    public class GetProductDetails : EndpointWithoutRequest<ProductDto>
-    {
-        private readonly AppDbContext _context;
 
-        public GetProductDetails(AppDbContext context)
+    public class GetProductDetailsMapper : Mapper<EmptyRequest, ProductDto, Product>
+    {
+        public override ProductDto FromEntity(Product e) 
         {
-            _context = context;
+            return new ProductDto {
+                Id = e.Id,
+                ProductName = e.ProductName,
+                Description = e.Description,
+                UnitPrice = e.UnitPrice,
+                Details = e.Details,
+                TotalQuantity = e.TotalQuantity,
+                Sku = e.Sku,
+                CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
+                CategoryName = e.Category != null ? e.Category.CategoryName : string.Empty,
+                CreatedTime = e.CreatedTime
+            };
         }
 
+    }
+    public class GetProductDetails(IProductRepository productRepository) : EndpointWithoutRequest<ProductDto>
+    {
+        
         public override void Configure()
         {
             Get("{id}");
@@ -26,7 +42,7 @@ namespace NovaFashion.API.Features.Products
 
         public override async Task HandleAsync(CancellationToken ct)
         {
-            var product = _context.Products.Find(Route<Guid>("id"));
+            var product = await productRepository.FindAsync(Route<Guid>("id"), ct);
 
             if (product == null) { 
                 await Send.NotFoundAsync(ct);

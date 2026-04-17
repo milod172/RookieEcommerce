@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using NovaFashion.API.Persistence;
+using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Pagination;
 using NovaFashion.API.Shared.Validators;

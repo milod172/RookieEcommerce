@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.28.0" />
     <PackageReference Include="FastEndpoints" Version="8.1.0" />
     <PackageReference Include="FastEndpoints.Generator" Version="8.1.0">
       <PrivateAssets>all</PrivateAssets>
@@ -27,6 +28,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NovaFashion.SharedViewModels\NovaFashion.SharedViewModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Infrastructure\OpenApi\" />
+    <Folder Include="Infrastructure\Repositories\" />
   </ItemGroup>
 
 </Project>

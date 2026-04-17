@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
 
-namespace NovaFashion.API.Persistence
+namespace NovaFashion.API.Infrastructure.Persistence
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {

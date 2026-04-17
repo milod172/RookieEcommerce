@@ -1,21 +1,40 @@
 ﻿using FastEndpoints;
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using NovaFashion.API.Persistence;
-using NovaFashion.API.Shared.Extensions;
+using NovaFashion.API.Entities;
 using NovaFashion.API.Shared.Pagination;
 using NovaFashion.API.Shared.Validators;
 using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.Products
 {
-    public class GetProduct : Endpoint<PaginationQuery,PaginationList<ProductDto>>
+    public class GetProductMapper : Mapper<PaginationQuery,PaginationList<ProductDto>, PaginationList<Product>>
     {
-        private readonly AppDbContext _context;
-        public GetProduct(AppDbContext context)
+        public ProductDto MapToDto(Product e)
         {
-            _context = context;
+            return new ProductDto
+            {
+                Id = e.Id,
+                ProductName = e.ProductName,
+                Description = e.Description,
+                UnitPrice = e.UnitPrice      
+            };
         }
+
+        public override PaginationList<ProductDto> FromEntity(PaginationList<Product> e)
+        {
+            var dtos = e.Items.Select(x => MapToDto(x)).ToList();
+
+            return new PaginationList<ProductDto>(
+                dtos,
+                e.TotalCount,
+                e.PageNumber,
+                e.PageSize
+            );
+        }
+    }
+
+    public class GetProduct(IProductRepository _productRepository) : Endpoint<PaginationQuery,PaginationList<ProductDto>, GetProductMapper>
+    {
         public override void Configure()
         {
             Get("");
@@ -26,35 +45,15 @@ namespace NovaFashion.API.Features.Products
             Description(x => x
                 .WithName("GetProducts")
                 .Produces<PaginationList<ProductDto>>(StatusCodes.Status200OK));
-
         }
+
+
         public override async Task HandleAsync(PaginationQuery req, CancellationToken ct)
         {
-            var query =  _context.Products
-                .AsNoTracking()
-                .Select(p => new ProductDto
-                {
-                    Id = p.Id,
-                    ProductName = p.ProductName,
-                    Description = p.Description,
-                    CreatedTime = p.CreatedTime,
-                    CreatedBy = p.CreatedBy,
-                    ModifiedTime = p.ModifiedTime,
-                    ModifiedBy = p.ModifiedBy
-                });
+            var pageResultEntities = await _productRepository.GetPagedProductsAsync(req, ct);
+            var pageResultDtos = Map.FromEntity(pageResultEntities);
 
-          
-            if (!string.IsNullOrEmpty(req.SortBy))
-            {
-                query = query.ApplySorting(req.SortBy);
-            }
-
-            var pageResult = await query.PaginateAsync(
-                req.PageNumber, 
-                req.PageSize, 
-                ct);
-
-            await Send.OkAsync(pageResult, ct);
+            await Send.OkAsync(pageResultDtos, ct);
         }
     }
 }

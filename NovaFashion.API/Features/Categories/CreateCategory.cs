@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using NovaFashion.API.Entities;
-using NovaFashion.API.Persistence;
+using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.CategoryDtos;
 
 namespace NovaFashion.API.Features.Categories
@@ -12,7 +12,6 @@ namespace NovaFashion.API.Features.Categories
         public string Description { get; set; } = string.Empty;
         public Guid? ParentCategoryId { get; set; }
     }
-
     public class CreateCategoryValidator : Validator<CreateCategoryRequest>
     {
         public CreateCategoryValidator()

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NovaFashion.API.Entities;
 
-namespace NovaFashion.API.Persistence.Configurations
+namespace NovaFashion.API.Infrastructure.Persistence.Configurations
 {
     public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
