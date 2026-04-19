@@ -22,11 +22,14 @@ namespace NovaFashion.API.Features.Products
         {
             RuleFor(x => x.ProductName)
                 .NotEmpty().WithMessage("Tên sản phẩm không được để trống");
+
             RuleFor(x => x.Description)
                 .NotEmpty().WithMessage("Mô tả không được để trống")
                 .MaximumLength(500).WithMessage("Mô tả không được vượt quá 500 ký tự");
+
             RuleFor(x => x.Details)
                 .MaximumLength(1000).WithMessage("Chi tiết sản phẩm không được vượt quá 1000 ký tự");
+
             RuleFor(x => x.UnitPrice)
                 .GreaterThan(0).WithMessage("Giá phải lớn hơn 0")
                 .LessThanOrEqualTo(1000000000).WithMessage("Giá quá lớn, vui lòng điều chỉnh lại");
@@ -69,13 +72,9 @@ namespace NovaFashion.API.Features.Products
         public override void Configure()
         {
             Post("");
-            Group<ProductGroup>();
             AllowAnonymous();
             //RequireAuthorization()
-            Description(x => x
-                .WithName("CreateProduct")
-                .Produces(StatusCodes.Status201Created)
-                .Produces(StatusCodes.Status400BadRequest));
+            Group<ProductGroup>();
         }
 
         public override async Task HandleAsync(CreateProductRequest req, CancellationToken ct)
@@ -88,6 +87,7 @@ namespace NovaFashion.API.Features.Products
 
             var response = Map.FromEntity(product);
             await Send.CreatedAtAsync("GetProductDetails", new { id = product.Id }, response,cancellation: ct);
+            //await Send.CreatedAsync(response, ct);
         }
     }
 }

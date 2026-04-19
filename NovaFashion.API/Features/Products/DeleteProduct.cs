@@ -10,12 +10,8 @@ namespace NovaFashion.API.Features.Products
         {
             Delete("{id}");
             AllowAnonymous();
-            Group<ProductGroup>();
             //RequireAuthorization()
-            Description(x => x
-                .WithName("DeleteProduct")
-                .Produces<ProductDto>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status400BadRequest));
+            Group<ProductGroup>();
         }
 
         public override async Task HandleAsync(CancellationToken ct)

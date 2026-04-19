@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using NovaFashion.API.Features.Categories;
+using NovaFashion.API.Features.ProductImages;
 using NovaFashion.API.Features.Products;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Infrastructure.Persistence.Interceptors;
@@ -14,11 +16,6 @@ namespace NovaFashion.API
         {
             //Add Controllers & API Behavior
             services.AddControllers();
-
-            //Config Scalar UI with JWT Bearer Token
-            //services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
-            //services.AddAuthorizationBuilder();
-            //services.AddOpenApi("v1", options => { options.AddDocumentTransformer<BearerSecuritySchemeTransformer>(); });
 
             return services;
         }
@@ -51,6 +48,9 @@ namespace NovaFashion.API
             //}, ServiceLifetime.Scoped);
 
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductImageRepository, ProductImageRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            
 
             return services;
         }

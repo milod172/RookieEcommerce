@@ -12,6 +12,8 @@ namespace NovaFashion_API;
 /// STJ serializer context for NovaFashion_API endpoints.
 /// </summary>
 [JsonSerializable(typeof(NovaFashion.API.Features.Categories.CreateCategoryRequest), TypeInfoPropertyName = "TI_CreateCategoryRequest_1F53A338")]
+[JsonSerializable(typeof(NovaFashion.API.Features.Categories.UpdateCategoryRequest), TypeInfoPropertyName = "TI_UpdateCategoryRequest_C69AA8A8")]
+[JsonSerializable(typeof(NovaFashion.API.Features.ProductImages.CreateProductImagesRequest), TypeInfoPropertyName = "TI_CreateProductImagesRequest_E5EECCB9")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Products.CreateProductRequest), TypeInfoPropertyName = "TI_CreateProductRequest_FC354E65")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Products.UpdateProductRequest), TypeInfoPropertyName = "TI_UpdateProductRequest_5B0FC238")]
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationList<NovaFashion.SharedViewModels.CategoryDtos.CategoryDto>), TypeInfoPropertyName = "TI_CategoryDto__420D6AE2")]
@@ -19,6 +21,9 @@ namespace NovaFashion_API;
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationQuery), TypeInfoPropertyName = "TI_PaginationQuery_78DEE636")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.CategoryDtos.CategoryDto), TypeInfoPropertyName = "TI_CategoryDto_BC9C3AB9")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.ProductDtos.ProductDto), TypeInfoPropertyName = "TI_ProductDto_65993031")]
+[JsonSerializable(typeof(NovaFashion.SharedViewModels.ProductImageDtos.ProductImageDto), TypeInfoPropertyName = "TI_ProductImageDto_EC3DE9DD")]
+[JsonSerializable(typeof(System.Collections.Generic.List<IFormFile>), TypeInfoPropertyName = "TI_List_IFormFile__83E64208")]
 [JsonSerializable(typeof(System.Collections.Generic.List<NovaFashion.SharedViewModels.CategoryDtos.CategoryDto>), TypeInfoPropertyName = "TI_CategoryDto__E226E334")]
 [JsonSerializable(typeof(System.Collections.Generic.List<NovaFashion.SharedViewModels.ProductDtos.ProductDto>), TypeInfoPropertyName = "TI_ProductDto__B747A29B")]
+[JsonSerializable(typeof(System.Collections.Generic.List<NovaFashion.SharedViewModels.ProductImageDtos.ProductImageDto>), TypeInfoPropertyName = "TI_ProductImageDto__5C71893B")]
 internal partial class GeneratedSerializerContext : JsonSerializerContext;

@@ -60,7 +60,8 @@ namespace NovaFashion.API.Features.Products
                 CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
                 CategoryName = e.Category != null ? e.Category.CategoryName : string.Empty,
                 Sku = e.Sku,
-                CreatedTime = e.CreatedTime
+                CreatedTime = e.CreatedTime,
+                ModifiedTime = e.ModifiedTime,
             };
         }
     }
@@ -70,13 +71,9 @@ namespace NovaFashion.API.Features.Products
         public override void Configure()
         {
             Put("{id}");
-            Group<ProductGroup>();
             AllowAnonymous();
             //RequireAuthorization()
-            Description(x => x
-                .WithName("UpdateProduct")
-                .Produces<ProductDto>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status400BadRequest));
+            Group<ProductGroup>();
         }
 
         public override async Task HandleAsync(UpdateProductRequest req, CancellationToken ct)

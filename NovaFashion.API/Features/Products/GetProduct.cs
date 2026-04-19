@@ -38,13 +38,10 @@ namespace NovaFashion.API.Features.Products
         public override void Configure()
         {
             Get("");
-            Group<ProductGroup>();
             AllowAnonymous(); 
             //RequireAuthorization()
             Validator<PaginationQueryValidator>();
-            Description(x => x
-                .WithName("GetProducts")
-                .Produces<PaginationList<ProductDto>>(StatusCodes.Status200OK));
+            Group<ProductGroup>();
         }
 
 

@@ -1,56 +1,55 @@
 ﻿using FastEndpoints;
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using NovaFashion.API.Infrastructure.Persistence;
-using NovaFashion.API.Shared.Extensions;
+using NovaFashion.API.Entities;
 using NovaFashion.API.Shared.Pagination;
-using NovaFashion.API.Shared.Validators;
 using NovaFashion.SharedViewModels.CategoryDtos;
 
 namespace NovaFashion.API.Features.Categories
 {
-    public class GetCategory : Endpoint<PaginationQuery, PaginationList<CategoryDto>>
+
+    public class GetCategoryMapper : Mapper<PaginationQuery, PaginationList<CategoryDto>, PaginationList<Category>>
     {
-        private readonly AppDbContext _context;
-        public GetCategory(AppDbContext context)
+        public CategoryDto MapToDto(Category e)
         {
-            _context = context;
+            return new CategoryDto
+            {
+                Id = e.Id,
+                CategoryName = e.CategoryName,
+                Description = e.Description,
+                CreatedTime = e.CreatedTime,
+                ModifiedTime = e.ModifiedTime
+            };
         }
+
+        public override PaginationList<CategoryDto> FromEntity(PaginationList<Category> e)
+        {
+            var dtos = e.Items.Select(MapToDto).ToList();
+
+            return new PaginationList<CategoryDto>(
+                dtos,
+                e.TotalCount,
+                e.PageNumber,
+                e.PageSize
+            );
+        }
+    }
+
+
+    public class GetCategory(ICategoryRepository categoryRepository): Endpoint<PaginationQuery, PaginationList<CategoryDto>, GetCategoryMapper>
+    {
         public override void Configure()
         {
-            Get("");
-            Group<CategoryGroup>();
+            Get("");   
             AllowAnonymous();
-            //RequireAuthorization()
-            Validator<PaginationQueryValidator>();
-            Description(x => x
-                .WithName("GetCategories")
-                .Produces<PaginationList<CategoryDto>>(StatusCodes.Status200OK));
+            Group<CategoryGroup>();
         }
-    
+
         public override async Task HandleAsync(PaginationQuery req, CancellationToken ct)
         {
-            var query = _context.Categories
-            .AsNoTracking()
-            .Select(c => new CategoryDto
-            {
-                Id = c.Id,
-                CategoryName = c.CategoryName,
-                Description = c.Description,
-                ParentCategoryId = c.ParentCategoryId
-            });
+            var result = await categoryRepository.GetPagedCategoriesAsync(req, ct);
+            var dto = Map.FromEntity(result);
 
-            if (!string.IsNullOrEmpty(req.SortBy))
-            {
-                query = query.ApplySorting(req.SortBy);
-            }
-
-            var pageResult = await query.PaginateAsync(
-                req.PageNumber,
-                req.PageSize,
-                ct);
-
-            await Send.OkAsync(pageResult, ct);
+            await Send.OkAsync(dto, ct);
         }
     }
 }

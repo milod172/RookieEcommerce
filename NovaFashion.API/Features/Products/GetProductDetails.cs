@@ -1,7 +1,5 @@
 ﻿using FastEndpoints;
 using NovaFashion.API.Entities;
-using NovaFashion.API.Infrastructure.Persistence;
-using NovaFashion.API.Shared.Pagination;
 using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.Products
@@ -26,18 +24,15 @@ namespace NovaFashion.API.Features.Products
         }
 
     }
-    public class GetProductDetails(IProductRepository productRepository) : EndpointWithoutRequest<ProductDto>
+    public class GetProductDetails(IProductRepository productRepository) : EndpointWithoutRequest<ProductDto, GetProductDetailsMapper>
     {
         
         public override void Configure()
         {
             Get("{id}");
-            Group<ProductGroup>();
             AllowAnonymous();
             //RequireAuthorization()
-            Description(x => x
-                .WithName("GetProductDetails")
-                .Produces<ProductDto>(StatusCodes.Status200OK));
+            Group<ProductGroup>();
         }
 
         public override async Task HandleAsync(CancellationToken ct)
@@ -49,12 +44,7 @@ namespace NovaFashion.API.Features.Products
                 return;
             }
 
-            var productDto = new ProductDto
-            {
-                Id = product.Id,
-                ProductName = product.ProductName,
-                Description = product.Description
-            };
+            var productDto = Map.FromEntity(product); 
 
             await Send.OkAsync(productDto, ct);
         }

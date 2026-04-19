@@ -2,4 +2,5 @@
   <Project Path="NovaFashion.API/NovaFashion.API.csproj" />
   <Project Path="NovaFashion.CustomerSite/NovaFashion.CustomerSite.csproj" />
   <Project Path="NovaFashion.SharedViewModels/NovaFashion.SharedViewModels.csproj" />
+  <Project Path="NovaFashion.Tests/NovaFashion.Tests.csproj" Id="983db699-89e4-4cab-b5b8-e751e3737548" />
 </Solution>

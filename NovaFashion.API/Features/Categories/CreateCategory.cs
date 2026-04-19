@@ -1,65 +1,72 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using NovaFashion.API.Entities;
-using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.CategoryDtos;
 
 namespace NovaFashion.API.Features.Categories
 {
-    public class CreateCategoryRequest
+    public record CreateCategoryRequest
     {
         public string CategoryName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public Guid? ParentCategoryId { get; set; }
     }
+
     public class CreateCategoryValidator : Validator<CreateCategoryRequest>
     {
         public CreateCategoryValidator()
         {
-            RuleFor(x => x.CategoryName).NotEmpty().WithMessage("Category name is required.");
-            RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.");
+            RuleFor(x => x.CategoryName)
+                .NotEmpty().WithMessage("Tên danh mục không được để trống")
+                .MaximumLength(100).WithMessage("Tên danh mục không được vượt quá 100 ký tự");
+
+            RuleFor(x => x.Description)
+                .MaximumLength(255).WithMessage("Mô tả không được vượt quá 255 ký tự");
         }
     }
-    public class CreateCategory : Endpoint<CreateCategoryRequest, CategoryDto>
+
+    public class CreateCategoryMapper : Mapper<CreateCategoryRequest, CategoryDto, Category>
     {
-        private readonly AppDbContext _context;
-        public CreateCategory(AppDbContext context)
+        public override Category ToEntity(CreateCategoryRequest r)
         {
-            _context = context;
+            return new Category
+            {
+                CategoryName = r.CategoryName,
+                Description = r.Description,
+                ParentCategoryId = r.ParentCategoryId
+            };
         }
 
+        public override CategoryDto FromEntity(Category e)
+        {
+            return new CategoryDto
+            {
+                Id = e.Id,
+                CategoryName = e.CategoryName,
+                Description = e.Description,
+                ParentCategoryId = e.ParentCategoryId,
+                CreatedTime = e.CreatedTime
+            };
+        }
+    }
+
+    public class CreateCategory(ICategoryRepository categoryRepository) : Endpoint<CreateCategoryRequest, CategoryDto, CreateCategoryMapper>
+    {
         public override void Configure()
         {
             Post("");
             Group<CategoryGroup>();
-            AllowAnonymous();
-            //RequireAuthorization()
-            Description(x => x
-                .WithName("CreateCategory")
-                .Produces<CategoryDto>(StatusCodes.Status201Created)
-                .Produces(StatusCodes.Status400BadRequest));
         }
 
         public override async Task HandleAsync(CreateCategoryRequest req, CancellationToken ct)
         {
-            var category = new Category
-            {
-                CategoryName = req.CategoryName,
-                Description = req.Description,
-                ParentCategoryId = req.ParentCategoryId
-            };
+            var entity = Map.ToEntity(req);
 
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync(ct);
+            await categoryRepository.AddAsync(entity, ct);
 
-            var categoryDto = new CategoryDto
-            {
-                Id = category.Id,
-                CategoryName = category.CategoryName,
-                Description = category.Description,
-                ParentCategoryId = category.ParentCategoryId
-            };
-            await Send.CreatedAtAsync("", null, categoryDto, cancellation: ct);
+            var response = Map.FromEntity(entity);
+
+            await Send.CreatedAtAsync("", null, response, cancellation: ct);
         }
     }
 }

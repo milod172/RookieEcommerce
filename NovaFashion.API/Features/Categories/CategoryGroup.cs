@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using FastEndpoints.Swagger;
 
 namespace NovaFashion.API.Features.Categories
 {
@@ -9,7 +10,10 @@ namespace NovaFashion.API.Features.Categories
             Configure("categories", ep =>
             {
                 ep.Description(x => x
-                    .WithTags("Category"));
+                    .ProducesProblemDetails(500)
+                    .AutoTagOverride("Category")
+                    .WithGroupName("Category"));
+                ep.AllowAnonymous();
             });
         }
     }
