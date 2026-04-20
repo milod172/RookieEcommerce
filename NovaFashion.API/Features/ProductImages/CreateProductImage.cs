@@ -1,7 +1,9 @@
 ﻿using FastEndpoints;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Services;
 using NovaFashion.SharedViewModels.ProductImageDtos;
@@ -20,23 +22,27 @@ namespace NovaFashion.API.Features.ProductImages
     }
 
     public class CreateProductImagesValidator : Validator<CreateProductImagesRequest>
-    {  
+    {
+        public const string ProductIdRequired = "ProductId không được để trống";
+        public const string AtLeastOneImageRequired = "Vui lòng chọn ít nhất một hình ảnh";
+        public const string AltTextTooLong = "AltText không được vượt quá 200 ký tự";
+        public const string FilesCannotBeNull = "Danh sách file không được để trống";
+
         public CreateProductImagesValidator()
         {
             RuleFor(x => x.ProductId)
                 .NotEmpty()
-                .WithMessage("ProductId không được để trống");
-
+                .WithMessage(ProductIdRequired);
 
             RuleFor(x => x.Files)
-                .Must(f => f != null && f.Count > 0)
-                .WithMessage("Vui lòng chọn ít nhất một hình ảnh");
-                
+                .NotNull().WithMessage(FilesCannotBeNull)
+                .Must(f => f.Count > 0)
+                .WithMessage(AtLeastOneImageRequired);
 
             RuleFor(x => x.AltText)
                 .MaximumLength(200)
-                .WithMessage("AltText không được vượt quá 200 ký tự")
-                .When(x => x.AltText is not null);
+                .WithMessage(AltTextTooLong)
+                .When(x => !string.IsNullOrEmpty(x.AltText));
         }
     }
 
@@ -59,27 +65,22 @@ namespace NovaFashion.API.Features.ProductImages
             };
         }
     }
-    public class CreateProductImages(IProductImageRepository repo,ICloudinaryService cloudinary): Endpoint<CreateProductImagesRequest, List<ProductImageDto>, CreateProductImageMapper>
+    public class CreateProductImages(AppDbContext db, ICloudinaryService cloudinary) : Endpoint<CreateProductImagesRequest, List<ProductImageDto>, CreateProductImageMapper>
     {
+        
         public override void Configure()
         {
-            Post("/{product_id}/upload");
+            Post("products/{product_id}/images");
             AllowFileUploads();
             Group<ProductImageGroup>();
         }
 
-
         public override async Task HandleAsync(CreateProductImagesRequest req, CancellationToken ct)
         {
+            // Get next SortOrder (if no images → start from 0)
+            int nextSortOrder = await GetNextSortOrderAsync(req.ProductId, ct);
+
             var entities = new List<ProductImage>();
-
-            // Check if product has any existing images in the database
-            bool hasAnyImageInProduct = await repo.HasImagesAsync(req.ProductId, ct);
-
-            // if images already exist, take the next SortOrder. If not, start from 0.
-            int nextSortOrder = hasAnyImageInProduct
-                                ? await repo.GetMaxSortOrderAsync(req.ProductId, ct) + 1
-                                : 0;
 
             foreach (var file in req.Files)
             {
@@ -90,18 +91,31 @@ namespace NovaFashion.API.Features.ProductImages
                     ProductId = req.ProductId,
                     ImageUrl = imageUrl,
                     AltText = req.AltText ?? file.FileName,
-                    SortOrder = nextSortOrder,            
-                    IsPrimary = (nextSortOrder == 0) // if SortOrder = 0 then it must be Primary
+                    SortOrder = nextSortOrder,
+                    IsPrimary = (nextSortOrder == 0)
                 };
 
                 entities.Add(entity);
-                nextSortOrder++; 
+                nextSortOrder++;
             }
 
-            await repo.AddRangeAsync(entities, ct);
+            db.ProductImages.AddRange(entities);
+            await db.SaveChangesAsync(ct);
 
-            var listImagesDto = entities.Select(e => Map.FromEntity(e)).ToList();   
+            var listImagesDto = entities.Select(e => Map.FromEntity(e)).ToList();
             await Send.CreatedAsync(listImagesDto, ct);
         }
+
+        
+        #region Get Next SortOrder
+        private async Task<int> GetNextSortOrderAsync(Guid productId, CancellationToken ct)
+        {
+            var maxOrder = await db.ProductImages
+                .Where(x => x.ProductId == productId)
+                .MaxAsync(x => (int?)x.SortOrder, ct);
+
+            return maxOrder ?? -1 + 1;   // If null → return 0
+        }
+        #endregion
     }
 }

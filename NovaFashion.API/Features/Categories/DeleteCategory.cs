@@ -1,30 +1,39 @@
 ﻿using FastEndpoints;
+using Microsoft.EntityFrameworkCore;
+using NJsonSchema.Annotations;
+using NovaFashion.API.Infrastructure.Persistence;
 
 namespace NovaFashion.API.Features.Categories
 {
-    public class DeleteCategory(ICategoryRepository categoryRepository) : EndpointWithoutRequest
+    public class DeleteCategoryRequest
+    {
+        [BindFrom("id")]
+        [JsonSchemaIgnore]
+        public Guid Id { get; set; }
+    }
+    public class DeleteCategory(AppDbContext db) : Endpoint<DeleteCategoryRequest>
     {
         public override void Configure()
         {
             Delete("{id}");
             AllowAnonymous();
-
             Group<CategoryGroup>();
         }
 
-        public override async Task HandleAsync(CancellationToken ct)
+        public override async Task HandleAsync(DeleteCategoryRequest req, CancellationToken ct)
         {
-            var entity = await categoryRepository.FindAsync(Route<Guid>("id"), ct);
+            var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == req.Id, ct);
 
-            if (entity == null)
+            if (category == null)
             {
                 await Send.NotFoundAsync(ct);
                 return;
             }
 
-            await categoryRepository.DeleteAsync(entity, ct);
+            db.Categories.Remove(category);
+            await db.SaveChangesAsync(ct);
 
-            await Send.OkAsync(null, ct);
+            await Send.OkAsync(null, ct);   
         }
     }
 }

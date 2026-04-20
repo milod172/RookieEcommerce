@@ -1,12 +1,18 @@
 ﻿using FastEndpoints;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.CategoryDtos;
 
 namespace NovaFashion.API.Features.Categories
 {
    public record UpdateCategoryRequest
     {
+        [BindFrom("id")]
+        [JsonSchemaIgnore]
+        public Guid Id { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public Guid? ParentCategoryId { get; set; }
@@ -14,14 +20,21 @@ namespace NovaFashion.API.Features.Categories
 
     public class UpdateCategoryValidator : Validator<UpdateCategoryRequest>
     {
+        public const string CategoryNameRequired = "Tên danh mục không được để trống";
+        public const string CategoryNameTooLong = "Tên danh mục không được vượt quá 100 ký tự";
+        public const string DescriptionTooLong = "Mô tả không được vượt quá 255 ký tự";
+
         public UpdateCategoryValidator()
         {
             RuleFor(x => x.CategoryName)
-               .NotEmpty().WithMessage("Tên danh mục không được để trống")
-               .MaximumLength(100).WithMessage("Tên danh mục không được vượt quá 100 ký tự");
+            .NotEmpty()
+            .WithMessage(CategoryNameRequired)
+            .MaximumLength(100)
+            .WithMessage(CategoryNameTooLong);
 
             RuleFor(x => x.Description)
-                .MaximumLength(255).WithMessage("Mô tả không được vượt quá 255 ký tự");
+                .MaximumLength(255)
+                .WithMessage(DescriptionTooLong);
         }
     }
 
@@ -49,7 +62,7 @@ namespace NovaFashion.API.Features.Categories
         }
     }
 
-    public class UpdateCategory(ICategoryRepository categoryRepository) : Endpoint<UpdateCategoryRequest, CategoryDto, UpdateCategoryMapper>
+    public class UpdateCategory(AppDbContext db) : Endpoint<UpdateCategoryRequest, CategoryDto, UpdateCategoryMapper>
     {
         public override void Configure()
         {
@@ -60,21 +73,21 @@ namespace NovaFashion.API.Features.Categories
 
         public override async Task HandleAsync(UpdateCategoryRequest req, CancellationToken ct)
         {
-            var entity = await categoryRepository.FindAsync(Route<Guid>("id"), ct);
+            var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == req.Id, ct);
 
-            if (entity == null)
+            if (category == null)
             {
                 await Send.NotFoundAsync(ct);
                 return;
             }
 
-            Map.UpdateEntity(req, entity);
+            Map.UpdateEntity(req, category);
 
-            await categoryRepository.UpdateAsync(entity, ct);
+            db.Categories.Update(category);
+            await db.SaveChangesAsync(ct);
+            var response = Map.FromEntity(category);
 
-            var dto = Map.FromEntity(entity);
-
-            await Send.OkAsync(dto, ct);
+            await Send.OkAsync(response, ct);
         }
     }
 }

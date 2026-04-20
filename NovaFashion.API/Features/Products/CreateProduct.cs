@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.SharedViewModels.ProductDtos;
 
@@ -18,25 +19,37 @@ namespace NovaFashion.API.Features.Products
 
     public class CreateProductValidator : Validator<CreateProductRequest>
     {
+        public const string ProductNameRequired = "Tên sản phẩm không được để trống";
+        public const string DescriptionRequired = "Mô tả không được để trống";
+        public const string DescriptionTooLong = "Mô tả không được vượt quá 500 ký tự";
+        public const string DetailsTooLong = "Chi tiết sản phẩm không được vượt quá 1000 ký tự";
+        public const string UnitPriceMustBeGreaterThanZero = "Giá phải lớn hơn 0";
+        public const string UnitPriceTooLarge = "Giá quá lớn, vui lòng điều chỉnh lại";
         public CreateProductValidator()
         {
             RuleFor(x => x.ProductName)
-                .NotEmpty().WithMessage("Tên sản phẩm không được để trống");
+            .NotEmpty()
+            .WithMessage(ProductNameRequired);
 
             RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("Mô tả không được để trống")
-                .MaximumLength(500).WithMessage("Mô tả không được vượt quá 500 ký tự");
+                .NotEmpty()
+                .WithMessage(DescriptionRequired)
+                .MaximumLength(500)
+                .WithMessage(DescriptionTooLong);
 
             RuleFor(x => x.Details)
-                .MaximumLength(1000).WithMessage("Chi tiết sản phẩm không được vượt quá 1000 ký tự");
+                .MaximumLength(1000)
+                .WithMessage(DetailsTooLong);
 
             RuleFor(x => x.UnitPrice)
-                .GreaterThan(0).WithMessage("Giá phải lớn hơn 0")
-                .LessThanOrEqualTo(1000000000).WithMessage("Giá quá lớn, vui lòng điều chỉnh lại");
+                .GreaterThan(0)
+                .WithMessage(UnitPriceMustBeGreaterThanZero)
+                .LessThanOrEqualTo(1_000_000_000)
+                .WithMessage(UnitPriceTooLarge);
         }
     }
 
-    public class CreateProductMapper : Mapper<CreateProductRequest, ProductDto, Product>
+    public class CreateProductMapper : Mapper<CreateProductRequest, ProductDetailsDto, Product>
     {
         public override Product ToEntity(CreateProductRequest r)
         {
@@ -51,13 +64,14 @@ namespace NovaFashion.API.Features.Products
             };
         }
 
-        public override ProductDto FromEntity(Product e)
+        public override ProductDetailsDto FromEntity(Product e)
         {
-            return new ProductDto
+            return new ProductDetailsDto
             {
                 Id = e.Id,
                 ProductName = e.ProductName,
                 UnitPrice = e.UnitPrice,
+                Description = e.Description,
                 Details = e.Details,
                 TotalQuantity = e.TotalQuantity,
                 CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
@@ -67,27 +81,25 @@ namespace NovaFashion.API.Features.Products
             };
         }
     }
-    public class CreateProduct(IProductRepository productRepository) : Endpoint<CreateProductRequest, ProductDto, CreateProductMapper>
+    public class CreateProduct(AppDbContext db) : Endpoint<CreateProductRequest, ProductDetailsDto, CreateProductMapper>
     {
         public override void Configure()
         {
             Post("");
             AllowAnonymous();
-            //RequireAuthorization()
             Group<ProductGroup>();
         }
 
         public override async Task HandleAsync(CreateProductRequest req, CancellationToken ct)
         {
-
             var product = Map.ToEntity(req);
             product.Sku = product.GenerateSku();
 
-            await productRepository.AddAsync(product, ct);
+            db.Products.Add(product);
+            await db.SaveChangesAsync(ct);
 
             var response = Map.FromEntity(product);
-            await Send.CreatedAtAsync("GetProductDetails", new { id = product.Id }, response,cancellation: ct);
-            //await Send.CreatedAsync(response, ct);
+            await Send.CreatedAtAsync("GetProductDetails", new { id = product.Id }, response, cancellation: ct);
         }
     }
 }

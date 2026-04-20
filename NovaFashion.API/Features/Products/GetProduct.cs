@@ -1,6 +1,8 @@
 ﻿using FastEndpoints;
-using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Infrastructure.Persistence;
+using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Pagination;
 using NovaFashion.API.Shared.Validators;
 using NovaFashion.SharedViewModels.ProductDtos;
@@ -12,11 +14,11 @@ namespace NovaFashion.API.Features.Products
         public ProductDto MapToDto(Product e)
         {
             return new ProductDto
-            {
+            { 
                 Id = e.Id,
                 ProductName = e.ProductName,
                 Description = e.Description,
-                UnitPrice = e.UnitPrice      
+                UnitPrice = e.UnitPrice,
             };
         }
 
@@ -33,21 +35,29 @@ namespace NovaFashion.API.Features.Products
         }
     }
 
-    public class GetProduct(IProductRepository _productRepository) : Endpoint<PaginationQuery,PaginationList<ProductDto>, GetProductMapper>
+    public class GetProduct(AppDbContext db) : Endpoint<PaginationQuery, PaginationList<ProductDto>, GetProductMapper>
     {
         public override void Configure()
         {
             Get("");
-            AllowAnonymous(); 
-            //RequireAuthorization()
+            AllowAnonymous();
             Validator<PaginationQueryValidator>();
             Group<ProductGroup>();
         }
 
-
         public override async Task HandleAsync(PaginationQuery req, CancellationToken ct)
         {
-            var pageResultEntities = await _productRepository.GetPagedProductsAsync(req, ct);
+            var query = db.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(req.SortBy))
+            {
+                query = query.ApplySorting(req.SortBy);
+            }
+
+            var pageResultEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
             var pageResultDtos = Map.FromEntity(pageResultEntities);
 
             await Send.OkAsync(pageResultDtos, ct);

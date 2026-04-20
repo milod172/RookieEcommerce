@@ -1,14 +1,18 @@
 ﻿using FastEndpoints;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.Products
 {
-    
     public record UpdateProductRequest
     {
+        [BindFrom("id")]
+        [JsonSchemaIgnore]
+        public Guid Id { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal UnitPrice { get; set; } = 0;
@@ -19,22 +23,44 @@ namespace NovaFashion.API.Features.Products
 
     public class UpdateProductValidator : Validator<UpdateProductRequest>
     {
+        public const string ProductNameRequired = "Tên sản phẩm không được để trống";
+        public const string DescriptionRequired = "Mô tả không được để trống";
+        public const string DescriptionTooLong = "Mô tả không được vượt quá 500 ký tự";
+        public const string DetailsTooLong = "Chi tiết sản phẩm không được vượt quá 1000 ký tự";
+        public const string UnitPriceMustBeGreaterThanZero = "Giá phải lớn hơn 0";
+        public const string UnitPriceTooLarge = "Giá quá lớn, vui lòng điều chỉnh lại";
+        public const string TotalQuantityInvalid = "Số lượng tổng phải lớn hơn hoặc bằng 0";
+
         public UpdateProductValidator()
         {
+
             RuleFor(x => x.ProductName)
-                 .NotEmpty().WithMessage("Tên sản phẩm không được để trống");
+            .NotEmpty()
+            .WithMessage(ProductNameRequired);
+
             RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("Mô tả không được để trống")
-                .MaximumLength(500).WithMessage("Mô tả không được vượt quá 500 ký tự");
+                .NotEmpty()
+                .WithMessage(DescriptionRequired)
+                .MaximumLength(500)
+                .WithMessage(DescriptionTooLong);
+
             RuleFor(x => x.Details)
-                .MaximumLength(1000).WithMessage("Chi tiết sản phẩm không được vượt quá 1000 ký tự");
+                .MaximumLength(1000)
+                .WithMessage(DetailsTooLong);
+
             RuleFor(x => x.UnitPrice)
-                .GreaterThan(0).WithMessage("Giá phải lớn hơn 0")
-                .LessThanOrEqualTo(1000000000).WithMessage("Giá quá lớn, vui lòng điều chỉnh lại");
+                .GreaterThan(0)
+                .WithMessage(UnitPriceMustBeGreaterThanZero)
+                .LessThanOrEqualTo(1_000_000_000)          
+                .WithMessage(UnitPriceTooLarge);
+
+            RuleFor(x => x.TotalQuantity)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage(TotalQuantityInvalid);
         }
     }
 
-    public class UpdateProductMapper : Mapper<UpdateProductRequest, ProductDto, Product>
+    public class UpdateProductMapper : Mapper<UpdateProductRequest, ProductDetailsDto, Product>
     {
         public override Product UpdateEntity(UpdateProductRequest r, Product e)
         {
@@ -48,9 +74,9 @@ namespace NovaFashion.API.Features.Products
             return e;
         }
 
-        public override ProductDto FromEntity(Product e)
+        public override ProductDetailsDto FromEntity(Product e)
         {
-            return new ProductDto
+            return new ProductDetailsDto
             {
                 Id = e.Id,
                 ProductName = e.ProductName,
@@ -66,20 +92,21 @@ namespace NovaFashion.API.Features.Products
         }
     }
 
-    public class UpdateProduct(IProductRepository productRepository) : Endpoint<UpdateProductRequest, ProductDto, UpdateProductMapper>
-    { 
+    public class UpdateProduct(AppDbContext db) : Endpoint<UpdateProductRequest, ProductDetailsDto, UpdateProductMapper>
+    {
         public override void Configure()
         {
             Put("{id}");
             AllowAnonymous();
-            //RequireAuthorization()
             Group<ProductGroup>();
         }
 
         public override async Task HandleAsync(UpdateProductRequest req, CancellationToken ct)
         {
-            
-            var product = await productRepository.FindAsync(Route<Guid>("id"), ct);
+            var product = await db.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == req.Id, ct);
+
             if (product == null)
             {
                 await Send.NotFoundAsync(ct);
@@ -87,15 +114,12 @@ namespace NovaFashion.API.Features.Products
             }
 
             Map.UpdateEntity(req, product);
+            db.Products.Update(product);
+            await db.SaveChangesAsync(ct);
 
-           
-            await productRepository.UpdateAsync(product, ct);
-            var updatedProduct = Map.FromEntity(product);
-
-            await Send.OkAsync(updatedProduct, ct);
-
+            await Send.OkAsync(Map.FromEntity(product), ct);
         }
     }
-        
+
 }
 

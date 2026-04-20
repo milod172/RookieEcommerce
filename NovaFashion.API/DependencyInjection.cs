@@ -1,9 +1,6 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using NovaFashion.API.Features.Categories;
-using NovaFashion.API.Features.ProductImages;
-using NovaFashion.API.Features.Products;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Infrastructure.Persistence.Interceptors;
 using NovaFashion.API.Shared.Services;
@@ -46,11 +43,6 @@ namespace NovaFashion.API
             //    options.UseSqlServer(connectionString);
             //    options.AddInterceptors(serviceProvider.GetRequiredService<AuditInterceptor>());
             //}, ServiceLifetime.Scoped);
-
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<IProductImageRepository, ProductImageRepository>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            
 
             return services;
         }

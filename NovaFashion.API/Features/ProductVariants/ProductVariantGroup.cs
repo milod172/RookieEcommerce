@@ -1,18 +1,18 @@
 ﻿using FastEndpoints;
 using FastEndpoints.Swagger;
 
-namespace NovaFashion.API.Features.ProductImages
+namespace NovaFashion.API.Features.ProductVariants
 {
-    public class ProductImageGroup : Group
+    public class ProductVariantGroup : Group
     {
-        public ProductImageGroup()
+        public ProductVariantGroup()
         {
             Configure("", ep =>
             {
                 ep.Description(x => x
                     .ProducesProblemDetails(500)
-                    .AutoTagOverride("Product Image")
-                    .WithGroupName("Product Image"));
+                    .AutoTagOverride("Product Variant")
+                    .WithGroupName("Product Variant"));
                 ep.AllowAnonymous();
             });
         }

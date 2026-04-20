@@ -31,5 +31,21 @@ namespace NovaFashion.API.Shared.Services
 
             return result.SecureUrl.ToString();
         }
+
+        public async Task DeleteImageAsync(string imageUrl)
+        {
+            // Extract publicId từ Cloudinary URL
+            // URL dạng: https://res.cloudinary.com/{cloud}/image/upload/v123456/{publicId}.jpg
+            var uri = new Uri(imageUrl);
+            var segments = uri.AbsolutePath.Split('/');
+
+            // Lấy phần sau "upload/" bỏ version (v123456) và extension
+            var uploadIndex = Array.IndexOf(segments, "upload");
+            var publicIdWithExtension = string.Join("/", segments[(uploadIndex + 2)..]);
+            var publicId = Path.ChangeExtension(publicIdWithExtension, null); 
+
+            var deleteParams = new DeletionParams(publicId);
+            await _cloudinary.DestroyAsync(deleteParams);
+        }
     }
 }

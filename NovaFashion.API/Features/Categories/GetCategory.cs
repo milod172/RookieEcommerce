@@ -1,6 +1,9 @@
 ﻿using FastEndpoints;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Infrastructure.Persistence;
+using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Pagination;
 using NovaFashion.SharedViewModels.CategoryDtos;
 
@@ -16,6 +19,7 @@ namespace NovaFashion.API.Features.Categories
                 Id = e.Id,
                 CategoryName = e.CategoryName,
                 Description = e.Description,
+                ParentCategoryId = e.ParentCategoryId,
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime
             };
@@ -34,22 +38,33 @@ namespace NovaFashion.API.Features.Categories
         }
     }
 
-
-    public class GetCategory(ICategoryRepository categoryRepository): Endpoint<PaginationQuery, PaginationList<CategoryDto>, GetCategoryMapper>
+    public class GetCategory(AppDbContext db) : Endpoint<PaginationQuery, PaginationList<CategoryDto>, GetCategoryMapper>
     {
+       
         public override void Configure()
         {
-            Get("");   
+            Get("");
             AllowAnonymous();
             Group<CategoryGroup>();
         }
 
         public override async Task HandleAsync(PaginationQuery req, CancellationToken ct)
         {
-            var result = await categoryRepository.GetPagedCategoriesAsync(req, ct);
-            var dto = Map.FromEntity(result);
+            var query = db.Categories
+                           .AsNoTracking()
+                           .AsQueryable();
 
-            await Send.OkAsync(dto, ct);
+           
+            if (!string.IsNullOrEmpty(req.SortBy))
+            {
+                query = query.ApplySorting(req.SortBy);
+            }
+            
+            var pagedEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
+
+            var response = Map.FromEntity(pagedEntities);
+
+            await Send.OkAsync(response, ct);
         }
     }
 }

@@ -1,45 +1,38 @@
-﻿using System.Globalization;
-using System.Text;
+﻿
 using NovaFashion.API.Entities;
 
 namespace NovaFashion.API.Shared.Extensions
 {
     public static class SkuGeneratorExtension
     {
+        // Áo thun nam --> AO-TH-NA
         public static string GenerateSku(this Product product)
         {
             var nameParts = product.ProductName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             var skuParts = nameParts.Select(part =>
-            {
-                var noDiacritics = RemoveDiacritics(part);
-
-
-                if (!noDiacritics.Any(char.IsLetter))
-                    return noDiacritics;
-
-                return noDiacritics.ToUpperInvariant();
-            });
+                (part.Length >= 2 ? part[..2] : part).ToUpperInvariant()
+            );
 
             var generatedSku = string.Join("-", skuParts);
+            
             return generatedSku;
         }
 
-        private static string RemoveDiacritics(string text)
+        public static string GenerateVariantSku(this ProductVariant variant)
         {
-            var normalized = text.Normalize(NormalizationForm.FormD);
-            var sb = new StringBuilder();
+            var productName = variant.Product?.ProductName ?? "SP";
+           
+            var nameParts = productName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var prefixParts = nameParts.Select(part =>
+                (part.Length >= 2 ? part[..2] : part).ToUpperInvariant()
+            );
+            var prefix = string.Join("-", prefixParts);
 
-            foreach (var c in normalized)
-            {
-                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
-                {
-                    sb.Append(c);
-                }
-            }
+            // Size from enum
+            var sizePart = variant.Size.ToString().ToUpperInvariant();
 
-            return sb.ToString().Normalize(NormalizationForm.FormC);
+            return $"{prefix}-{sizePart}";
         }
     }
 }

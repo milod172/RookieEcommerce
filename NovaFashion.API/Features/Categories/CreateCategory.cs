@@ -1,6 +1,8 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Infrastructure.Persistence;
+using NovaFashion.API.Shared.Extensions;
 using NovaFashion.SharedViewModels.CategoryDtos;
 
 namespace NovaFashion.API.Features.Categories
@@ -50,7 +52,7 @@ namespace NovaFashion.API.Features.Categories
         }
     }
 
-    public class CreateCategory(ICategoryRepository categoryRepository) : Endpoint<CreateCategoryRequest, CategoryDto, CreateCategoryMapper>
+    public class CreateCategory(AppDbContext db) : Endpoint<CreateCategoryRequest, CategoryDto, CreateCategoryMapper>
     {
         public override void Configure()
         {
@@ -62,11 +64,12 @@ namespace NovaFashion.API.Features.Categories
         {
             var entity = Map.ToEntity(req);
 
-            await categoryRepository.AddAsync(entity, ct);
+            db.Categories.Add(entity);                    
+            await db.SaveChangesAsync(ct);
 
             var response = Map.FromEntity(entity);
 
-            await Send.CreatedAtAsync("", null, response, cancellation: ct);
+            await Send.CreatedAsync(response, ct);
         }
     }
 }
