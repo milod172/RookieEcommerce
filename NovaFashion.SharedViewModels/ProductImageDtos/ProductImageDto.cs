@@ -8,5 +8,6 @@
         public int SortOrder { get; set; }
         public bool IsPrimary { get; set; }
         public Guid ProductId { get; set; }
+
     }
 }

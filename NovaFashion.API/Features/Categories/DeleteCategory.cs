@@ -26,8 +26,7 @@ namespace NovaFashion.API.Features.Categories
 
             if (category == null)
             {
-                await Send.NotFoundAsync(ct);
-                return;
+                ThrowError("Không tìm thấy danh mục", statusCode: 404);
             }
 
             db.Categories.Remove(category);

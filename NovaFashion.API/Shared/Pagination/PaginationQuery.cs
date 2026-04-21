@@ -8,12 +8,12 @@ namespace NovaFashion.API.Shared.Pagination
     {
         [QueryParam]
         [DefaultValue(1)]
-        public int PageNumber { get; set; }
+        public int PageNumber { get; set; } = 1;
         [QueryParam]
         [DefaultValue(5)]
-        public int PageSize { get; set; }
+        public int PageSize { get; set; } = 5;
         [QueryParam]
         [DefaultValue("Id desc")]
-        public string? SortBy { get; set; }
+        public string? SortBy { get; set; } = "Id desc";
     }
 }

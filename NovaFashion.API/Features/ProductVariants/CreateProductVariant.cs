@@ -65,6 +65,7 @@ namespace NovaFashion.API.Features.ProductVariants
             {
                 Id = e.Id,
                 ProductId = e.ProductId,
+                ProductName = e.Product.ProductName,
                 Size = e.Size.ToString(),
                 VariantSku = e.VariantSku,
                 StockQuantity = e.StockQuantity,
@@ -90,6 +91,7 @@ namespace NovaFashion.API.Features.ProductVariants
 
             if (product == null)
             {
+                AddError("Không tìm thấy sản phẩm");
                 await Send.NotFoundAsync(ct);
                 return;
             }
@@ -107,13 +109,15 @@ namespace NovaFashion.API.Features.ProductVariants
                 AddError(
                     x => x.StockQuantity,
                     $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
-                    $"vượt quá số lượng sản phẩm ({product.TotalQuantity})"
+                    $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})"
                 );
                 await Send.ErrorsAsync(400, ct);
                 return;
             }
 
             var variant = Map.ToEntity(req);
+            variant.VariantSku = variant.GenerateVariantSku(product.ProductName, product.Id);
+
             db.ProductVariants.Add(variant);
             await db.SaveChangesAsync(ct);
             var response = Map.FromEntity(variant);

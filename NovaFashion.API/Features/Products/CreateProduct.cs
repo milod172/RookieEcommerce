@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
@@ -75,7 +76,6 @@ namespace NovaFashion.API.Features.Products
                 Details = e.Details,
                 TotalQuantity = e.TotalQuantity,
                 CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
-                CategoryName = e.Category != null ? e.Category.CategoryName : string.Empty,
                 Sku = e.Sku,
                 CreatedTime = e.CreatedTime
             };

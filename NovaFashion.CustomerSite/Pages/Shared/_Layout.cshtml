@@ -8,44 +8,86 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NovaFashion.CustomerSite.styles.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Manrope%3A200%2C300%2Cregular%2C500%2C600%2C700%2C800%26subset%3Dlatin%2Clatin-ext&amp;display=swap">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">NovaFashion.CustomerSite</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
+    
+    <header class="container-fluid mx-0 px-0 border-bottom border-opacity-10 border-dark">
+        <div class="row align-items-center py-md-3 py-3">
+            <!-- Navigation Mobile -->
+            <div class="col-2 d-md-none d-block">
+                <nav class="dropdown ">
+                    <a class="d-flex justify-content-center align-items-center text-decoration-none" href="#"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-bars" style="color: rgb(30, 48, 80); font-size: 1.5rem;"></i>
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
                     </ul>
-                </div>
+                </nav>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - NovaFashion.CustomerSite - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            <!-- HEADER-LOGO -->
+            <div class="col-md-4 col-7 d-md-block d-flex justify-content-center ps-5">
+                <img src="https://res.cloudinary.com/novafashion/image/upload/w_162,h_20,c_fill/v1776763238/novafashion_logo_uoa7wz.png" alt="Logo">
+            </div>
+
+            <!-- HEADER-NAV -->
+            <div class="col-md-4 d-md-block d-none">
+                <nav class="d-md-flex justify-content-center gap-5 header_nav">
+                    <a href="" class="header_nav-link">TRANG CHỦ</a>
+                    <a href="" class="header_nav-link">MUA SẮM</a>
+                    <a href="" class="header_nav-link">LIÊN HỆ</a>
+                </nav>
+            </div>
+
+            <!-- HEADER-ACTION -->
+            <div class="col-md-4 col-3 pe-md-5 d-flex justify-content-end">
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item d-none d-md-block border-0">
+                        <a href="#" title="Account">
+                            <i class="fa-regular fa-user text-black"></i>
+                        </a>
+                    </li>
+                    <li class="list-group-item d-none d-md-block border-0">
+                        <a href="#" title="Search">
+                            <i class="fa-brands fa-sistrix text-black"></i>
+                        </a>
+                    </li>
+                    <li class="list-group-item d-none d-md-block border-0">
+                        <a href="#" title="Wishlist">
+                            <i class="fa-regular fa-heart text-black"></i>
+                        </a>
+                    </li>
+                    <li class="list-group-item border-0 d-md-block">
+                        <a href="#" class="cart-icon" title="Shopping Cart">
+                            <i class="fa-solid fa-bag-shopping text-black"></i>
+                            <!-- <span class="cart-count">0</span> -->
+                        </a>
+                    </li>
+                </ul>
+
+
+            </div>
         </div>
-    </footer>
 
+        <hr class="my-0 border-1 border-black">
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    
+
+    <script src="https://kit.fontawesome.com/22c7ec7d54.js" crossorigin="anonymous"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/site.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

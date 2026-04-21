@@ -51,7 +51,7 @@ namespace NovaFashion.API.Features.Products
 
             if (product == null)
             {
-                await Send.NotFoundAsync(ct);
+                ThrowError("Không tìm thấy sản phẩm", statusCode: 404);
                 return;
             }
 

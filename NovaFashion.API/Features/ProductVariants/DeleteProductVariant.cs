@@ -27,19 +27,23 @@ namespace NovaFashion.API.Features.ProductVariants
 
         public override async Task HandleAsync(DeleteProductVariantRequest req, CancellationToken ct)
         {
+            var productExists = await db.Products.AnyAsync(p => p.Id == req.ProductId, ct);
+            if (!productExists) {
+                ThrowError("Không tìm thấy sản phẩm", statusCode: 404);
+            }
+
             var variant = await db.ProductVariants
                 .FirstOrDefaultAsync(v => v.Id == req.VariantId && v.ProductId == req.ProductId, ct);
 
             if (variant is null)
             {
-                await Send.NotFoundAsync(ct);
-                return;
+                ThrowError("Không tìm thấy biến thể bên trong sản phẩm", statusCode: 404);
             }
 
             db.ProductVariants.Remove(variant);
             await db.SaveChangesAsync(ct);
 
-            await Send.OkAsync(null, ct);
+            await Send.OkAsync("Xóa biến thể sản phẩm thành công", ct);
         }
     }
 }

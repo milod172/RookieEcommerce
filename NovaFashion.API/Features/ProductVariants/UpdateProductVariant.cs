@@ -64,8 +64,10 @@ namespace NovaFashion.API.Features.ProductVariants
             {
                 Id = e.Id,
                 ProductId = e.ProductId,
+                ProductName = e.Product.ProductName,
                 Size = e.Size.ToString(),
                 StockQuantity = e.StockQuantity,
+                VariantSku = e.VariantSku,
                 UnitPrice = e.UnitPrice,
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime
@@ -83,20 +85,25 @@ namespace NovaFashion.API.Features.ProductVariants
 
         public override async Task HandleAsync(UpdateProductVariantRequest req, CancellationToken ct)
         {
+            var product = await db.Products
+              .AsNoTracking()
+              .FirstOrDefaultAsync(p => p.Id == req.ProductId, ct);
+
+            if (product is null)
+            {
+                ThrowError("Không tìm thấy sản phẩm", statusCode: 404);
+            }
+
             var variant = await db.ProductVariants
                 .FirstOrDefaultAsync(v => v.Id == req.VariantId && v.ProductId == req.ProductId, ct);
 
             if (variant is null)
             {
-                await Send.NotFoundAsync(ct);
-                return;
+                ThrowError("Không tìm thấy biến thể bên trong sản phẩm", statusCode: 404);
             }
 
-            var product = await db.Products
-           .AsNoTracking()
-           .FirstOrDefaultAsync(p => p.Id == req.ProductId, ct);
 
-            // Sum all OTHER variants (exclude the one being updated)
+            // Sum all other variants (exclude the one being updated)
             var otherVariantsTotal = await db.ProductVariants
                 .Where(v => v.ProductId == req.ProductId && v.Id != variant.Id)
                 .SumAsync(v => (int?)v.StockQuantity, ct) ?? 0;
@@ -109,7 +116,7 @@ namespace NovaFashion.API.Features.ProductVariants
                 AddError(
                     x => x.StockQuantity,
                     $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
-                    $"vượt quá số lượng sản phẩm ({product.TotalQuantity})"
+                    $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})"
                 );
                 await Send.ErrorsAsync(400, ct);
                 return;

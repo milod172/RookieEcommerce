@@ -1,31 +1,148 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
+html,
+body {
     font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    font-family: 'Manrope', sans-serif;
 }
 
 body {
-  margin-bottom: 60px;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.header_nav-link {
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: black !important;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.header_nav-link:hover {
+    color: rgb(105, 104, 104) !important;
+}
+
+.carousel-content {
+    padding: 5.625rem 4.375rem;
+
+    & h1 {
+        font-size: 4rem;
+    }
+
+    & p {
+        font-size: 0.8125rem;
+        line-height: 1.4rem;
+    }
+
+    & button {
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 0;
+        padding: 1.125rem 3.2rem;
+    }
+
+        & button:hover {
+            background-color: orangered;
+        }
+}
+
+.product-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.product-categories {
+    text-align: center;
+
+    & a {
+        text-decoration: none;
+        color: rgb(105, 104, 104);
+        font-weight: 700;
+        font-size: 0.875rem;
+
+        &:hover {
+            color: black;
+        }
+    }
+}
+
+.product-image {
+    position: relative;
+
+    & img {
+        transition: opacity 0.3s ease-out;
+    }
+}
+
+.image-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    /*Ẩn*/
+}
+
+.product-image:hover .image-hover {
+    opacity: 1;
+}
+
+.product-image:hover .image-default {
+    opacity: 0;
+}
+
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 0rem;
+}
+
+.card-description {
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-price {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+footer {
+    color: white;
+    padding: 4.0625rem 4.375rem;
+    background-color: #070707;
+}
+
+.footer-subcription {
+    padding-right: 3.125rem !important;
+
+    & h2 {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        word-spacing: 0.15rem;
+    }
+
+    & div:nth-child(2) input {
+        margin-bottom: 0.8rem;
+        background-color: #070707;
+        padding: 0.625rem 0.9375rem;
+        border: solid 1px #FFFFFF40;
+        font-size: 0.9rem;
+    }
+
+    & div:nth-child(3) input {
+        padding: 0.6rem 1.6rem;
+        background-color: #FFFFFF40;
+        color: white;
+        border: 0;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+}
+
+.footer-nav {
+    font-size: 0.8rem;
+    font-weight: 600;
+    word-spacing: 0.15rem;
 }

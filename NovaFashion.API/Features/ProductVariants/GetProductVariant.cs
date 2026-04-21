@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
-using NovaFashion.API.Features.Products;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Pagination;
@@ -10,7 +9,13 @@ using NovaFashion.SharedViewModels.ProductVariantDtos;
 
 namespace NovaFashion.API.Features.ProductVariants
 {
-    public class GetProductVariantMapper : Mapper<PaginationQuery, PaginationList<ProductVariantDto>, PaginationList<ProductVariant>>
+    public class GetVariantsPaginationQuery : PaginationQuery
+    {
+        [BindFrom("product_id")]
+        public Guid ProductId { get; set; } = Guid.Empty;
+    }
+
+    public class GetProductVariantMapper : Mapper<GetVariantsPaginationQuery, PaginationList<ProductVariantDto>, PaginationList<ProductVariant>>
     {
         public ProductVariantDto MapToDto(ProductVariant e)
         {
@@ -23,7 +28,7 @@ namespace NovaFashion.API.Features.ProductVariants
                 StockQuantity = e.StockQuantity,
                 VariantSku = e.VariantSku,  
                 CreatedTime = e.CreatedTime,
-                ModifiedTime = e.ModifiedTime ?? e.CreatedTime,
+                ModifiedTime = e.ModifiedTime,
                 UnitPrice = e.UnitPrice,
             };
         }
@@ -41,7 +46,7 @@ namespace NovaFashion.API.Features.ProductVariants
         }
     }
 
-    public class GetProductVariants(AppDbContext db) : Endpoint<PaginationQuery, PaginationList<ProductVariantDto>, GetProductVariantMapper>
+    public class GetProductVariants(AppDbContext db) : Endpoint<GetVariantsPaginationQuery, PaginationList<ProductVariantDto>, GetProductVariantMapper>
     {
         
         public override void Configure()
@@ -52,13 +57,19 @@ namespace NovaFashion.API.Features.ProductVariants
             Group<ProductVariantGroup>();
         }
 
-        public override async Task HandleAsync(PaginationQuery req, CancellationToken ct)
+        public override async Task HandleAsync(GetVariantsPaginationQuery req, CancellationToken ct)
         {
-            var productId = Route<Guid>("product_id");
+            var product = await db.Products.AnyAsync(p => p.Id == req.ProductId, ct);
+
+            if (!product)
+            {
+                 ThrowError("Không tìm thấy sản phẩm", statusCode: 404);
+            }
 
             var query = db.ProductVariants
+                .Include(v => v.Product)
                 .AsNoTracking()
-                .Where(v => v.ProductId == productId)
+                .Where(v => v.ProductId == req.ProductId)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(req.SortBy))

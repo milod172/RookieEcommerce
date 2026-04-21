@@ -4,7 +4,7 @@ namespace NovaFashion.API.Entities
 {
     public class Product : IHasKey<Guid>, IHasAudit
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string ProductName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal? UnitPrice { get; set; }

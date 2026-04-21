@@ -4,7 +4,58 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+    <!-- Carousel -->
+    <section class="border-1 border-bottom border-black mb-md-5">
+        <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+            </div>
+
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleInterval" data-bs-slide-to="0" class="active"
+                        aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleInterval" data-bs-slide-to="1"
+                        aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleInterval" data-bs-slide-to="2"
+                        aria-label="Slide 3"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Items -->
+    <h2 class="text-center mb-md-3 product-title">SẢN PHẨM MỚI HÔM NAY</h2>
+
+    <section class="container-fluid">
+        <div class="product-categories d-flex justify-content-center gap-5 mb-md-4">
+            <div class="pb-md-1 border-bottom border-black border-2">
+                <a href="" class="">NAM</a>
+            </div>
+            <div>
+                <a href="">NỮ</a>
+            </div>
+        </div>
+
+        <div id="product-items" class="row row-cols-5">
+            @foreach (var item in Model.Products.Items)
+            {
+                <article class="card col px-0">
+                    <div class="product-image">
+                        <img src="@item.Images.ElementAtOrDefault(0)?.ImageUrl" 
+                             class="card-img-top image-default" 
+                             alt="@item.Images.ElementAtOrDefault(0)?.AltText">
+                        <img src="@item.Images.ElementAtOrDefault(1)?.ImageUrl" 
+                             class="card-img-top image-hover" 
+                             alt="@item.Images.ElementAtOrDefault(1)?.AltText">
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title">@item.ProductName</h5>
+                        <p class="card-description">@item.Description</p>
+                    <span class="card-price">@item.UnitPrice?.ToString("N0") đ</span>
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+
+

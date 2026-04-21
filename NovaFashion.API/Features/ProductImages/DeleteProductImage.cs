@@ -50,8 +50,7 @@ namespace NovaFashion.API.Features.ProductImages
 
             if (imageUrl is null)
             {
-                await Send.NotFoundAsync(ct);
-                return;
+                ThrowError("Không tìm thấy hình ảnh", statusCode: 404);
             }
 
             // Delete from Cloudinary

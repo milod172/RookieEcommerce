@@ -3,6 +3,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+builder.Services.AddHttpClient("NovaFashion.API", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5289/"); 
+});
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

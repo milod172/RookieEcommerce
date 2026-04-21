@@ -1,38 +1,52 @@
 ﻿
+using System.Globalization;
+using System.Text;
 using NovaFashion.API.Entities;
 
 namespace NovaFashion.API.Shared.Extensions
 {
     public static class SkuGeneratorExtension
     {
-        // Áo thun nam --> AO-TH-NA
+        // BANANA REPUBLIC Jean --> BRJ - 6 chars from guid
         public static string GenerateSku(this Product product)
         {
             var nameParts = product.ProductName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            var skuParts = nameParts.Select(part =>
-                (part.Length >= 2 ? part[..2] : part).ToUpperInvariant()
+            var prefix = string.Concat(
+                nameParts.Select(part => RemoveDiacritics(part)[..1].ToUpperInvariant())
             );
 
-            var generatedSku = string.Join("-", skuParts);
-            
-            return generatedSku;
+            var guidPart = product.Id.ToString("N")[..6].ToUpperInvariant();
+
+            return $"{prefix}-{guidPart}";
         }
 
-        public static string GenerateVariantSku(this ProductVariant variant)
+        public static string GenerateVariantSku(this ProductVariant variant, string productName, Guid productId)
         {
-            var productName = variant.Product?.ProductName ?? "SP";
-           
             var nameParts = productName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var prefixParts = nameParts.Select(part =>
-                (part.Length >= 2 ? part[..2] : part).ToUpperInvariant()
-            );
-            var prefix = string.Join("-", prefixParts);
 
-            // Size from enum
+            var prefix = string.Concat(
+                nameParts.Select(part => RemoveDiacritics(part)[..1].ToUpperInvariant())
+            );
+
+            var guidPart = productId.ToString("N")[..6].ToUpperInvariant();
             var sizePart = variant.Size.ToString().ToUpperInvariant();
 
-            return $"{prefix}-{sizePart}";
+            return $"{prefix}-{guidPart}-{sizePart}";
+        }
+
+        private static string RemoveDiacritics(string text)
+        {
+            var normalized = text.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder();
+
+            foreach (var c in normalized)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                    sb.Append(c);
+            }
+
+            return sb.ToString().Normalize(NormalizationForm.FormC);
         }
     }
 }

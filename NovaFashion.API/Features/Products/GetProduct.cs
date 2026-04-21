@@ -6,6 +6,7 @@ using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Pagination;
 using NovaFashion.API.Shared.Validators;
 using NovaFashion.SharedViewModels.ProductDtos;
+using NovaFashion.SharedViewModels.ProductImageDtos;
 
 namespace NovaFashion.API.Features.Products
 {
@@ -19,6 +20,16 @@ namespace NovaFashion.API.Features.Products
                 ProductName = e.ProductName,
                 Description = e.Description,
                 UnitPrice = e.UnitPrice,
+                Images = e.ProductImages
+                    .OrderBy(pi => pi.SortOrder)
+                    .Select(pi => new ProductImageInProductDto
+                    {
+                        ImageUrl = pi.ImageUrl,
+                        AltText  = pi.AltText ?? string.Empty,
+                        SortOrder = pi.SortOrder,
+                        IsPrimary = pi.IsPrimary
+                    })
+                    .ToList()
             };
         }
 
@@ -50,6 +61,7 @@ namespace NovaFashion.API.Features.Products
             var query = db.Products
                 .AsNoTracking()
                 .Include(p => p.Category)
+                .Include(p => p.ProductImages)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(req.SortBy))
