@@ -1,35 +1,22 @@
 using System.Text;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using NovaFashion.CustomerSite.Services;
 using NovaFashion.SharedViewModels;
 using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.CustomerSite.Pages
 {
-    public class IndexModel : PageModel
+    public class IndexModel(ProductApiClient productApi) : PageModel
     {
-        private readonly HttpClient _httpClient;
-
         public PaginationResponseDto<ProductDto> Products { get; set; } = new();
 
-        public IndexModel(IHttpClientFactory httpClientFactory)
+        public async Task OnGetAsync(int? pageNumber, int? pageSize, string? sortBy)
         {
-            _httpClient = httpClientFactory.CreateClient("NovaFashion.API");
-        }
-
-        public async Task OnGetAsync(int? pageNumber, string? sortBy)
-        {
-            var query = new StringBuilder("api/products?")
-                .Append($"PageNumber={pageNumber ?? 1}&")
-                .Append($"PageSize=5&")
-                .Append($"SortBy={Uri.EscapeDataString(sortBy ?? "Id desc")}");
-
-            var response = await _httpClient.GetFromJsonAsync<PaginationResponseDto<ProductDto>>(
-                query.ToString()
+            Products = await productApi.GetProductsAsync(
+                pageNumber ?? 1,
+                pageSize ?? 5,
+                sortBy ?? "Id desc"
             );
-
-            if (response is not null)
-                Products = response;
         }
     }
 }

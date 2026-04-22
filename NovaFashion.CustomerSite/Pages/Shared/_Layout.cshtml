@@ -33,13 +33,13 @@
 
             <!-- HEADER-LOGO -->
             <div class="col-md-4 col-7 d-md-block d-flex justify-content-center ps-5">
-                <img src="https://res.cloudinary.com/novafashion/image/upload/w_162,h_20,c_fill/v1776763238/novafashion_logo_uoa7wz.png" alt="Logo">
+                <a asp-page="/Index"> <img src="https://res.cloudinary.com/novafashion/image/upload/w_162,h_20,c_fill/v1776763238/novafashion_logo_uoa7wz.png" alt="Logo"></a>
             </div>
 
             <!-- HEADER-NAV -->
             <div class="col-md-4 d-md-block d-none">
                 <nav class="d-md-flex justify-content-center gap-5 header_nav">
-                    <a href="" class="header_nav-link">TRANG CHỦ</a>
+                    <a asp-page="/Index" class="header_nav-link">TRANG CHỦ</a>
                     <a href="" class="header_nav-link">MUA SẮM</a>
                     <a href="" class="header_nav-link">LIÊN HỆ</a>
                 </nav>
@@ -82,7 +82,64 @@
         @RenderBody()
     </main>
 
-    
+    <footer class="mt-3">
+        <div class="row">
+            <div class="col-12 col-md-4 px-0 footer-subcription">
+                <div class="d-flex flex-column">
+                    <div>
+                        <h2 class="">
+                            Sign up to get 10% off your first order and stay up to date on
+                            the latest product releases, special offers and news
+                        </h2>
+                    </div>
+                    <div>
+                        <input class="" size="40" maxlength="400" placeholder="Your Email *" name="your_email"
+                               value="" />
+                    </div>
+                    <div>
+                        <input class="" type="submit" name="name" value="SUBSCRIBE" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 px-md-0 footer-nav">
+                <ul class="list-unstyled">
+                    <li class="pb-md-1">SHOP</li>
+                    <li class="pb-md-1">FAQ</li>
+                    <li class="pb-md-1">SHIPPING</li>
+                    <li class="pb-md-1">RETURNS</li>
+                    <li class="pb-md-1">TERM & CONDITIONS</li>
+                    <li class="">PRIVACY POLICY</li>
+                </ul>
+            </div>
+            <div class="col-12 col-md-4 footer-contact-info">
+                <div class="d-flex flex-column">
+                    <div>
+                        <h2 class="">
+                            If you have any questions regarding your order, products or our service, please
+                            contact our customer service.
+                        </h2>
+                    </div>
+                    <div class="">
+                        <span>EVERYDAY: 6:00 AM - 22:00 PM</span>
+                    </div>
+                    <div class="">
+                        <span class="label">PHONE:</span>
+                        <span class="value">+84 932-100-437</span>
+                    </div>
+
+                    <div class="">
+                        <span class="label">EMAIL:</span>
+                        <span class="value">NOVAFASHION@OFFICIAL.COM</span>
+                    </div>
+
+                    <div class="">
+                        <span class="label">ADDRESS:</span>
+                        <span class="value">364 Cong Hoa Street, Tan Binh District, Ho Chi Minh City</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="https://kit.fontawesome.com/22c7ec7d54.js" crossorigin="anonymous"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

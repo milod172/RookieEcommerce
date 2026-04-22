@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
 using NovaFashion.API.Entities.Enum;
-using NovaFashion.API.Features.Products;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.SharedViewModels.ProductVariantDtos;
@@ -65,7 +64,7 @@ namespace NovaFashion.API.Features.ProductVariants
             {
                 Id = e.Id,
                 ProductId = e.ProductId,
-                ProductName = e.Product.ProductName,
+                ProductName = e.Product?.ProductName ?? string.Empty,   
                 Size = e.Size.ToString(),
                 VariantSku = e.VariantSku,
                 StockQuantity = e.StockQuantity,
@@ -86,7 +85,6 @@ namespace NovaFashion.API.Features.ProductVariants
         public override async Task HandleAsync(CreateProductVariantRequest req, CancellationToken ct)
         {
             var product = await db.Products
-            .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == req.ProductId, ct);
 
             if (product == null)
@@ -120,8 +118,9 @@ namespace NovaFashion.API.Features.ProductVariants
 
             db.ProductVariants.Add(variant);
             await db.SaveChangesAsync(ct);
-            var response = Map.FromEntity(variant);
 
+            var response = Map.FromEntity(variant);
+           
             await Send.CreatedAsync(response, ct);
         }
     }

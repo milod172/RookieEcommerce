@@ -114,7 +114,7 @@ namespace NovaFashion.API.Features.ProductImages
                 .Where(x => x.ProductId == productId)
                 .MaxAsync(x => (int?)x.SortOrder, ct);
 
-            return maxOrder ?? -1 + 1;   // If null → return 0
+            return maxOrder.HasValue ? maxOrder.Value + 1 : 0;
         }
         #endregion
     }

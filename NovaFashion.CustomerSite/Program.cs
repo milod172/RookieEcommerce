@@ -1,12 +1,13 @@
+using NovaFashion.CustomerSite;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-builder.Services.AddHttpClient("NovaFashion.API", client =>
-{
-    client.BaseAddress = new Uri("http://localhost:5289/"); 
-});
+//Register API clients 
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]!;
+builder.Services.AddApiClients(apiBaseUrl);
 
 
 

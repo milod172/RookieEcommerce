@@ -65,6 +65,13 @@ body {
     }
 }
 
+#product-items {
+    & a {
+        text-decoration: none;
+        color: black;
+    }
+}
+
 .product-image {
     position: relative;
 
@@ -146,3 +153,116 @@ footer {
     font-weight: 600;
     word-spacing: 0.15rem;
 }
+
+.footer-contact-info {
+    word-spacing: 0.15rem;
+    font-weight: 600;
+
+    & h2 {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        color: #646464;
+    }
+
+    & span {
+        font-size: 0.8rem;
+
+        &.label {
+            color: #646464;
+        }
+    }
+}
+
+/* Product Details */
+.product-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.product-brand {
+    font-size: 2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.product-name {
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.size-label {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.size-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+    .size-item:hover {
+        border-color: #000;
+    }
+
+.btn-add-cart {
+    background-color: #000;
+    color: #fff;
+    border-radius: 0;
+    padding: 12px;
+    width: 100%;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.btn-wishlist {
+    background-color: transparent;
+    border: 1px solid #000;
+    border-radius: 0;
+    padding: 12px;
+    width: 100%;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.description-header {
+    border-top: 1px solid #eee;
+    margin-top: 30px;
+    padding-top: 15px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.description-content {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #444;
+    margin-top: 10px;
+}
+
+/*End Product Details*/

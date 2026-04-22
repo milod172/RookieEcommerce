@@ -80,6 +80,7 @@ namespace NovaFashion.API.Features.Products
             {
                 Id = e.Id,
                 ProductName = e.ProductName,
+                Description = e.Description,
                 UnitPrice = e.UnitPrice,
                 Details = e.Details,
                 TotalQuantity = e.TotalQuantity,

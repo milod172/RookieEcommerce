@@ -4,6 +4,8 @@ using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.ProductDtos;
+using NovaFashion.SharedViewModels.ProductImageDtos;
+using NovaFashion.SharedViewModels.ProductVariantDtos;
 
 namespace NovaFashion.API.Features.Products
 {
@@ -28,6 +30,27 @@ namespace NovaFashion.API.Features.Products
                 Sku = e.Sku,
                 CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
                 CategoryName = e.Category != null ? e.Category.CategoryName : string.Empty,
+                Images = e.ProductImages
+                    .OrderBy(pi => pi.SortOrder)
+                    .Select(pi => new ProductImageInProductDto
+                    {
+                        ImageUrl = pi.ImageUrl,
+                        AltText = pi.AltText ?? string.Empty,
+                        SortOrder = pi.SortOrder,
+                        IsPrimary = pi.IsPrimary
+                    })
+                    .ToList(),
+                Variants = e.ProductVariants
+                    .OrderBy(pv => pv.Size)
+                    .Select(pv => new ProductVariantInProductDto
+                    {
+                        Id = pv.Id,
+                        Size = pv.Size.ToString(),
+                        StockQuantity = pv.StockQuantity,
+                        UnitPrice = pv.UnitPrice,
+                        VariantSku = pv.VariantSku
+                    })
+                    .ToList(),
                 CreatedTime = e.CreatedTime
             };
         }
@@ -47,6 +70,8 @@ namespace NovaFashion.API.Features.Products
             var product = await db.Products
                 .AsNoTracking()
                 .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductVariants)
                 .FirstOrDefaultAsync(p => p.Id == req.Id, ct);
 
             if (product == null)

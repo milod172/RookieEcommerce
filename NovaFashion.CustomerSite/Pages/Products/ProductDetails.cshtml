@@ -1,0 +1,55 @@
+﻿@page "{id:Guid}"
+@model ProductDetailsModel
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<div class="container-fluid px-md-5">
+    <div class="row">
+        <div class="col-lg-8 col-md-12">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <img src="@Model.Product.Images.FirstOrDefault()?.ImageUrl"
+                         alt="@Model.Product.Images.FirstOrDefault()?.AltText" class="product-image">
+                </div>
+                <div class="col-md-6">
+                    <img src="@Model.Product.Images.Skip(1).FirstOrDefault()?.ImageUrl"
+                         alt="@Model.Product.Images.Skip(1).FirstOrDefault()?.AltText" class="product-image">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12 ps-lg-5 pt-md-5">
+            <h1 class="product-brand">@Model.Product.ProductName</h1>
+            <p class="product-name">@Model.Product.Description</p>
+            <div class="price">@Model.Product.UnitPrice?.ToString("N0") đ</div>
+
+            @* <p class="text-muted small">Colour: <strong>Green</strong></p> *@
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="size-label mb-0">Size:</span>
+                @* <a href="#" class="text-dark small text-decoration-underline">View size guide</a> *@
+            </div>
+
+            <div class="size-grid">
+                <div class="size-item">EU 37</div>
+                <div class="size-item">EU 38</div>
+                <div class="size-item">EU 39</div>
+                <div class="size-item">EU 40</div>
+                <div class="size-item">EU 41</div>
+                <div class="size-item">EU 42</div>
+                <div class="size-item">EU 43</div>
+                <div class="size-item">EU 44</div>
+            </div>
+
+            <button class="btn btn-add-cart">Thêm vào giỏ hàng</button>
+           
+            <div class="description-header">
+                <span>Chi tiết sản phẩm</span>     
+            </div>
+            <div class="description-content">
+                "@Model.Product.Details"
+            </div>
+        </div>
+    </div>
+</div>
