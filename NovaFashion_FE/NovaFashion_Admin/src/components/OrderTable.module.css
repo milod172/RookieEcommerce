@@ -1,0 +1,45 @@
+.customTable {
+    border-collapse: separate;
+    border-spacing: 0 0.625rem;
+}
+
+.customTable thead th {
+    background-color: #f9fafb !important;
+    border-bottom: 0.0625rem solid #f1f1f1;
+    padding: 0.9375rem 0.625rem;
+}
+
+.customTable tbody td {
+    padding: 1.125rem 0.625rem;
+    border-bottom: 0.0625rem solid #f8f9fa;
+    color: #4b5563;
+}
+
+.badgeStatus {
+    padding: 0.375rem 0.75rem;
+    border-radius: 1.25rem;
+    font-weight: 500;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+.done {
+    background-color: #e6f4ea;
+    color: #1e7e34;
+}
+
+.inprogress {
+    background-color: #fff4e5;
+    color: #d97706;
+}
+
+.canceled {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.pending {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}

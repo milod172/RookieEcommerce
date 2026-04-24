@@ -1,0 +1,50 @@
+import { Link } from 'react-router-dom';
+import styles from './Sidebar.module.css';
+
+const Sidebar = () => {
+    const menuItems = [
+        { name: 'Dashboard', icon: 'bi-grid-fill', url: '/' },
+        { name: 'Products', icon: 'bi-box-seam', url: '/products' },
+        { name: 'Customers', icon: 'bi-people' },
+        { name: 'Category', icon: 'bi-tag' },
+        { name: 'Orders', icon: 'bi-cart3' },
+        { name: 'Message', icon: 'bi-chat-dots', badge: 6 },
+        { name: 'Settings', icon: 'bi-gear' },
+        { name: 'Support', icon: 'bi-question-circle' },
+    ];
+
+    return (
+        <div className={`${styles.sidebar} d-flex flex-column p-3`}>
+            {/* Brand Logo */}
+            <div className="mb-4">
+                <div className={styles.logoWrapper}>
+                    <img
+                        src="https://res.cloudinary.com/novafashion/image/upload/v1776763238/novafashion_logo_uoa7wz.png"
+                        alt="Logo"
+                        className=""
+                    />
+                </div>
+            </div>
+
+            {/* Navigation */}
+            <ul className="nav nav-pills flex-column mb-auto">
+                {menuItems.map((item, index) => (
+                    <li key={index} className="nav-item mb-1">
+
+                        <Link to={item.url} className={`nav-link d-flex align-items-center justify-content-between ${item.active ? styles.activeLink : styles.link}`}>
+                            <div className="d-flex align-items-center">
+                                <i className={`bi ${item.icon} me-3`}></i>
+                                {item.name}
+                            </div>
+                            {item.badge && <span className={styles.badge}>{item.badge}</span>}
+                        </Link>
+
+                    </li>
+                ))}
+            </ul>
+
+        </div>
+    );
+};
+
+export default Sidebar;

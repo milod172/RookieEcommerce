@@ -1,0 +1,41 @@
+.searchWrapper {
+    background-color: #f3f4f6;
+    border-radius: 0.625rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    min-width: 15.625rem;
+}
+
+.searchWrapper i {
+    color: #9ca3af;
+    margin-right: 0.625rem;
+}
+
+.searchInput {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.iconBtn {
+    background: white;
+    border: 0.0625rem solid #e5e7eb;
+    border-radius: 0.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #71717a;
+}
+
+.userProfile img {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: cover;
+    border: 0.125rem solid white;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+}
