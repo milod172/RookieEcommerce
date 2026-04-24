@@ -24,6 +24,8 @@ namespace NovaFashion.API.Features.Products
         public const string DescriptionRequired = "Mô tả không được để trống";
         public const string DescriptionTooLong = "Mô tả không được vượt quá 500 ký tự";
         public const string DetailsTooLong = "Chi tiết sản phẩm không được vượt quá 1000 ký tự";
+        public const string TotalQuantityMustBeGreaterThanZero = "Số lượng phải lớn hơn 0";
+        public const string TotalQuantityTooLarge = "Số lượng không được vượt quá 9999";
         public const string UnitPriceMustBeGreaterThanZero = "Giá phải lớn hơn 0";
         public const string UnitPriceTooLarge = "Giá quá lớn, vui lòng điều chỉnh lại";
         public CreateProductValidator()
@@ -57,7 +59,7 @@ namespace NovaFashion.API.Features.Products
             return new Product
             {
                 ProductName = r.ProductName,
-                Description = r.Description,
+                Description = r.Description,  
                 UnitPrice = r.UnitPrice,
                 Details = r.Details,
                 TotalQuantity = r.TotalQuantity,
@@ -70,9 +72,9 @@ namespace NovaFashion.API.Features.Products
             return new ProductDetailsDto
             {
                 Id = e.Id,
-                ProductName = e.ProductName,
-                UnitPrice = e.UnitPrice,
+                ProductName = e.ProductName,  
                 Description = e.Description,
+                UnitPrice = e.UnitPrice,
                 Details = e.Details,
                 TotalQuantity = e.TotalQuantity,
                 CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
@@ -99,6 +101,8 @@ namespace NovaFashion.API.Features.Products
             await db.SaveChangesAsync(ct);
 
             var response = Map.FromEntity(product);
+            response.CategoryName = product.Category.CategoryName;
+
             await Send.CreatedAtAsync("GetProductDetails", new { id = product.Id }, response, cancellation: ct);
         }
     }

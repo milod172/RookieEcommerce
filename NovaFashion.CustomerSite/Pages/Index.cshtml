@@ -35,10 +35,11 @@
             </div>
         </div>
 
-        <div id="product-items" class="row row-cols-5">
+    <div id="product-items" class="row row-cols-4 gy-md-4 ">
             @foreach (var item in Model.Products.Items)
             {
-                <article class="card col px-0">
+            <div class="col gx-md-4">
+                <article class="card h-100 px-0">
                     <a class="" asp-page="/Products/ProductDetails" asp-route-id="@item.Id">
                         <div class="product-image">
                             <img src="@item.Images.FirstOrDefault()?.ImageUrl"
@@ -56,6 +57,7 @@
                         </div>
                     </a>
                 </article>
+            </div>
             }
         </div>
     </section>

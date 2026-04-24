@@ -113,13 +113,9 @@ namespace NovaFashion.API.Features.ProductVariants
 
             if (projectedTotal > product!.TotalQuantity)
             {
-                AddError(
-                    x => x.StockQuantity,
-                    $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
-                    $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})"
-                );
-                await Send.ErrorsAsync(400, ct);
-                return;
+                ThrowError(x => x.StockQuantity,
+                     $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
+                     $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})", statusCode: 400);
             }
 
             Map.UpdateEntity(req, variant);

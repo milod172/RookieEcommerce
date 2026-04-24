@@ -7,5 +7,9 @@
 
         DateTime? ModifiedTime { get; set; }
         string? ModifiedBy { get; set; }
+
+        DateTime? DeletedAt { get; set; }
+        bool IsDeleted { get; set; }
+        string? DeletedBy { get; set; }
     }
 }

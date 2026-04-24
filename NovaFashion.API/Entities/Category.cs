@@ -11,6 +11,10 @@ namespace NovaFashion.API.Entities
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedTime { get; set; }
         public string? ModifiedBy { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public string? DeletedBy { get; set; }
+
         public Guid? ParentCategoryId { get; set; }
         public virtual Category? ParentCategory { get; set; }
         public virtual ICollection<Category> SubCategories { get; set; } = [];

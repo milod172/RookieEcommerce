@@ -22,7 +22,7 @@
         <div class="col-lg-4 col-md-12 ps-lg-5 pt-md-5">
             <h1 class="product-brand">@Model.Product.ProductName</h1>
             <p class="product-name">@Model.Product.Description</p>
-            <div class="price">@Model.Product.UnitPrice?.ToString("N0") đ</div>
+            <div class="price" id="product-price">@Model.Product.UnitPrice?.ToString("N0") đ</div>
 
             @* <p class="text-muted small">Colour: <strong>Green</strong></p> *@
 
@@ -32,14 +32,15 @@
             </div>
 
             <div class="size-grid">
-                <div class="size-item">EU 37</div>
-                <div class="size-item">EU 38</div>
-                <div class="size-item">EU 39</div>
-                <div class="size-item">EU 40</div>
-                <div class="size-item">EU 41</div>
-                <div class="size-item">EU 42</div>
-                <div class="size-item">EU 43</div>
-                <div class="size-item">EU 44</div>
+                @foreach(var item in Model.Product.Variants)
+                {
+                    <div class="size-item"
+                         data-price="@item.UnitPrice"
+                         data-id="@item.Id"
+                         onclick="selectVariant(this)">
+                        @item.Size
+                    </div>
+				}
             </div>
 
             <button class="btn btn-add-cart">Thêm vào giỏ hàng</button>
@@ -53,3 +54,16 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    
+    function selectVariant(variant) {
+        const price = variant.getAttribute("data-price");
+ 
+        document.getElementById("product-price").innerText = parseFloat(price).toLocaleString("vi-VN") + " đ";
+ 
+        document.querySelectorAll(".size-item").forEach(x => x.classList.remove("active"));
+        variant.classList.add("active");
+    }
+</script>

@@ -13,5 +13,11 @@ namespace NovaFashion.API.Shared.Extensions
         {
             entity.ModifiedTime = DateTime.UtcNow;
         }
+
+        public static void SetDeleted(this IHasAudit entity)
+        {
+            entity.DeletedAt = DateTime.UtcNow;
+        }
+
     }
 }

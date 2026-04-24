@@ -12,8 +12,24 @@ namespace NovaFashion.API.Infrastructure.Persistence.Interceptors
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
         {
+            HandleSoftDelete(eventData.Context);
             UpdateAuditFields(eventData.Context);
             return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+
+        private void HandleSoftDelete(DbContext? context)
+        {
+            if (context == null) return;
+
+            foreach (var entry in context.ChangeTracker.Entries<IHasAudit>())
+            {
+                if (entry.State == EntityState.Deleted)
+                {
+                    entry.State = EntityState.Modified;
+                    entry.Entity.IsDeleted = true;
+                    entry.Entity.DeletedAt = DateTime.UtcNow;
+                }
+            }
         }
 
         private void UpdateAuditFields(DbContext? context)

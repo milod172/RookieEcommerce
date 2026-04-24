@@ -89,28 +89,30 @@ namespace NovaFashion.API.Features.ProductVariants
 
             if (product == null)
             {
-                AddError("Không tìm thấy sản phẩm");
-                await Send.NotFoundAsync(ct);
-                return;
+                ThrowError("Không tìm thấy sản phẩm", statusCode: 404);
+            }
+
+            var sizeExist = await db.ProductVariants
+                .AnyAsync(v => v.ProductId == req.ProductId && v.Size == req.Size, ct);
+
+            if (sizeExist)
+            {
+                ThrowError("Biến thể với kích thước này đã tồn tại", statusCode: 400);
             }
 
             // 2. Sum all existing variants' StockQuantity for this product
             var existingTotalStock = await db.ProductVariants
-                .Where(v => v.ProductId == req.ProductId)
-                .SumAsync(v => (int?)v.StockQuantity, ct) ?? 0;
+            .Where(v => v.ProductId == req.ProductId)
+            .SumAsync(v => (int?)v.StockQuantity, ct) ?? 0;
 
             // 3. Check if adding new variant would exceed TotalQuantity
             var projectedTotal = existingTotalStock + req.StockQuantity;
 
             if (projectedTotal > product.TotalQuantity)
             {
-                AddError(
-                    x => x.StockQuantity,
+                ThrowError(x => x.StockQuantity,
                     $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
-                    $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})"
-                );
-                await Send.ErrorsAsync(400, ct);
-                return;
+                    $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})", statusCode: 400);
             }
 
             var variant = Map.ToEntity(req);

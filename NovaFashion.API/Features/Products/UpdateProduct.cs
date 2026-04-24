@@ -27,9 +27,9 @@ namespace NovaFashion.API.Features.Products
         public const string DescriptionRequired = "Mô tả không được để trống";
         public const string DescriptionTooLong = "Mô tả không được vượt quá 500 ký tự";
         public const string DetailsTooLong = "Chi tiết sản phẩm không được vượt quá 1000 ký tự";
+        public const string TotalQuantityInvalid = "Số lượng tổng phải lớn hơn hoặc bằng 0";
         public const string UnitPriceMustBeGreaterThanZero = "Giá phải lớn hơn 0";
         public const string UnitPriceTooLarge = "Giá quá lớn, vui lòng điều chỉnh lại";
-        public const string TotalQuantityInvalid = "Số lượng tổng phải lớn hơn hoặc bằng 0";
 
         public UpdateProductValidator()
         {
@@ -48,15 +48,15 @@ namespace NovaFashion.API.Features.Products
                 .MaximumLength(1000)
                 .WithMessage(DetailsTooLong);
 
-            RuleFor(x => x.UnitPrice)
-                .GreaterThan(0)
-                .WithMessage(UnitPriceMustBeGreaterThanZero)
-                .LessThanOrEqualTo(1_000_000_000)          
-                .WithMessage(UnitPriceTooLarge);
-
             RuleFor(x => x.TotalQuantity)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage(TotalQuantityInvalid);
+
+            RuleFor(x => x.UnitPrice)
+               .GreaterThan(0)
+               .WithMessage(UnitPriceMustBeGreaterThanZero)
+               .LessThanOrEqualTo(1_000_000_000)
+               .WithMessage(UnitPriceTooLarge);
         }
     }
 

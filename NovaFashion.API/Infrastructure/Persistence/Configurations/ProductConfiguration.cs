@@ -20,12 +20,12 @@ namespace NovaFashion.API.Infrastructure.Persistence.Configurations
                 .IsRequired(false)
                 .HasMaxLength(1000);
 
-            builder.Property(x => x.Sku)
-                .HasMaxLength(50);
-
             builder.Property(x => x.UnitPrice)
                 .IsRequired(false)
                 .HasColumnType("decimal(18,2)");
+
+            builder.Property(x => x.Sku)
+                .HasMaxLength(50);
 
             builder.HasOne(x => x.Category)
                 .WithMany(x => x.Products)

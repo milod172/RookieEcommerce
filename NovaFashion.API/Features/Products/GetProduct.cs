@@ -19,7 +19,9 @@ namespace NovaFashion.API.Features.Products
                 Id = e.Id,
                 ProductName = e.ProductName,
                 Description = e.Description,
-                UnitPrice = e.UnitPrice,
+                UnitPrice = e.ProductVariants.Any()
+                    ? e.ProductVariants.Min(v => v.UnitPrice)
+                    : e.UnitPrice,
                 Images = e.ProductImages
                     .OrderBy(pi => pi.SortOrder)
                     .Select(pi => new ProductImageInProductDto
@@ -62,7 +64,13 @@ namespace NovaFashion.API.Features.Products
                 .AsNoTracking()
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
+                .Include(p => p.ProductVariants)
                 .AsQueryable();
+
+            if(!req.IncludeDeleted)
+            {
+                query = query.Where(p => !p.IsDeleted);
+            }
 
             if (!string.IsNullOrEmpty(req.SortBy))
             {

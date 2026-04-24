@@ -34,7 +34,5 @@ namespace NovaFashion.API.Shared.Extensions
                 _ => query.OrderByDescending(x => EF.Property<object>(x, "Id")) 
             };
         }
-
-
     }
 }

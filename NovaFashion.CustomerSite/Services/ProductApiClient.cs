@@ -6,9 +6,12 @@ namespace NovaFashion.CustomerSite.Services
     public class ProductApiClient(HttpClient httpClient)
     {
 
-        public async Task<PaginationResponseDto<ProductDto>> GetProductsAsync(int page, int pageSize, string sort)
+        public async Task<PaginationResponseDto<ProductDto>> GetProductsAsync(int page, int pageSize, string sort, bool includeDeleted)
         {
-            var query = $"api/products?PageNumber={page}&PageSize={pageSize}&SortBy={Uri.EscapeDataString(sort)}";
+            var query = $"api/products?PageNumber={page}" +
+                $"&PageSize={pageSize}" +
+                $"&SortBy={Uri.EscapeDataString(sort)}" +
+                $"&IncludeDeleted={includeDeleted}";
 
             return await httpClient.GetFromJsonAsync<PaginationResponseDto<ProductDto>>(query)
                    ?? new();

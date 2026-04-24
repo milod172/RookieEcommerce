@@ -16,6 +16,9 @@ namespace NovaFashion.API.Entities
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedTime { get; set; }
         public string? ModifiedBy { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public string? DeletedBy { get; set; }
 
         //public virtual ICollection<CartItem> CartItems { get; set; } = [];
         //public virtual ICollection<OrderItem> OrderItems { get; set; } = [];

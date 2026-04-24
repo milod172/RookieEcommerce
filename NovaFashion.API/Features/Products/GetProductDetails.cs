@@ -24,7 +24,9 @@ namespace NovaFashion.API.Features.Products
                 Id = e.Id,
                 ProductName = e.ProductName,
                 Description = e.Description,
-                UnitPrice = e.UnitPrice,
+                UnitPrice = e.ProductVariants.Any() 
+                    ? e.ProductVariants.Min(v => v.UnitPrice) 
+                    : e.UnitPrice,
                 Details = e.Details,
                 TotalQuantity = e.TotalQuantity,
                 Sku = e.Sku,
