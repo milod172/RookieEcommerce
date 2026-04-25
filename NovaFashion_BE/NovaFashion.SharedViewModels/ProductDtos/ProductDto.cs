@@ -13,9 +13,20 @@ namespace NovaFashion.SharedViewModels.ProductDtos
 
         [JsonPropertyName("description")]
         public string Description { get; set; } = string.Empty;
+        [JsonPropertyName("sku")]
+        public string Sku { get; set;} = string.Empty; 
 
         [JsonPropertyName("unit_price")]
         public decimal? UnitPrice { get; set; }
+
+        [JsonPropertyName("total_quantity")]
+        public int TotalQuantity { get; set; }
+
+        [JsonPropertyName("total_sell")]
+        public int TotalSell { get; set; }
+
+        [JsonPropertyName("is_deleted")]
+        public bool IsDeleted { get; set; }
 
         [JsonPropertyName("images")]
         public List<ProductImageInProductDto> Images { get; set; } = [];

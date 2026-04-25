@@ -1,9 +1,55 @@
+import { Link } from 'react-router-dom';
 import styles from './Products.module.css';
+import { useMemo, useState } from 'react';
+import { useProducts } from '../hooks/useProducts.js';
+
+const PAGE_SIZE = 5;
 
 const Products = () => {
+    const [page, setPage] = useState(1);
+
+    // API
+    const { products, totalCount, isLoading } = useProducts({
+        PageNumber: page,
+        PageSize: PAGE_SIZE,
+        SortBy: "Id desc",
+        IncludeDeleted: false,
+    });
+
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+    const goTo = (p) => {
+        const next = Math.min(Math.max(1, p), totalPages);
+        setPage(next);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // Pagination UI
+    const pageNumbers = useMemo(() => {
+        const pages = [];
+        const windowSize = 1;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (
+                i === 1 ||
+                i === totalPages ||
+                (i >= page - windowSize && i <= page + windowSize)
+            ) {
+                pages.push(i);
+            } else if (pages[pages.length - 1] !== "...") {
+                pages.push("...");
+            }
+        }
+        return pages;
+    }, [page, totalPages]);
+
+    const startIdx = (page - 1) * PAGE_SIZE + 1;
+    const endIdx = Math.min(page * PAGE_SIZE, totalCount);
+
+    if (isLoading) return <div className="p-3">Loading...</div>;
+
     return (
         <div className="container-fluid">
-            {/* Panel */}
             <div className={`card border-0 shadow-sm ${styles.panel}`}>
 
                 {/* Header */}
@@ -11,30 +57,13 @@ const Products = () => {
                     <div>
                         <h5 className="fw-bold mb-0">Product Management</h5>
                         <small className="text-muted">
-                            Quản lý danh sách sản phẩm trong cửa hàng
+                            Quản lý danh sách sản phẩm
                         </small>
                     </div>
 
-                    <div>
-                        <button className={`btn ${styles.btnAccent}`}>
-                            <i className="bi bi-plus-lg"></i> Add Product
-                        </button>
-                    </div>
-                </div>
-
-                {/* Filters */}
-                <div className="d-flex flex-wrap gap-2 mb-3">
-                    <select className="form-select w-auto">
-                        <option>All Categories</option>
-                    </select>
-
-                    <select className="form-select w-auto">
-                        <option>All Status</option>
-                    </select>
-
-                    <select className="form-select w-auto">
-                        <option>Sort by: Newest</option>
-                    </select>
+                    <Link to="/products/add" className={`btn ${styles.btnAccent}`}>
+                        <i className="bi bi-plus-lg"></i> Add Product
+                    </Link>
                 </div>
 
                 {/* Table */}
@@ -42,56 +71,114 @@ const Products = () => {
                     <table className="table align-middle mb-0">
                         <thead className="bg-light small text-uppercase text-muted">
                             <tr>
-                                <th><input type="checkbox" /></th>
                                 <th>ID</th>
                                 <th>Product</th>
                                 <th>SKU</th>
                                 <th className="text-end">Qty</th>
                                 <th className="text-end">Sold</th>
-                                <th>Status</th>
+                                <th className="text-center">Status</th>
                                 <th className="text-end">Actions</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            <tr>
-                                <td><input type="checkbox" /></td>
-                                <td>#1001</td>
+                            {products.map((p) => (
+                                <tr key={p.id}>
+                                    <td>{p.id}</td>
 
-                                <td>
-                                    <div className="d-flex align-items-center gap-3">
-                                        <img
-                                            src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100"
-                                            className={styles.productImg}
-                                        />
-                                        <div>
-                                            <div className="fw-semibold">Classic White Tee</div>
-                                            <small className="text-muted">
-                                                Áo thun cotton 100%
-                                            </small>
+                                    <td>
+                                        <div className="d-flex align-items-center gap-3">
+                                            <img
+                                                src={p.images?.find(img => img.is_primary)?.image_url}
+                                                className={styles.productImg}
+                                            />
+                                            <div>
+                                                <div className="fw-semibold">
+                                                    {p.product_name}
+                                                </div>
+                                                <small className="text-muted">
+                                                    {p.description}
+                                                </small>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
+                                    </td>
 
-                                <td><span className={styles.sku}>NF-WT-001</span></td>
+                                    <td>
+                                        <span className={styles.sku}>{p.sku}</span>
+                                    </td>
 
-                                <td className="text-end">120</td>
-                                <td className="text-end">85</td>
+                                    <td className="text-end">{p.total_quantity}</td>
+                                    <td className="text-end">{p.total_sell}</td>
 
-                                <td>
-                                    <span className={`${styles.status} ${styles.active}`}>
-                                        Active
-                                    </span>
-                                </td>
+                                    <td className="text-center">
+                                        <span
+                                            className={`${styles.status} ${!p.is_deleted ? styles.active : styles.inactive}`}
+                                        >
+                                            {!p.isdeleted ? "Active" : "Inactive"}
+                                        </span>
+                                    </td>
 
-                                <td className="text-end">
-                                    <button className={styles.actionBtn}><i className="bi bi-eye"></i></button>
-                                </td>
-                            </tr>
+                                    <td className="text-end">
+                                        <Link
+                                            to={`/products/${p.id}`}
+                                            className={`btn btn-light btn-sm ${styles.actionBtn}`}
+                                        >
+                                            <i className="bi bi-eye"></i>
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
 
+                {/* Pagination */}
+                <div className="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
+
+                    <small className="text-muted">
+                        Hiển thị <strong>{startIdx}</strong>–<strong>{endIdx}</strong> trong{" "}
+                        <strong>{totalCount}</strong> sản phẩm
+                    </small>
+
+                    <nav>
+                        <ul className="pagination pagination-sm mb-0">
+
+                            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                                <button className="page-link" onClick={() => goTo(page - 1)}>
+                                    ‹
+                                </button>
+                            </li>
+
+                            {pageNumbers.map((n, idx) =>
+                                n === "..." ? (
+                                    <li key={idx} className="page-item disabled">
+                                        <span className="page-link">…</span>
+                                    </li>
+                                ) : (
+                                    <li
+                                        key={n}
+                                        className={`page-item ${page === n ? "active" : ""}`}
+                                    >
+                                        <button
+                                            className="page-link"
+                                            onClick={() => goTo(n)}
+                                        >
+                                            {n}
+                                        </button>
+                                    </li>
+                                )
+                            )}
+
+                            <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+                                <button className="page-link" onClick={() => goTo(page + 1)}>
+                                    ›
+                                </button>
+                            </li>
+
+                        </ul>
+                    </nav>
+
+                </div>
             </div>
         </div>
     );

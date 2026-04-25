@@ -22,6 +22,10 @@ namespace NovaFashion.API.Features.Products
                 UnitPrice = e.ProductVariants.Any()
                     ? e.ProductVariants.Min(v => v.UnitPrice)
                     : e.UnitPrice,
+                Sku = e.Sku,
+                TotalQuantity = e.TotalQuantity,
+                TotalSell = e.TotalSell,
+                IsDeleted = e.IsDeleted,
                 Images = e.ProductImages
                     .OrderBy(pi => pi.SortOrder)
                     .Select(pi => new ProductImageInProductDto

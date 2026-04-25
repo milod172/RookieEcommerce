@@ -1,0 +1,235 @@
+.panel {
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    background: #fff;
+}
+
+.sectionTitle {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid #f0efea;
+}
+
+.backDecorationNone {
+    text-decoration: none;
+    color: black;
+}
+
+.btnAccent {
+    background: #6b8e5a;
+    color: #fff;
+    border: none;
+}
+
+.btnAccent:hover {
+    background: #5a7a4b;
+    color: #fff;
+}
+
+.linkAccent {
+    color: #6b8e5a;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Inline inputs — viền nhạt, nổi rõ khi focus */
+.inlineInput {
+    background: #fafaf6;
+    border: 1px solid #ececec;
+    transition: background 0.15s ease, border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.inlineInput:hover:not(:disabled) {
+    background: #fff;
+    border-color: #d6d3c6;
+}
+
+.inlineInput:focus {
+    background: #fff;
+    border-color: #6b8e5a;
+    box-shadow: 0 0 0 0.15rem rgba(107, 142, 90, 0.15);
+}
+
+/* Status pill */
+.statusPill {
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.active {
+    background: #e8f3e3;
+    color: #4a7a3a;
+}
+
+.inactive {
+    background: #f1f1f1;
+    color: #777;
+}
+
+/* Dirty dot */
+.dirtyDot {
+    font-size: 0.75rem;
+    color: #b48a00;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.dirtyDot i {
+    font-size: 0.5rem;
+}
+
+/* Dropzone */
+.dropzone {
+    border: 1.5px dashed #d6d3c6;
+    border-radius: 0.75rem;
+    background: #fafaf6;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    color: #6b8e5a;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.dropzone:hover {
+    background: #f4f3ec;
+    border-color: #6b8e5a;
+}
+
+/* Image grid */
+.imageGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+.imageItem {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 0.625rem;
+    overflow: hidden;
+    border: 1px solid #ececec;
+    background: #f7f7f5;
+}
+
+.imageItem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.coverBadge {
+    position: absolute;
+    top: 0.375rem;
+    left: 0.375rem;
+    background: #6b8e5a;
+    color: #fff;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.imageActions {
+    position: absolute;
+    top: 0.375rem;
+    right: 0.375rem;
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 2;
+}
+
+.imageItem:hover .imageActions {
+    opacity: 1;
+}
+
+.imgActionBtn {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.imgActionBtn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.imgActionBtn.danger:hover {
+    background: #c0392b;
+}
+
+/* Cascading breadcrumb */
+.breadcrumbPath {
+    margin-top: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    background: #f4f3ec;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    color: #6b6b6b;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.breadcrumbPath i {
+    color: #6b8e5a;
+}
+
+/* Stats box */
+.statBox {
+    background: #fafaf6;
+    border: 1px solid #f0efea;
+    border-radius: 0.625rem;
+    padding: 0.75rem;
+}
+
+/* Variants table */
+.variantTable {
+    font-size: 0.875rem;
+}
+
+.variantTable thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #888;
+    font-weight: 600;
+    background: #fafaf6;
+    border-bottom: 1px solid #f0efea;
+}
+
+.variantTable tbody td {
+    vertical-align: middle;
+}
+
+.editingRow {
+    background: #fafff5;
+}
+
+.editBtn {
+    color: #4a4a4a;
+}
+
+.editBtn:hover {
+    color: #6b8e5a;
+    border-color: #6b8e5a;
+}

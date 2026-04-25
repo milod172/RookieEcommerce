@@ -6,11 +6,9 @@ const Sidebar = () => {
         { name: 'Dashboard', icon: 'bi-grid-fill', url: '/' },
         { name: 'Products', icon: 'bi-box-seam', url: '/products' },
         { name: 'Customers', icon: 'bi-people' },
-        { name: 'Category', icon: 'bi-tag' },
+        { name: 'Category', icon: 'bi-tag', url: '/categories' },
         { name: 'Orders', icon: 'bi-cart3' },
-        { name: 'Message', icon: 'bi-chat-dots', badge: 6 },
         { name: 'Settings', icon: 'bi-gear' },
-        { name: 'Support', icon: 'bi-question-circle' },
     ];
 
     return (
@@ -36,7 +34,6 @@ const Sidebar = () => {
                                 <i className={`bi ${item.icon} me-3`}></i>
                                 {item.name}
                             </div>
-                            {item.badge && <span className={styles.badge}>{item.badge}</span>}
                         </Link>
 
                     </li>
