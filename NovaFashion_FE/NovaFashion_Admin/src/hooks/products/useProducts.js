@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import httpClient from "../services/httpClient.service.js";
+import httpClient from "../../services/httpClient.service.js";
 
 const fetcher = (url) => httpClient.get(url).then(res => res.data);
 

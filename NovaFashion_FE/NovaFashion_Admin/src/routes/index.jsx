@@ -4,7 +4,7 @@ import Dashboard from '../pages/Dashboard';
 import Products from '../pages/Products';
 import Categories from '../pages/Categories';
 import './index.module.css'
-import AddProduct from '../pages/AddProduct';
+import CreateProduct from '../pages/CreateProduct';
 import ProductDetails from '../pages/ProductDetails';
 
 const AppRoutes = () => {
@@ -15,7 +15,7 @@ const AppRoutes = () => {
 
                 <Route path="/products">
                     <Route index element={<Products />} />
-                    <Route path="add" element={<AddProduct />} />
+                    <Route path="add" element={<CreateProduct />} />
                     <Route path="view" element={<ProductDetails />} />
                 </Route>
 

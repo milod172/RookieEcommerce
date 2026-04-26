@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import styles from './Products.module.css';
 import { useMemo, useState } from 'react';
-import { useProducts } from '../hooks/useProducts.js';
+import { useProducts } from '../hooks/products/useProducts.js';
 
 const PAGE_SIZE = 5;
 

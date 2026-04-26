@@ -1,4 +1,5 @@
-import httpClient from "@/services/httpClient";
+import httpClient from "../../services/httpClient.service";
+
 
 export const productApi = {
     getAll: (params) =>
@@ -9,4 +10,11 @@ export const productApi = {
 
     create: (data) =>
         httpClient.post("/products", data),
+
+    uploadImages: (productId, formData) =>
+        httpClient.post(`/products/${productId}/images`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }),
 };

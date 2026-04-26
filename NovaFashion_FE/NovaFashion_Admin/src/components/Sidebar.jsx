@@ -13,7 +13,6 @@ const Sidebar = () => {
 
     return (
         <div className={`${styles.sidebar} d-flex flex-column p-3`}>
-            {/* Brand Logo */}
             <div className="mb-4">
                 <div className={styles.logoWrapper}>
                     <img
