@@ -1,7 +1,9 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef } from 'react';
 import styles from './CreateProduct.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCreateProduct } from '../hooks/products/useCreateProduct.js';
+import { useCategoryTree } from '../hooks/products/useCategoryTree.js';
+import { useProductImages } from '../hooks/products/useProductImages.js';
 
 // Mock data — sau này thay bằng API
 const CATEGORIES = [
@@ -36,36 +38,15 @@ const CATEGORIES = [
     },
 ];
 
-/*Tìm node bất kỳ trong cây category theo id*/
-const findNode = (nodes, id) => {
-    for (const node of nodes) {
-        if (node.id === id) return node;
-        if (node.subCategories?.length) {
-            const found = findNode(node.subCategories, id);
-            if (found) return found;
-        }
-    }
-    return null;
-};
 
-/*Build đường dẫn breadcrumb từ root → node được chọn*/
-const buildPath = (nodes, targetId, path = []) => {
-    for (const node of nodes) {
-        const current = [...path, node];
-        if (node.id === targetId) return current;
-        if (node.subCategories?.length) {
-            const found = buildPath(node.subCategories, targetId, current);
-            if (found) return found;
-        }
-    }
-    return null;
-};
 
 const CreateProduct = () => {
-    const fileInputRef = useRef(null);
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
+
     const { createProduct } = useCreateProduct();
 
+    // ===== FORM =====
     const [form, setForm] = useState({
         name: '',
         description: '',
@@ -75,109 +56,37 @@ const CreateProduct = () => {
         status: 'active',
     });
 
-
     const [selectedPath, setSelectedPath] = useState([]);
-    const [images, setImages] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
-    // -------- Category helpers --------
+    // ===== HOOKS =====
+    const {
+        categoryDropdowns,
+        finalCategoryId,
+        breadcrumbPath,
+        handleCategorySelect
+    } = useCategoryTree(CATEGORIES, selectedPath, setSelectedPath);
 
-    /**
-     * Trả về danh sách các dropdowns cần hiển thị:
-     * - Luôn có dropdown cấp 0 (root categories)
-     * - Nếu cấp i đã chọn và node đó có subCategories → hiển thị dropdown cấp i+1
-     */
-    const categoryDropdowns = useMemo(() => {
-        const dropdowns = [{ level: 0, options: CATEGORIES, selectedId: selectedPath[0] ?? '' }];
+    const {
+        images,
+        handleFiles,
+        handleRemoveImage,
+        handleDrop,
+        handleDragOver,
+        clearImages
+    } = useProductImages();
 
-        for (let i = 0; i < selectedPath.length; i++) {
-            const node = findNode(CATEGORIES, selectedPath[i]);
-            if (node?.subCategories?.length > 0) {
-                dropdowns.push({
-                    level: i + 1,
-                    options: node.subCategories,
-                    selectedId: selectedPath[i + 1] ?? '',
-                });
-            } else {
-                break;
-            }
-        }
-
-        return dropdowns;
-    }, [selectedPath]);
-
-    /**
-     * ID category cuối cùng được chọn (deepest selected node)
-     */
-    const finalCategoryId = selectedPath.length > 0 ? selectedPath[selectedPath.length - 1] : null;
-
-    /**
-     * Breadcrumb text của path đã chọn
-     */
-    const breadcrumbPath = useMemo(() => {
-        if (!finalCategoryId) return null;
-        return buildPath(CATEGORIES, finalCategoryId);
-    }, [finalCategoryId]);
-
-    const handleCategorySelect = (level, value) => {
-        if (!value) {
-            // Bỏ chọn từ level này trở đi
-            setSelectedPath((prev) => prev.slice(0, level));
-            return;
-        }
-        setSelectedPath((prev) => {
-            const next = prev.slice(0, level);
-            next[level] = value;
-            return next;
-        });
-    };
-
-    // -------- Form --------
-
+    // FORM CHANGE 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        setForm(prev => ({ ...prev, [name]: value }));
     };
 
-    // -------- Images --------
-
-    const handleFiles = (fileList) => {
-        const files = Array.from(fileList || []);
-        const newItems = files.map((file) => ({
-            id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
-            url: URL.createObjectURL(file),
-            name: file.name,
-            file,
-        }));
-        setImages((prev) => [...prev, ...newItems]);
-    };
-
-    const handleRemoveImage = (id) => {
-        setImages((prev) => {
-            const target = prev.find((i) => i.id === id);
-            if (target) URL.revokeObjectURL(target.url);
-            return prev.filter((i) => i.id !== id);
-        });
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.dataTransfer?.files?.length) {
-            handleFiles(e.dataTransfer.files);
-        }
-    };
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
-
-    // -------- Submit --------
-
+    // SUBMIT 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         setError(null);
         setIsSubmitting(true);
 
@@ -188,25 +97,23 @@ const CreateProduct = () => {
                 details: form.details,
                 basePrice: form.basePrice,
                 totalQuantity: form.totalQuantity,
-
                 categoryId: finalCategoryId,
             };
 
-            const productId = await createProduct(formPayload, images);
-            // Sau khi tạo thành công, navigate về trang products hoặc trang detail
-            navigate(`/products`);
+            await createProduct(formPayload, images);
+
+            navigate('/products');
         } catch (err) {
-            setError(err?.response?.data?.message ?? 'Có lỗi xảy ra khi tạo sản phẩm. Vui lòng thử lại.');
+            setError(err?.response?.data?.message || 'Có lỗi xảy ra');
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    // Rest form
     const handleReset = () => {
-        images.forEach((img) => URL.revokeObjectURL(img.url));
-        setImages([]);
+        clearImages();
         setSelectedPath([]);
-        setError(null);
         setForm({
             name: '',
             description: '',
@@ -254,8 +161,7 @@ const CreateProduct = () => {
                                     <span
                                         className="spinner-border spinner-border-sm me-1"
                                         role="status"
-                                        aria-hidden="true"
-                                    />
+                                        aria-hidden="true" />
                                     Saving...
                                 </>
                             ) : (
@@ -283,11 +189,12 @@ const CreateProduct = () => {
                             <h6 className={styles.sectionTitle}>General Information</h6>
 
                             <div className="mb-3">
-                                <label className="form-label small fw-semibold">
+                                <label htmlFor="name" className="form-label small fw-semibold">
                                     Product Name <span className="text-danger">*</span>
                                 </label>
                                 <input
                                     type="text"
+                                    id="name"
                                     name="name"
                                     value={form.name}
                                     onChange={handleChange}
@@ -298,8 +205,9 @@ const CreateProduct = () => {
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label small fw-semibold">Description</label>
+                                <label htmlFor="description" className="form-label small fw-semibold">Description</label>
                                 <textarea
+                                    id="description"
                                     name="description"
                                     value={form.description}
                                     onChange={handleChange}
@@ -310,8 +218,9 @@ const CreateProduct = () => {
                             </div>
 
                             <div className="mb-0">
-                                <label className="form-label small fw-semibold">Details</label>
+                                <label htmlFor="details" className="form-label small fw-semibold">Details</label>
                                 <textarea
+                                    id="details"
                                     name="details"
                                     value={form.details}
                                     onChange={handleChange}
@@ -337,6 +246,14 @@ const CreateProduct = () => {
                                 onDrop={handleDrop}
                                 onDragOver={handleDragOver}
                                 onClick={() => fileInputRef.current?.click()}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        fileInputRef.current?.click();
+                                    }
+                                }}
+                                role="button"
+                                tabIndex={0}
+                                aria-label="Upload product images"
                             >
                                 <i className="bi bi-cloud-arrow-up" style={{ fontSize: '1.75rem' }}></i>
                                 <div className="fw-semibold mt-2">Kéo & thả ảnh vào đây</div>
@@ -385,12 +302,13 @@ const CreateProduct = () => {
                             <h6 className={styles.sectionTitle}>Pricing & Inventory</h6>
 
                             <div className="mb-3">
-                                <label className="form-label small fw-semibold">
+                                <label htmlFor='baseprice' className="form-label small fw-semibold">
                                     Base Price <span className="text-danger">*</span>
                                 </label>
                                 <div className="input-group">
                                     <span className="input-group-text">₫</span>
                                     <input
+                                        id='baseprice'
                                         type="number"
                                         name="basePrice"
                                         value={form.basePrice}
@@ -404,10 +322,11 @@ const CreateProduct = () => {
                             </div>
 
                             <div className="mb-0">
-                                <label className="form-label small fw-semibold">
+                                <label htmlFor='totalQuantity' className="form-label small fw-semibold">
                                     Total Quantity <span className="text-danger">*</span>
                                 </label>
                                 <input
+                                    id='totalQuantity'
                                     type="number"
                                     name="totalQuantity"
                                     value={form.totalQuantity}

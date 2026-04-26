@@ -3,12 +3,12 @@ import styles from './Sidebar.module.css';
 
 const Sidebar = () => {
     const menuItems = [
-        { name: 'Dashboard', icon: 'bi-grid-fill', url: '/' },
-        { name: 'Products', icon: 'bi-box-seam', url: '/products' },
-        { name: 'Customers', icon: 'bi-people' },
-        { name: 'Category', icon: 'bi-tag', url: '/categories' },
-        { name: 'Orders', icon: 'bi-cart3' },
-        { name: 'Settings', icon: 'bi-gear' },
+        { id: 1, name: 'Dashboard', icon: 'bi-grid-fill', url: '/' },
+        { id: 2, name: 'Products', icon: 'bi-box-seam', url: '/products' },
+        { id: 3, name: 'Customers', icon: 'bi-people' },
+        { id: 4, name: 'Category', icon: 'bi-tag', url: '/categories' },
+        { id: 5, name: 'Orders', icon: 'bi-cart3' },
+        { id: 6, name: 'Settings', icon: 'bi-gear' },
     ];
 
     return (
@@ -25,8 +25,8 @@ const Sidebar = () => {
 
             {/* Navigation */}
             <ul className="nav nav-pills flex-column mb-auto">
-                {menuItems.map((item, index) => (
-                    <li key={index} className="nav-item mb-1">
+                {menuItems.map((item) => (
+                    <li key={item.id} className="nav-item mb-1">
 
                         <Link to={item.url} className={`nav-link d-flex align-items-center justify-content-between ${item.active ? styles.activeLink : styles.link}`}>
                             <div className="d-flex align-items-center">

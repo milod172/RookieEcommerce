@@ -12,32 +12,7 @@ const mockCategories = [
             { id: '#1001-2', name: 'Quần Nam', description: 'Quần jean, quần tây, quần short', status: 'Active' },
             { id: '#1001-3', name: 'Phụ kiện Nam', description: 'Thắt lưng, ví, mũ', status: 'Inactive' },
         ],
-    },
-    {
-        id: '#1002',
-        name: 'NỮ',
-        description: 'Thời trang dành cho nữ giới',
-        status: 'Active',
-        subCategories: [
-            { id: '#1002-1', name: 'Váy & Đầm', description: 'Váy ngắn, đầm dài, váy công sở', status: 'Active' },
-            { id: '#1002-2', name: 'Áo Nữ', description: 'Áo kiểu, áo thun, áo khoác', status: 'Active' },
-        ],
-    },
-    {
-        id: '#1003',
-        name: 'TRẺ EM',
-        description: 'Thời trang dành cho trẻ em',
-        status: 'Active',
-    },
-    {
-        id: '#1004',
-        name: 'PHỤ KIỆN',
-        description: 'Phụ kiện thời trang các loại',
-        status: 'Inactive',
-        subCategories: [
-            { id: '#1004-1', name: 'Túi xách', description: 'Túi đeo, balo, ví cầm tay', status: 'Active' },
-        ],
-    },
+    }
 ];
 
 const Categories = () => {

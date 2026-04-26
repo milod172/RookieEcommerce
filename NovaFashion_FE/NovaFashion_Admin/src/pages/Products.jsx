@@ -36,7 +36,7 @@ const Products = () => {
                 (i >= page - windowSize && i <= page + windowSize)
             ) {
                 pages.push(i);
-            } else if (pages[pages.length - 1] !== "...") {
+            } else if (pages.at[pages.length - 1] !== "...") {
                 pages.push("...");
             }
         }
@@ -88,7 +88,7 @@ const Products = () => {
 
                                     <td>
                                         <div className="d-flex align-items-center gap-3">
-                                            <img
+                                            <img alt=''
                                                 src={p.images?.find(img => img.is_primary)?.image_url}
                                                 className={styles.productImg}
                                             />
@@ -112,9 +112,9 @@ const Products = () => {
 
                                     <td className="text-center">
                                         <span
-                                            className={`${styles.status} ${!p.is_deleted ? styles.active : styles.inactive}`}
+                                            className={`${styles.status} ${p.is_deleted ? styles.inactive : styles.active}`}
                                         >
-                                            {!p.isdeleted ? "Active" : "Inactive"}
+                                            {p.is_deleted ? "Inactive" : "Active"}
                                         </span>
                                     </td>
 

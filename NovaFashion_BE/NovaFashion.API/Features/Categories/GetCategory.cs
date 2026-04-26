@@ -12,6 +12,7 @@ namespace NovaFashion.API.Features.Categories
 
     public class GetCategoryMapper : Mapper<PaginationQuery, PaginationList<CategoryDto>, PaginationList<Category>>
     {
+        private List<Category> _allCategories = [];
         public CategoryDto MapToDto(Category e)
         {
             return new CategoryDto
@@ -20,13 +21,18 @@ namespace NovaFashion.API.Features.Categories
                 CategoryName = e.CategoryName,
                 Description = e.Description,
                 ParentCategoryId = e.ParentCategoryId,
+                SubCategories = _allCategories
+                    .Where(c => c.ParentCategoryId == e.Id)
+                    .Select(MapToDto)   // Đệ quy
+                    .ToList(),
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime
             };
         }
 
-        public override PaginationList<CategoryDto> FromEntity(PaginationList<Category> e)
+        public PaginationList<CategoryDto> FromEntity(PaginationList<Category> e, List<Category> allCategories)
         {
+            _allCategories = allCategories;
             var dtos = e.Items.Select(MapToDto).ToList();
 
             return new PaginationList<CategoryDto>(
@@ -51,7 +57,8 @@ namespace NovaFashion.API.Features.Categories
         public override async Task HandleAsync(PaginationQuery req, CancellationToken ct)
         {
             var query = db.Categories
-                           .AsNoTracking()
+                           .AsNoTracking()              
+                           .Where(c => c.ParentCategoryId == null && c.IsDeleted == false)
                            .AsQueryable();
 
            
@@ -62,7 +69,12 @@ namespace NovaFashion.API.Features.Categories
             
             var pagedEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
 
-            var response = Map.FromEntity(pagedEntities);
+            var allCategories = await db.Categories
+                                    .AsNoTracking()
+                                    .Where(c => c.IsDeleted == false)
+                                    .ToListAsync(ct);
+
+            var response = Map.FromEntity(pagedEntities, allCategories);
 
             await Send.OkAsync(response, ct);
         }
