@@ -4,47 +4,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCreateProduct } from '../hooks/products/useCreateProduct.js';
 import { useCategoryTree } from '../hooks/products/useCategoryTree.js';
 import { useProductImages } from '../hooks/products/useProductImages.js';
-
-// Mock data — sau này thay bằng API
-const CATEGORIES = [
-    {
-        id: 'cat-1',
-        name: 'NAM',
-        subCategories: [
-            {
-                id: 'sub-1-1',
-                name: 'Áo thun nam',
-                subCategories: [
-                    { id: 'sub-1-1-1', name: 'Áo thun tay ngắn', subCategories: [] },
-                    { id: 'sub-1-1-2', name: 'Áo thun tay dài', subCategories: [] },
-                ],
-            },
-            { id: 'sub-1-2', name: 'Quần jeans nam', subCategories: [] },
-            { id: 'sub-1-3', name: 'Áo khoác nam', subCategories: [] },
-        ],
-    },
-    {
-        id: 'cat-2',
-        name: 'NỮ',
-        subCategories: [
-            { id: 'sub-2-1', name: 'Đầm nữ', subCategories: [] },
-            { id: 'sub-2-2', name: 'Áo sơ mi nữ', subCategories: [] },
-        ],
-    },
-    {
-        id: 'cat-3',
-        name: 'PHỤ KIỆN',
-        subCategories: [],
-    },
-];
-
-
+import { useCategories } from '../hooks/categories/useCategory.js';
+import CategorySection from '../features/categories/components/CategorySection.jsx';
 
 const CreateProduct = () => {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
 
-    const { createProduct } = useCreateProduct();
+    const { createProduct, isCreating } = useCreateProduct();
+    const { categories, isLoading: categoriesLoading, isError: categoriesError } = useCategories({
+        pageNumber: 1,
+        pageSize: 20
+    });
 
     // ===== FORM =====
     const [form, setForm] = useState({
@@ -57,7 +28,6 @@ const CreateProduct = () => {
     });
 
     const [selectedPath, setSelectedPath] = useState([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
     // ===== HOOKS =====
@@ -66,7 +36,7 @@ const CreateProduct = () => {
         finalCategoryId,
         breadcrumbPath,
         handleCategorySelect
-    } = useCategoryTree(CATEGORIES, selectedPath, setSelectedPath);
+    } = useCategoryTree(categories, selectedPath, setSelectedPath);
 
     const {
         images,
@@ -77,40 +47,40 @@ const CreateProduct = () => {
         clearImages
     } = useProductImages();
 
-    // FORM CHANGE 
+    // FORM CHANGE
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
     };
 
-    // SUBMIT 
+    // SUBMIT
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         setError(null);
-        setIsSubmitting(true);
 
         try {
             const formPayload = {
-                name: form.name,
+                product_name: form.name,
                 description: form.description,
+                unit_price: Number(form.basePrice),
                 details: form.details,
-                basePrice: form.basePrice,
-                totalQuantity: form.totalQuantity,
-                categoryId: finalCategoryId,
+                total_quantity: Number(form.totalQuantity),
+                category_id: finalCategoryId,
             };
 
-            await createProduct(formPayload, images);
+            await createProduct({
+                form: formPayload,
+                images: images,
+            });
 
             navigate('/products');
+
         } catch (err) {
             setError(err?.response?.data?.message || 'Có lỗi xảy ra');
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
-    // Rest form
+    // RESET
     const handleReset = () => {
         clearImages();
         setSelectedPath([]);
@@ -147,21 +117,22 @@ const CreateProduct = () => {
                             type="button"
                             className="btn btn-light border"
                             onClick={handleReset}
-                            disabled={isSubmitting}
+                            disabled={isCreating}
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             className={`btn ${styles.btnAccent}`}
-                            disabled={isSubmitting}
+                            disabled={isCreating}
                         >
-                            {isSubmitting ? (
+                            {isCreating ? (
                                 <>
                                     <span
                                         className="spinner-border spinner-border-sm me-1"
                                         role="status"
-                                        aria-hidden="true" />
+                                        aria-hidden="true"
+                                    />
                                     Saving...
                                 </>
                             ) : (
@@ -205,7 +176,9 @@ const CreateProduct = () => {
                             </div>
 
                             <div className="mb-3">
-                                <label htmlFor="description" className="form-label small fw-semibold">Description</label>
+                                <label htmlFor="description" className="form-label small fw-semibold">
+                                    Description
+                                </label>
                                 <textarea
                                     id="description"
                                     name="description"
@@ -218,7 +191,9 @@ const CreateProduct = () => {
                             </div>
 
                             <div className="mb-0">
-                                <label htmlFor="details" className="form-label small fw-semibold">Details</label>
+                                <label htmlFor="details" className="form-label small fw-semibold">
+                                    Details
+                                </label>
                                 <textarea
                                     id="details"
                                     name="details"
@@ -259,8 +234,7 @@ const CreateProduct = () => {
                                 <div className="fw-semibold mt-2">Kéo & thả ảnh vào đây</div>
                                 <small className="text-muted">
                                     hoặc{' '}
-                                    <span className={styles.linkAccent}>chọn từ máy tính</span> ·
-                                    PNG, JPG, WEBP
+                                    <span className={styles.linkAccent}>chọn từ máy tính</span> · PNG, JPG, WEBP
                                 </small>
                                 <input
                                     ref={fileInputRef}
@@ -293,22 +267,23 @@ const CreateProduct = () => {
                                 </div>
                             )}
                         </div>
+
                     </div>
 
                     {/* RIGHT — Side panels */}
                     <div className="col-lg-4">
-                        {/* Pricing & inventory */}
+                        {/* Pricing & Inventory */}
                         <div className={`card border-0 shadow-sm ${styles.panel} mb-3`}>
                             <h6 className={styles.sectionTitle}>Pricing & Inventory</h6>
 
                             <div className="mb-3">
-                                <label htmlFor='baseprice' className="form-label small fw-semibold">
+                                <label htmlFor="baseprice" className="form-label small fw-semibold">
                                     Base Price <span className="text-danger">*</span>
                                 </label>
                                 <div className="input-group">
                                     <span className="input-group-text">₫</span>
                                     <input
-                                        id='baseprice'
+                                        id="baseprice"
                                         type="number"
                                         name="basePrice"
                                         value={form.basePrice}
@@ -322,11 +297,11 @@ const CreateProduct = () => {
                             </div>
 
                             <div className="mb-0">
-                                <label htmlFor='totalQuantity' className="form-label small fw-semibold">
+                                <label htmlFor="totalQuantity" className="form-label small fw-semibold">
                                     Total Quantity <span className="text-danger">*</span>
                                 </label>
                                 <input
-                                    id='totalQuantity'
+                                    id="totalQuantity"
                                     type="number"
                                     name="totalQuantity"
                                     value={form.totalQuantity}
@@ -339,72 +314,20 @@ const CreateProduct = () => {
                             </div>
                         </div>
 
-                        {/* Cascading category */}
+                        {/* Categorization */}
                         <div className={`card border-0 shadow-sm ${styles.panel} mb-3`}>
                             <h6 className={styles.sectionTitle}>Categorization</h6>
 
-                            {categoryDropdowns.map((dropdown, idx) => (
-                                <div key={dropdown.level} className={idx < categoryDropdowns.length - 1 ? 'mb-3' : 'mb-0'}>
-                                    <label className="form-label small fw-semibold">
-                                        {idx === 0 ? (
-                                            <>Category <span className="text-danger">*</span></>
-                                        ) : (
-                                            `Sub Category (cấp ${idx})`
-                                        )}
-                                    </label>
-                                    <select
-                                        className="form-select"
-                                        value={dropdown.selectedId}
-                                        onChange={(e) => handleCategorySelect(dropdown.level, e.target.value)}
-                                        required={idx === 0}
-                                    >
-                                        <option value="">
-                                            {idx === 0 ? '-- Chọn category --' : '-- Chọn sub category --'}
-                                        </option>
-                                        {dropdown.options.map((opt) => (
-                                            <option key={opt.id} value={opt.id}>
-                                                {opt.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            ))}
-
-                            {/* Breadcrumb path */}
-                            {breadcrumbPath && (
-                                <div className={styles.breadcrumbPath} style={{ marginTop: '0.75rem' }}>
-                                    <i className="bi bi-diagram-3"></i>
-                                    {breadcrumbPath.map((node, idx) => (
-                                        <span key={node.id} className="d-flex align-items-center gap-1">
-                                            {idx > 0 && (
-                                                <i className="bi bi-chevron-right" style={{ fontSize: '0.65rem' }}></i>
-                                            )}
-                                            <span className={idx === breadcrumbPath.length - 1 ? 'fw-semibold' : ''}>
-                                                {node.name}
-                                            </span>
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-
+                            <CategorySection
+                                isLoading={categoriesLoading}
+                                isError={categoriesError}
+                                categoryDropdowns={categoryDropdowns}
+                                breadcrumbPath={breadcrumbPath}
+                                handleCategorySelect={handleCategorySelect}
+                            />
                         </div>
 
                         {/* Status */}
-                        <div className={`card border-0 shadow-sm ${styles.panel} mb-3`}>
-                            <h6 className={styles.sectionTitle}>Status</h6>
-                            <select
-                                name="status"
-                                value={form.status}
-                                onChange={handleChange}
-                                className="form-select"
-                            >
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                            <small className="text-muted d-block mt-2">
-                                Sản phẩm "Inactive" sẽ không hiển thị ngoài cửa hàng.
-                            </small>
-                        </div>
                     </div>
                 </div>
             </form>

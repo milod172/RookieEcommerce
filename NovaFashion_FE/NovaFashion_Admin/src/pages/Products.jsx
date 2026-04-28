@@ -1,50 +1,23 @@
 import { Link } from 'react-router-dom';
 import styles from './Products.module.css';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useProducts } from '../hooks/products/useProducts.js';
+import Pagination from '../components/Pagination.jsx';
 
 const PAGE_SIZE = 5;
 
 const Products = () => {
     const [page, setPage] = useState(1);
+    const [status, setStatus] = useState("All");
+    const [sort, setSort] = useState("Newest");
 
     // API
     const { products, totalCount, isLoading } = useProducts({
         PageNumber: page,
         PageSize: PAGE_SIZE,
-        SortBy: "Id desc",
-        IncludeDeleted: false,
+        SortBy: sort,
+        Status: status,
     });
-
-    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
-
-    const goTo = (p) => {
-        const next = Math.min(Math.max(1, p), totalPages);
-        setPage(next);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    // Pagination UI
-    const pageNumbers = useMemo(() => {
-        const pages = [];
-        const windowSize = 1;
-
-        for (let i = 1; i <= totalPages; i++) {
-            if (
-                i === 1 ||
-                i === totalPages ||
-                (i >= page - windowSize && i <= page + windowSize)
-            ) {
-                pages.push(i);
-            } else if (pages.at[pages.length - 1] !== "...") {
-                pages.push("...");
-            }
-        }
-        return pages;
-    }, [page, totalPages]);
-
-    const startIdx = (page - 1) * PAGE_SIZE + 1;
-    const endIdx = Math.min(page * PAGE_SIZE, totalCount);
 
     if (isLoading) return <div className="p-3">Loading...</div>;
 
@@ -66,6 +39,37 @@ const Products = () => {
                     </Link>
                 </div>
 
+                {/* Filters */}
+                <div className="d-flex flex-wrap gap-2 mb-3">
+                    <select
+                        className="form-select w-auto"
+                        value={status}
+                        onChange={(e) => {
+                            setStatus(e.target.value);
+                            setPage(1);
+                        }}
+                    >
+                        <option value="All">Tất cả</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                    <select
+                        className="form-select w-auto"
+                        value={sort}
+                        onChange={(e) => {
+                            setSort(e.target.value);
+                            setPage(1);
+                        }}
+                    >
+                        <option value="Newest">Sort by: Mới nhất</option>
+                        <option value="Oldest">Sort by: Cũ nhất</option>
+                        <option value="NameAsc">Sort by: Tên từ A - Z</option>
+                        <option value="NameDesc">Sort by: Tên từ Z - A</option>
+                        <option value="IdAsc">Sort by: Id tăng dần</option>
+                        <option value="IdDesc">Sort by: Id giảm dần</option>
+                    </select>
+                </div>
+
                 {/* Table */}
                 <div className="table-responsive">
                     <table className="table align-middle mb-0">
@@ -84,7 +88,7 @@ const Products = () => {
                         <tbody>
                             {products.map((p) => (
                                 <tr key={p.id}>
-                                    <td>{p.id}</td>
+                                    <td>{p.id.slice(0, 8)}</td>
 
                                     <td>
                                         <div className="d-flex align-items-center gap-3">
@@ -121,6 +125,7 @@ const Products = () => {
                                     <td className="text-end">
                                         <Link
                                             to={`/products/${p.id}`}
+
                                             className={`btn btn-light btn-sm ${styles.actionBtn}`}
                                         >
                                             <i className="bi bi-eye"></i>
@@ -133,52 +138,13 @@ const Products = () => {
                 </div>
 
                 {/* Pagination */}
-                <div className="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
-
-                    <small className="text-muted">
-                        Hiển thị <strong>{startIdx}</strong>–<strong>{endIdx}</strong> trong{" "}
-                        <strong>{totalCount}</strong> sản phẩm
-                    </small>
-
-                    <nav>
-                        <ul className="pagination pagination-sm mb-0">
-
-                            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                                <button className="page-link" onClick={() => goTo(page - 1)}>
-                                    ‹
-                                </button>
-                            </li>
-
-                            {pageNumbers.map((n, idx) =>
-                                n === "..." ? (
-                                    <li key={idx} className="page-item disabled">
-                                        <span className="page-link">…</span>
-                                    </li>
-                                ) : (
-                                    <li
-                                        key={n}
-                                        className={`page-item ${page === n ? "active" : ""}`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={() => goTo(n)}
-                                        >
-                                            {n}
-                                        </button>
-                                    </li>
-                                )
-                            )}
-
-                            <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                                <button className="page-link" onClick={() => goTo(page + 1)}>
-                                    ›
-                                </button>
-                            </li>
-
-                        </ul>
-                    </nav>
-
-                </div>
+                <Pagination
+                    page={page}
+                    totalCount={totalCount}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setPage}
+                    itemLabel="sản phẩm"
+                />
             </div>
         </div>
     );

@@ -101,8 +101,7 @@ namespace NovaFashion.API.Features.Products
             await db.SaveChangesAsync(ct);
 
             var response = Map.FromEntity(product);
-            response.CategoryName = product.Category.CategoryName;
-
+           
             await Send.CreatedAtAsync("GetProductDetails", new { id = product.Id }, response, cancellation: ct);
         }
     }

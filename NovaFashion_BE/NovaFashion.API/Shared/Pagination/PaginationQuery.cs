@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text.Json.Serialization;
 using FastEndpoints;
+using NovaFashion.API.Entities.Enum;
 
 namespace NovaFashion.API.Shared.Pagination
 {
@@ -13,10 +14,10 @@ namespace NovaFashion.API.Shared.Pagination
         [DefaultValue(5)]
         public int PageSize { get; set; } 
         [QueryParam]
-        [DefaultValue("Id desc")]
-        public string? SortBy { get; set; } 
+        [DefaultValue(FilterSort.Newest)]
+        public FilterSort SortBy { get; set; } 
         [QueryParam]
-        [DefaultValue(false)]
-        public bool IncludeDeleted { get; set; }
+        [DefaultValue(FilterStatus.Active)]
+        public FilterStatus Status { get; set; }
     }
 }

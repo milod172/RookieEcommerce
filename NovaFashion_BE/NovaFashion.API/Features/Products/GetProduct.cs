@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Pagination;
@@ -69,22 +70,41 @@ namespace NovaFashion.API.Features.Products
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
                 .Include(p => p.ProductVariants)
-                .AsQueryable();
+                .ApplyStatusFilter(req.Status)
+                .ApplySortFilter(req.SortBy);
 
-            if(!req.IncludeDeleted)
-            {
-                query = query.Where(p => !p.IsDeleted);
-            }
-
-            if (!string.IsNullOrEmpty(req.SortBy))
-            {
-                query = query.ApplySorting(req.SortBy);
-            }
 
             var pageResultEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
             var pageResultDtos = Map.FromEntity(pageResultEntities);
 
             await Send.OkAsync(pageResultDtos, ct);
         }
+    }
+
+    internal static class GetProductQueryExtensions
+    {
+        internal static IQueryable<Product> ApplyStatusFilter(
+            this IQueryable<Product> query,
+            FilterStatus status)
+            => status switch
+            {
+                FilterStatus.Active => query.Where(p => !p.IsDeleted),
+                FilterStatus.Inactive => query.Where(p => p.IsDeleted),
+                _ => query
+            };
+
+        internal static IQueryable<Product> ApplySortFilter(
+            this IQueryable<Product> query,
+            FilterSort sortBy)
+            => sortBy switch
+            {
+                FilterSort.Oldest => query.OrderBy(p => p.CreatedTime),
+                FilterSort.Newest => query.OrderByDescending(p => p.CreatedTime),
+                FilterSort.IdAsc => query.OrderBy(p => p.Id),
+                FilterSort.IdDesc => query.OrderByDescending(p => p.Id),
+                FilterSort.NameAsc => query.OrderBy(p => p.ProductName),
+                FilterSort.NameDesc => query.OrderByDescending(p => p.ProductName),
+                _ => query
+            };
     }
 }

@@ -1,17 +1,13 @@
 import useSWR from "swr";
-import httpClient from "../../services/httpClient.service.js";
-
-const fetcher = (url) => httpClient.get(url).then(res => res.data);
+import { productApi } from "../../features/products/productApi";
 
 export const useProducts = (params) => {
-    const query = new URLSearchParams(params).toString();
-
     const { data, error, isLoading } = useSWR(
-        `/products?${query}`,
-        fetcher,
+        ['products', params],
+        () => productApi.getAll(params),
         {
             keepPreviousData: true,
-            revalidateOnFocus: false, //Switch Tab
+            revalidateOnFocus: false,
         }
     );
 
@@ -19,6 +15,6 @@ export const useProducts = (params) => {
         products: data?.items || [],
         totalCount: data?.total_count || 0,
         isLoading,
-        isError: error,
+        isError: !!error,
     };
 };

@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Pagination;
@@ -23,7 +24,7 @@ namespace NovaFashion.API.Features.Categories
                 ParentCategoryId = e.ParentCategoryId,
                 SubCategories = _allCategories
                     .Where(c => c.ParentCategoryId == e.Id)
-                    .Select(MapToDto)   // Đệ quy
+                    .Select(MapToDto)   // Recursion
                     .ToList(),
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime
@@ -59,14 +60,10 @@ namespace NovaFashion.API.Features.Categories
             var query = db.Categories
                            .AsNoTracking()              
                            .Where(c => c.ParentCategoryId == null && c.IsDeleted == false)
-                           .AsQueryable();
+                           .ApplyStatusFilter(req.Status)
+                           .ApplySortFilter(req.SortBy);
 
-           
-            if (!string.IsNullOrEmpty(req.SortBy))
-            {
-                query = query.ApplySorting(req.SortBy);
-            }
-            
+
             var pagedEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
 
             var allCategories = await db.Categories
@@ -78,5 +75,32 @@ namespace NovaFashion.API.Features.Categories
 
             await Send.OkAsync(response, ct);
         }
+    }
+
+    internal static class GetCategoryQueryExtensions
+    {
+        internal static IQueryable<Category> ApplyStatusFilter(
+            this IQueryable<Category> query,
+            FilterStatus status)
+            => status switch
+            {
+                FilterStatus.Active => query.Where(c => !c.IsDeleted && c.ParentCategoryId == null),
+                FilterStatus.Inactive => query.Where(c => c.IsDeleted && c.ParentCategoryId == null),
+                _ => query.Where(c => c.ParentCategoryId == null)
+            };
+
+        internal static IQueryable<Category> ApplySortFilter(
+            this IQueryable<Category> query,
+            FilterSort sortBy)
+            => sortBy switch
+            {
+                FilterSort.Oldest => query.OrderBy(c => c.CreatedTime),
+                FilterSort.Newest => query.OrderByDescending(c => c.CreatedTime),           
+                FilterSort.IdAsc => query.OrderBy(c => c.Id),
+                FilterSort.IdDesc => query.OrderByDescending(c => c.Id),
+                FilterSort.NameAsc => query.OrderBy(c => c.CategoryName),
+                FilterSort.NameDesc => query.OrderByDescending(c => c.CategoryName),
+                _ => query
+            };
     }
 }

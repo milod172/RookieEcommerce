@@ -15,7 +15,7 @@ namespace NovaFashion.API.Features.ProductImages
     {
        [BindFrom("product_id")]
        [JsonSchemaIgnore]  
-        public Guid ProductId { get; set; }
+        public Guid ProductId { get; set; }   
         public List<IFormFile> Files { get; set; } = [];
         [JsonSchemaIgnore]
         public string? AltText { get; set; }

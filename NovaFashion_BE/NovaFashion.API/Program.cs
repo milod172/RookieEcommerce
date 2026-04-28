@@ -1,8 +1,10 @@
 
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Options;
 using NovaFashion.API;
 using NovaFashion.API.Configuration;
 using NovaFashion_API;
@@ -19,8 +21,9 @@ builder.Services.AddControllers();
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-    
 });
+
+
 
 
 builder.Services.AddFastEndpoints();
@@ -35,6 +38,7 @@ builder.Services.SwaggerDocument(opt =>
     opt.SerializerSettings = x =>
     {
         x.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+        x.Converters.Add(new JsonStringEnumConverter());
     };
 
     opt.DocumentSettings = s =>

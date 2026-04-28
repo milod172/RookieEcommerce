@@ -5,8 +5,8 @@ export const useCategoryTree = (CATEGORIES, selectedPath, setSelectedPath) => {
     const findNode = (nodes, id) => {
         for (const node of nodes) {
             if (node.id === id) return node;
-            if (node.subCategories?.length) {
-                const found = findNode(node.subCategories, id);
+            if (node.sub_categories?.length) {
+                const found = findNode(node.sub_categories, id);
                 if (found) return found;
             }
         }
@@ -18,8 +18,8 @@ export const useCategoryTree = (CATEGORIES, selectedPath, setSelectedPath) => {
             const current = [...path, node];
             if (node.id === targetId) return current;
 
-            if (node.subCategories?.length) {
-                const found = buildPath(node.subCategories, targetId, current);
+            if (node.sub_categories?.length) {
+                const found = buildPath(node.sub_categories, targetId, current);
                 if (found) return found;
             }
         }
@@ -27,21 +27,20 @@ export const useCategoryTree = (CATEGORIES, selectedPath, setSelectedPath) => {
     };
 
     const categoryDropdowns = useMemo(() => {
-        const dropdowns = [
-            {
-                level: 0,
-                options: CATEGORIES,
-                selectedId: selectedPath[0] ?? ''
-            }
-        ];
+        if (!CATEGORIES.length) return [];
+
+        const dropdowns = [{
+            level: 0,
+            options: CATEGORIES,
+            selectedId: selectedPath[0] ?? ''
+        }];
 
         for (let i = 0; i < selectedPath.length; i++) {
             const node = findNode(CATEGORIES, selectedPath[i]);
-
-            if (node?.subCategories?.length > 0) {
+            if (node?.sub_categories?.length > 0) {
                 dropdowns.push({
                     level: i + 1,
-                    options: node.subCategories,
+                    options: node.sub_categories,
                     selectedId: selectedPath[i + 1] ?? ''
                 });
             } else {
@@ -50,7 +49,7 @@ export const useCategoryTree = (CATEGORIES, selectedPath, setSelectedPath) => {
         }
 
         return dropdowns;
-    }, [selectedPath]);
+    }, [CATEGORIES, selectedPath]);
 
     const finalCategoryId =
         selectedPath.length > 0
@@ -58,9 +57,9 @@ export const useCategoryTree = (CATEGORIES, selectedPath, setSelectedPath) => {
             : null;
 
     const breadcrumbPath = useMemo(() => {
-        if (!finalCategoryId) return null;
+        if (!finalCategoryId || !CATEGORIES.length) return null;
         return buildPath(CATEGORIES, finalCategoryId);
-    }, [finalCategoryId]);
+    }, [CATEGORIES, finalCategoryId]);
 
     const handleCategorySelect = (level, value) => {
         if (!value) {

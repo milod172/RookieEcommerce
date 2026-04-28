@@ -29,6 +29,7 @@ namespace NovaFashion.API.Features.Products
                     : e.UnitPrice,
                 Details = e.Details,
                 TotalQuantity = e.TotalQuantity,
+                TotalSell = e.TotalSell,
                 Sku = e.Sku,
                 CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
                 CategoryName = e.Category != null ? e.Category.CategoryName : string.Empty,

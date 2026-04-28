@@ -1,40 +1,31 @@
 import { productApi } from "../../features/products/productApi";
-
+import useSWRMutation from "swr/mutation";
 
 export const useCreateProduct = () => {
-    const createProduct = async (form, images) => {
-        try {
+    const { trigger, isMutating } = useSWRMutation(
+        'createProduct',
+        async (_, { arg: { form, images } }) => {
+            // 1. tạo product
+            const product = await productApi.create(form);
+            const productId = product?.id;
 
-            const res = await productApi.create({
-                product_name: form.name,
-                description: form.description,
-                unit_price: Number(form.basePrice),
-                details: form.details,
-                total_quantity: Number(form.totalQuantity),
-                category_id: form.categoryId || null,
-            });
-
-            const productId = res.data?.id;
-
+            // 2. upload images
             if (images?.length > 0 && productId) {
-
                 const formData = new FormData();
 
                 images.forEach((img) => {
-                    formData.append("files", img.file);
+                    formData.append('files', img.file);
                 });
 
                 await productApi.uploadImages(productId, formData);
             }
 
             return productId;
-
-        } catch (err) {
-            console.error(err);
-            throw err;
         }
+    );
+
+    return {
+        createProduct: trigger,
+        isCreating: isMutating,
     };
-
-    return { createProduct };
-
 };

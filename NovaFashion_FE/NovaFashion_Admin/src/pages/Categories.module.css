@@ -7,21 +7,9 @@
     font-size: 0.75rem;
 }
 
-.status {
-    padding: 0.25rem 0.625rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-}
 
-.active {
-    background: #e8f3e3;
-    color: #4a7a3a;
-}
-
-
-.inactive {
-    background: #f1f1f1;
-    color: #888;
+.parentRow {
+    background: #fafafa;
 }
 
 .btnAccent {
@@ -33,57 +21,6 @@
 .btnAccent:hover {
     background: #5a7a4b;
     color: #fff;
-}
-
-.actionBtn {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.5rem;
-}
-
-.expandBtn {
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 0.375rem;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    color: #555;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-}
-
-.expandBtn:hover {
-    background: #f1f5ee;
-    border-color: #6b8e5a;
-    color: #6b8e5a;
-}
-
-.dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: #d4d4d4;
-}
-
-.parentRow {
-    background: #fafafa;
-}
-
-.countBadge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 1.75rem;
-    height: 1.5rem;
-    padding: 0 0.5rem;
-    border-radius: 999px;
-    background: #eef3ea;
-    color: #4a7a3a;
-    font-size: 0.75rem;
-    font-weight: 600;
 }
 
 .subRow {

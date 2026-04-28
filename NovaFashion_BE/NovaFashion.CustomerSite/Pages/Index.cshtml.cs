@@ -10,13 +10,13 @@ namespace NovaFashion.CustomerSite.Pages
     {
         public PaginationResponseDto<ProductDto> Products { get; set; } = new();
 
-        public async Task OnGetAsync(int? pageNumber, int? pageSize, string? sortBy, bool includeDeleted)
+        public async Task OnGetAsync(int? pageNumber, int? pageSize, string? sortBy)
         {
             Products = await productApi.GetProductsAsync(
                 pageNumber ?? 1,
                 pageSize ?? 10,
                 sortBy ?? "Id desc",
-                includeDeleted
+                "Active"
             );
         }
     }

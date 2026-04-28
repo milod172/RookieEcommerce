@@ -21,8 +21,13 @@
 }
 
 .active {
-    background: #e8f3e3;
-    color: #4a7a3a;
+    background: #d6e8cd;
+    color: #2f5d2a;
+}
+
+.inactive {
+    background: #f3e3e3;
+    color: #7a3a3a;
 }
 
 .btnAccent {

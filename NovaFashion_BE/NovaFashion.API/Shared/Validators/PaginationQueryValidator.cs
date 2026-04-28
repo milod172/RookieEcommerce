@@ -16,11 +16,6 @@ namespace NovaFashion.API.Shared.Validators
                 .InclusiveBetween(5, 20)           
                 .WithMessage("PageSize must be between 5 to 20 items");
 
-            RuleFor(x => x.SortBy)
-                .Must(x => string.IsNullOrEmpty(x) ||
-                           x.Trim().Equals("Id asc", StringComparison.OrdinalIgnoreCase) ||
-                           x.Trim().Equals("Id desc", StringComparison.OrdinalIgnoreCase))
-                .WithMessage("SortBy must be 'Id asc' or 'Id desc'");
         }
     }
 }

@@ -1,20 +1,31 @@
 import httpClient from "../../services/httpClient.service";
 
-
 export const productApi = {
-    getAll: (params) =>
-        httpClient.get("/products", { params }),
+    getAll: async (params) => {
+        const res = await httpClient.get('/products', { params });
+        return res.data;
+    },
 
-    getById: (id) =>
-        httpClient.get(`/products/${id}`),
+    getById: async (id) => {
+        const res = await httpClient.get(`/products/${id}`);
+        return res.data;
+    },
 
-    create: (data) =>
-        httpClient.post("/products", data),
+    create: async (data) => {
+        const res = await httpClient.post('/products', data);
+        return res.data;
+    },
 
-    uploadImages: (productId, formData) =>
-        httpClient.post(`/products/${productId}/images`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        }),
+    uploadImages: async (productId, formData) => {
+        const res = await httpClient.post(
+            `/products/${productId}/images`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': undefined
+                }
+            }
+        );
+        return res.data;
+    },
 };
