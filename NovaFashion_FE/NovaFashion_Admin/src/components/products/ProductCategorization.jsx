@@ -1,66 +1,80 @@
-import { CATEGORIES } from '../../constants/productConstants';
 import styles from '../../pages/ProductDetails.module.css';
 
-const ProductCategorization = ({ form, subCategories, handleChange, handleCategoryChange }) => {
+const ProductCategorization = ({ currentCategoryName, categoryDropdowns, breadcrumbPath, handleCategorySelect, isChanging, setIsChanging }) => {
+
+
     return (
         <div className={`card border-0 shadow-sm ${styles.panel} mb-3`}>
-            <h6 className={styles.sectionTitle}>Categorization</h6>
-
-            <div className="mb-3">
-                <label className="form-label small fw-semibold">Category</label>
-                <select
-                    name="categoryId"
-                    value={form.categoryId || ''}
-                    onChange={handleCategoryChange}
-                    className={`form-select ${styles.inlineInput}`}
-                >
-                    <option value="">-- Chọn category --</option>
-                    {CATEGORIES.map((c) => (
-                        <option key={c.id} value={c.id}>
-                            {c.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div className="mb-0">
-                <label className="form-label small fw-semibold">Sub Category</label>
-                <select
-                    name="subCategoryId"
-                    value={form.subCategoryId || ''}
-                    onChange={handleChange}
-                    className={`form-select ${styles.inlineInput}`}
-                    disabled={!form.categoryId || subCategories.length === 0}
-                >
-                    <option value="">
-                        {!form.categoryId
-                            ? '-- Chọn category trước --'
-                            : subCategories.length === 0
-                                ? '-- Không có sub category --'
-                                : '-- Chọn sub category --'}
-                    </option>
-                    {subCategories.map((s) => (
-                        <option key={s.id} value={s.id}>
-                            {s.name}
-                        </option>
-                    ))}
-                </select>
-
-                {form.categoryId && (
-                    <div className={styles.breadcrumbPath}>
-                        <i className="bi bi-diagram-3"></i>
-                        <span>{CATEGORIES.find((c) => c.id === form.categoryId)?.name}</span>
-                        {form.subCategoryId && (
-                            <>
-                                <i className="bi bi-chevron-right" style={{ fontSize: '0.65rem' }}></i>
-                                <span className="fw-semibold">
-                                    {subCategories.find((s) => s.id === form.subCategoryId)?.name}
-                                </span>
-                            </>
-                        )}
-                    </div>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h6 className={`${styles.sectionTitle} mb-0`}>Categorization</h6>
+                {!isChanging && (
+                    <button
+                        type="button"
+                        className="btn btn-sm btn-light border"
+                        onClick={() => setIsChanging(true)}
+                    >
+                        <i className="bi bi-pencil me-1"></i>Change
+                    </button>
                 )}
             </div>
+
+            {isChanging ? (
+                <>
+                    {categoryDropdowns.map((dropdown) => (
+                        <div key={dropdown.level} className="mb-2">
+                            <label className="form-label small fw-semibold">
+                                Level {dropdown.level + 1}
+                            </label>
+
+                            {dropdown.isLoading ? (
+                                <div className="d-flex align-items-center gap-2 text-muted small">
+                                    <span className="spinner-border spinner-border-sm" />
+                                    Đang tải...
+                                </div>
+                            ) : (
+                                <select
+                                    value={dropdown.selectedId || ''}
+                                    onChange={(e) => handleCategorySelect(dropdown.level, e.target.value)}
+                                    className={`form-select ${styles.inlineInput}`}
+                                >
+                                    <option value="">-- Chọn --</option>
+                                    {dropdown.options.map((opt) => (
+                                        <option key={opt.id} value={opt.id}>
+                                            {opt.category_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
+                        </div>
+                    ))}
+
+                    {breadcrumbPath?.length > 0 && (
+                        <div className={styles.breadcrumbPath}>
+                            <i className="bi bi-diagram-3"></i>
+                            {breadcrumbPath.map((node, idx) => (
+                                <span key={node.id}>
+                                    {idx > 0 && <i className="bi bi-chevron-right"></i>}
+                                    {node.category_name}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    <button
+                        type="button"
+                        className="btn btn-sm btn-light border mt-2"
+                        onClick={() => setIsChanging(false)}
+                    >
+                        Cancel
+                    </button>
+                </>
+            ) : (
+
+                <div className="d-flex align-items-center gap-2">
+                    <i className="bi bi-tag text-muted"></i>
+                    <span className="fw-semibold">{currentCategoryName ?? '—'}</span>
+                </div>
+            )}
         </div>
     );
 };

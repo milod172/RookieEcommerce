@@ -11,6 +11,11 @@ export const productApi = {
         return res.data;
     },
 
+    update: async (id, data) => {
+        const res = await httpClient.put(`/products/${id}`, data);
+        return res.data;
+    },
+
     create: async (data) => {
         const res = await httpClient.post('/products', data);
         return res.data;
@@ -28,4 +33,13 @@ export const productApi = {
         );
         return res.data;
     },
+
+    deleteImage: async (productId, imageId) => {
+        const res = await httpClient.delete(
+            `/products/${productId}/images/${imageId}`
+        );
+        return res.data;
+    },
+
+
 };

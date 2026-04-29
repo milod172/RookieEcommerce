@@ -1,5 +1,4 @@
 import useSWR from 'swr';
-
 import { categoryApi } from '../../features/categories/categoryApi';
 
 export const useCategories = (params) => {

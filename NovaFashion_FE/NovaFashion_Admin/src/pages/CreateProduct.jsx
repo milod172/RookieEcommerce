@@ -11,7 +11,15 @@ const CreateProduct = () => {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
 
-    const { createProduct, isCreating } = useCreateProduct();
+    const {
+        createProduct,
+        isCreating,
+        fieldErrors,
+        error,
+        clearFieldError,
+        resetErrors
+    } = useCreateProduct();
+
     const { categories, isLoading: categoriesLoading, isError: categoriesError } = useCategories({
         pageNumber: 1,
         pageSize: 20
@@ -28,7 +36,6 @@ const CreateProduct = () => {
     });
 
     const [selectedPath, setSelectedPath] = useState([]);
-    const [error, setError] = useState(null);
 
     // ===== HOOKS =====
     const {
@@ -50,13 +57,16 @@ const CreateProduct = () => {
     // FORM CHANGE
     const handleChange = (e) => {
         const { name, value } = e.target;
+
         setForm(prev => ({ ...prev, [name]: value }));
+
+        clearFieldError(name);
     };
 
     // SUBMIT
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
+        resetErrors();
 
         try {
             const formPayload = {
@@ -75,8 +85,8 @@ const CreateProduct = () => {
 
             navigate('/products');
 
-        } catch (err) {
-            setError(err?.response?.data?.message || 'Có lỗi xảy ra');
+        } catch {
+            //
         }
     };
 
@@ -184,10 +194,15 @@ const CreateProduct = () => {
                                     name="description"
                                     value={form.description}
                                     onChange={handleChange}
-                                    className="form-control"
+                                    className={`form-control ${fieldErrors.description ? 'is-invalid' : ''}`}
                                     rows={3}
                                     placeholder="Mô tả ngắn gọn về sản phẩm..."
                                 />
+                                {fieldErrors.description && (
+                                    <div className="invalid-feedback">
+                                        {fieldErrors.description}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="mb-0">
@@ -199,10 +214,15 @@ const CreateProduct = () => {
                                     name="details"
                                     value={form.details}
                                     onChange={handleChange}
-                                    className="form-control"
+                                    className={`form-control ${fieldErrors.details ? 'is-invalid' : ''}`}
                                     rows={5}
                                     placeholder="Chất liệu, kích thước, hướng dẫn bảo quản..."
                                 />
+                                {fieldErrors.details && (
+                                    <div className="invalid-feedback">
+                                        {fieldErrors.details}
+                                    </div>
+                                )}
                                 <small className="text-muted">
                                     Thông tin chi tiết hiển thị ở tab "Chi tiết sản phẩm".
                                 </small>
@@ -288,11 +308,16 @@ const CreateProduct = () => {
                                         name="basePrice"
                                         value={form.basePrice}
                                         onChange={handleChange}
-                                        className="form-control"
+                                        className={`form-control ${fieldErrors.basePrice ? 'is-invalid' : ''}`}
                                         placeholder="0"
                                         min="0"
                                         required
                                     />
+                                    {fieldErrors.basePrice && (
+                                        <div className="invalid-feedback">
+                                            {fieldErrors.basePrice}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -306,11 +331,16 @@ const CreateProduct = () => {
                                     name="totalQuantity"
                                     value={form.totalQuantity}
                                     onChange={handleChange}
-                                    className="form-control"
+                                    className={`form-control ${fieldErrors.totalQuantity ? 'is-invalid' : ''}`}
                                     placeholder="0"
                                     min="0"
                                     required
                                 />
+                                {fieldErrors.totalQuantity && (
+                                    <div className="invalid-feedback">
+                                        {fieldErrors.totalQuantity}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

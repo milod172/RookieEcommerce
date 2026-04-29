@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import styles from './CategoryRow.module.css';
 import { Link } from 'react-router-dom';
+import { useSubCategories } from '../../../hooks/categories/useSubCategory';
 
 /*
 node: object hiện tại
@@ -12,18 +13,25 @@ ancestorIsLast: array boolean đánh dấu từng tổ tiên có phải là node
 */
 
 const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorIsLast = [] }) => {
-    const hasSubs = !!(node.subCategories?.length);
     const isExpanded = expandedIds.includes(node.id);
+
+    // Dùng hasChildren từ BE thay vì check subCategories.length
+    const { subCategories, isLoading } = useSubCategories(
+        isExpanded && node.has_children ? node.id : null
+    );
 
     return (
         <Fragment>
             <tr className={depth > 0 ? styles.subRow : styles.parentRow}>
-                {/* Expand button — ở cột 1 chỉ hiện với depth=0, depth>0 chuyển sang cột ID */}
+                {/* Expand button col 1 — chỉ depth=0 */}
                 <td className="text-center">
                     {depth === 0 && (
-                        hasSubs ? (
+                        node.has_children ? (
                             <button className={styles.expandBtn} onClick={() => onToggle(node.id)}>
-                                <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`}></i>
+                                {isLoading
+                                    ? <span className="spinner-border spinner-border-sm" style={{ width: '12px', height: '12px' }} />
+                                    : <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`}></i>
+                                }
                             </button>
                         ) : (
                             <span className={styles.dot}></span>
@@ -31,10 +39,9 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                     )}
                 </td>
 
-                {/* ID cell — chứa tree lines và expand button cho sub rows */}
+                {/* ID cell — tree lines + expand cho sub rows */}
                 <td>
                     <div className="d-flex align-items-center">
-                        {/* Tree lines: mỗi tầng tổ tiên vẽ một đường dọc hoặc trắng */}
                         {ancestorIsLast.map((ancIsLast, i) => (
                             <span
                                 key={i}
@@ -43,12 +50,14 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                             />
                         ))}
 
-                        {/* Branch + toggle cho sub */}
                         {depth > 0 && (
                             <span className={`${styles.treeBranch} ${isLast ? styles.treeBranchLast : ''}`}>
-                                {hasSubs ? (
+                                {node.has_children ? (
                                     <button className={styles.expandBtn} onClick={() => onToggle(node.id)}>
-                                        <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`} style={{ fontSize: '10px' }}></i>
+                                        {isLoading
+                                            ? <span className="spinner-border spinner-border-sm" style={{ width: '10px', height: '10px' }} />
+                                            : <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`} style={{ fontSize: '10px' }}></i>
+                                        }
                                     </button>
                                 ) : (
                                     <span className={styles.dot}></span>
@@ -62,48 +71,47 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
 
                 <td>
                     <div className="fw-semibold" style={{ fontSize: depth > 0 ? '13px' : '14px' }}>
-                        {node.name}
+                        {node.category_name}
                     </div>
                     <small className="text-muted">{node.description}</small>
                 </td>
 
+                {/* Badge: chỉ hiện khi đã fetch xong và có data */}
                 <td className="text-center">
-                    {hasSubs
-                        ? <span className={styles.countBadge}>{node.subCategories.length}</span>
+                    {node.has_children
+                        ? <span className={styles.countBadge}>{node.sub_count}</span>
                         : <span className="text-muted">—</span>}
                 </td>
 
                 <td className="text-center">
-                    <span className={`${styles.status} ${node.isDeleted ? styles.inactive : styles.active}`}>
+                    <span className={`${styles.status} ${node.is_deleted ? styles.inactive : styles.active}`}>
                         {node.is_deleted ? "Inactive" : "Active"}
                     </span>
                 </td>
 
                 <td className="text-end">
-                    <Link
-                        to={`/categories/${node.id}`}
-                        className={`btn btn-light btn-sm ${styles.actionBtn}`}
-                    >
+                    <Link to={`/categories/${node.id}`} className={`btn btn-light btn-sm ${styles.actionBtn}`}>
                         <i className="bi bi-eye"></i>
                     </Link>
-                    <button className={`btn btn-light btn-sm ${styles.actionBtn}`} title="Add Sub"><i className="bi bi-plus-lg"></i></button>
+                    <button className={`btn btn-light btn-sm ${styles.actionBtn}`} title="Add Sub">
+                        <i className="bi bi-plus-lg"></i>
+                    </button>
                 </td>
             </tr>
 
-            {/* Đệ quy render sub categories */}
-            {hasSubs && isExpanded && node.subCategories.map((sub, idx) => (
+            {/* Render sub categories sau khi fetch */}
+            {isExpanded && subCategories.map((sub, idx) => (
                 <CategoryRow
                     key={sub.id}
                     node={sub}
                     depth={depth + 1}
                     expandedIds={expandedIds}
                     onToggle={onToggle}
-                    isLast={idx === node.subCategories.length - 1}
+                    isLast={idx === subCategories.length - 1}
                     ancestorIsLast={[...ancestorIsLast, isLast]}
                 />
             ))}
         </Fragment>
     );
 };
-
 export default CategoryRow;

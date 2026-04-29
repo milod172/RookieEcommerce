@@ -14,6 +14,7 @@ namespace NovaFashion_API;
 [JsonSerializable(typeof(CloudinaryDotNet.Actions.Size), TypeInfoPropertyName = "TI_Size_CA647042")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Categories.CreateCategoryRequest), TypeInfoPropertyName = "TI_CreateCategoryRequest_1F53A338")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Categories.DeleteCategoryRequest), TypeInfoPropertyName = "TI_DeleteCategoryRequest_C697690E")]
+[JsonSerializable(typeof(NovaFashion.API.Features.Categories.GetSubCategoryQuery), TypeInfoPropertyName = "TI_GetSubCategoryQuery_6FDBF9D6")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Categories.UpdateCategoryRequest), TypeInfoPropertyName = "TI_UpdateCategoryRequest_C69AA8A8")]
 [JsonSerializable(typeof(NovaFashion.API.Features.ProductImages.CreateProductImagesRequest), TypeInfoPropertyName = "TI_CreateProductImagesRequest_E5EECCB9")]
 [JsonSerializable(typeof(NovaFashion.API.Features.ProductImages.DeleteProductImageRequest), TypeInfoPropertyName = "TI_DeleteProductImageRequest_D976E70F")]

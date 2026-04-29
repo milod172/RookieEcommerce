@@ -6,13 +6,6 @@ import CategoryRow from '../features/categories/components/CategoryRow';
 
 const PAGE_SIZE = 5;
 
-const normalizeCategory = (cat) => ({
-    id: cat.id,
-    name: cat.category_name,
-    description: cat.description,
-    isDeleted: cat.is_deleted,
-    subCategories: (cat.sub_categories || []).map(normalizeCategory),
-});
 
 const Categories = () => {
     const [page, setPage] = useState(1);
@@ -20,14 +13,13 @@ const Categories = () => {
     const [status, setStatus] = useState("All");
     const [sort, setSort] = useState("Newest");
 
-    const { categories: raw, totalCount, isLoading, isError } = useCategories({
+    const { categories, totalCount, isLoading, isError } = useCategories({
         PageNumber: page,
         PageSize: PAGE_SIZE,
         SortBy: sort,
         Status: status
     });
 
-    const categories = raw.map(normalizeCategory);
 
     const toggleExpand = (id) => {
         setExpandedIds((prev) =>

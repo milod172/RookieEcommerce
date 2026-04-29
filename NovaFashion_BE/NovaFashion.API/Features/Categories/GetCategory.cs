@@ -21,21 +21,16 @@ namespace NovaFashion.API.Features.Categories
                 Id = e.Id,
                 CategoryName = e.CategoryName,
                 Description = e.Description,
-                ParentCategoryId = e.ParentCategoryId,
-                SubCategories = _allCategories
-                    .Where(c => c.ParentCategoryId == e.Id)
-                    .Select(MapToDto)   // Recursion
-                    .ToList(),
+                HasChildren = e.SubCategories.Any(),
+                SubCount = e.SubCategories.Count(),
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime
             };
         }
 
-        public PaginationList<CategoryDto> FromEntity(PaginationList<Category> e, List<Category> allCategories)
+        public PaginationList<CategoryDto> FromEntity(PaginationList<Category> e)
         {
-            _allCategories = allCategories;
             var dtos = e.Items.Select(MapToDto).ToList();
-
             return new PaginationList<CategoryDto>(
                 dtos,
                 e.TotalCount,
@@ -60,18 +55,13 @@ namespace NovaFashion.API.Features.Categories
             var query = db.Categories
                            .AsNoTracking()              
                            .Where(c => c.ParentCategoryId == null && c.IsDeleted == false)
+                             .Include(c => c.SubCategories.Where(s => s.IsDeleted == false))
                            .ApplyStatusFilter(req.Status)
                            .ApplySortFilter(req.SortBy);
 
 
             var pagedEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
-
-            var allCategories = await db.Categories
-                                    .AsNoTracking()
-                                    .Where(c => c.IsDeleted == false)
-                                    .ToListAsync(ct);
-
-            var response = Map.FromEntity(pagedEntities, allCategories);
+            var response = Map.FromEntity(pagedEntities);
 
             await Send.OkAsync(response, ct);
         }

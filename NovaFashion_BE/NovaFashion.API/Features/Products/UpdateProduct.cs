@@ -27,7 +27,8 @@ namespace NovaFashion.API.Features.Products
         public const string DescriptionRequired = "Mô tả không được để trống";
         public const string DescriptionTooLong = "Mô tả không được vượt quá 500 ký tự";
         public const string DetailsTooLong = "Chi tiết sản phẩm không được vượt quá 1000 ký tự";
-        public const string TotalQuantityInvalid = "Số lượng tổng phải lớn hơn hoặc bằng 0";
+        public const string TotalQuantityMustBeGreaterThanZero = "Số lượng phải lớn hơn 0";
+        public const string TotalQuantityTooLarge = "Số lượng không được vượt quá 9999";
         public const string UnitPriceMustBeGreaterThanZero = "Giá phải lớn hơn 0";
         public const string UnitPriceTooLarge = "Giá quá lớn, vui lòng điều chỉnh lại";
 
@@ -49,8 +50,10 @@ namespace NovaFashion.API.Features.Products
                 .WithMessage(DetailsTooLong);
 
             RuleFor(x => x.TotalQuantity)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage(TotalQuantityInvalid);
+                .GreaterThan(0)
+                .WithMessage(TotalQuantityMustBeGreaterThanZero)
+                .LessThanOrEqualTo(9999)
+                .WithMessage(TotalQuantityTooLarge);
 
             RuleFor(x => x.UnitPrice)
                .GreaterThan(0)
@@ -70,7 +73,6 @@ namespace NovaFashion.API.Features.Products
             e.Details = r.Details;
             e.TotalQuantity = r.TotalQuantity;
             e.CategoryId = r.CategoryId;
-
             return e;
         }
 
@@ -117,7 +119,11 @@ namespace NovaFashion.API.Features.Products
             db.Products.Update(product);
             await db.SaveChangesAsync(ct);
 
-            await Send.OkAsync(Map.FromEntity(product), ct);
+            var updatedProduct = await db.Products
+                .Include(p => p.Category)
+                .SingleOrDefaultAsync(p => p.Id == product.Id, ct);
+
+            await Send.OkAsync(Map.FromEntity(updatedProduct), ct);
         }
     }
 

@@ -25,8 +25,7 @@ export const useProductDetails = (id) => {
             basePrice: data.unit_price,
             categoryId: data.category_id,
             categoryName: data.category_name,
-            subCategoryId: '',
-            images: data.images,
+            images: data.images || [],
             variants: data.variants,
         };
     }, [data]);
@@ -36,6 +35,6 @@ export const useProductDetails = (id) => {
         isLoading,
         isError: !!error,
         error,
-        mutate,
+        mutateProduct: mutate,
     };
 };

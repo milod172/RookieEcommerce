@@ -2,7 +2,7 @@ import { useState } from "react";
 import { productApi } from "../../features/products/productApi";
 import useSWRMutation from "swr/mutation";
 
-export const useCreateProduct = () => {
+export const useUpdateProduct = (productId) => {
     const [fieldErrors, setFieldErrors] = useState({});
     const [error, setError] = useState(null);
 
@@ -16,44 +16,22 @@ export const useCreateProduct = () => {
     };
 
     const { trigger, isMutating } = useSWRMutation(
-        'createProduct',
-        async (_, { arg: { form, images } }) => {
+        ['updateProduct', productId],
+        async (_, { arg: form }) => {
             try {
-
-                const product = await productApi.create(form);
-                const productId = product?.id;
-
-
-                if (images?.length > 0 && productId) {
-                    const formData = new FormData();
-
-                    images.forEach((img) => {
-                        formData.append('files', img.file);
-                    });
-
-                    await productApi.uploadImages(productId, formData);
-                }
-
-                return productId;
-
+                await productApi.update(productId, form);
             } catch (err) {
                 const res = err?.response?.data;
 
-
                 if (res?.errors) {
                     const mapped = {};
-
                     Object.keys(res.errors).forEach(key => {
                         const field = errorMap[key];
-                        if (field) {
-                            mapped[field] = res.errors[key][0];
-                        }
+                        if (field) mapped[field] = res.errors[key][0];
                     });
-
                     setFieldErrors(mapped);
                     throw mapped;
                 }
-
 
                 setError(res?.message || 'Có lỗi xảy ra');
                 throw err;
@@ -61,12 +39,8 @@ export const useCreateProduct = () => {
         }
     );
 
-
     const clearFieldError = (field) => {
-        setFieldErrors(prev => ({
-            ...prev,
-            [field]: undefined
-        }));
+        setFieldErrors(prev => ({ ...prev, [field]: undefined }));
     };
 
     const resetErrors = () => {
@@ -75,8 +49,8 @@ export const useCreateProduct = () => {
     };
 
     return {
-        createProduct: trigger,
-        isCreating: isMutating,
+        updateProduct: trigger,
+        isUpdating: isMutating,
         fieldErrors,
         error,
         clearFieldError,

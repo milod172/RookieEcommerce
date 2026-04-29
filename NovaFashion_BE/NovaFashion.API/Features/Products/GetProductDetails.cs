@@ -37,6 +37,7 @@ namespace NovaFashion.API.Features.Products
                     .OrderBy(pi => pi.SortOrder)
                     .Select(pi => new ProductImageInProductDto
                     {
+                        Id = pi.Id,
                         ImageUrl = pi.ImageUrl,
                         AltText = pi.AltText ?? string.Empty,
                         SortOrder = pi.SortOrder,

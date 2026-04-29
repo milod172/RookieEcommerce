@@ -1,10 +1,11 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProductDetails } from '../hooks/products/useProductDetails';
 import { useProductForm } from '../hooks/products/useProductForm';
 import { useProductImages } from '../hooks/products/useProductImages';
 import { useProductVariants } from '../hooks/products/useProductVariants';
+import { useCategories } from '../hooks/categories/useCategory';
 import ProductHeader from '../components/products/ProductHeader';
 import ProductGeneralInfo from '../components/products/ProductGeneralInfo';
 import ProductImages from '../components/products/ProductImages';
@@ -13,36 +14,90 @@ import ProductStats from '../components/products/ProductStats';
 import ProductPricing from '../components/products/ProductPricing';
 import ProductCategorization from '../components/products/ProductCategorization';
 import ProductStatus from '../components/products/ProductStatus';
+import { useCategoryTree } from '../hooks/products/useCategoryTree';
+import { useUpdateProduct } from '../hooks/products/useUpdateProduct';
 
 const ProductDetails = () => {
     const { id } = useParams();
-    const { product, isLoading, isError } = useProductDetails(id);
+    const { product, isLoading, isError, mutateProduct } = useProductDetails(id);
+    const { updateProduct, isUpdating, fieldErrors, error, resetErrors } = useUpdateProduct(id);
     const formLogic = useProductForm(product);
-    const imageLogic = useProductImages();
+    const imageLogic = useProductImages(id, mutateProduct);
+
+    //Categorization
+    const [isChangingCategory, setIsChangingCategory] = useState(false);
+    const { categories } = useCategories({
+        pageNumber: 1,
+        pageSize: 20
+    });
+    const [selectedPath, setSelectedPath] = useState([]);
+    const [categoryDirty, setCategoryDirty] = useState(false);
+    const { categoryDropdowns, finalCategoryId, breadcrumbPath, handleCategorySelect: _handleCategorySelect } =
+        useCategoryTree(categories, selectedPath, setSelectedPath);
+
     const variantLogic = useProductVariants(formLogic.setIsDirty);
 
-    const handleSave = (e) => {
-        e.preventDefault();
-        const payload = { ...formLogic.form, images: imageLogic.images, variants: variantLogic.variants };
-        console.log('Save product payload:', payload);
-
-        // TODO: Gọi API update ở đây (FormData nếu có file mới)
-        formLogic.setIsDirty(false);
+    const handleCategorySelect = (level, value) => {
+        _handleCategorySelect(level, value);
+        setCategoryDirty(true);
     };
 
+    const isAnythingDirty = formLogic.isDirty || categoryDirty;
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+        resetErrors();
+
+        try {
+            const formPayload = {
+                product_name: formLogic.form.name,
+                description: formLogic.form.description,
+                unit_price: Number(formLogic.form.basePrice),
+                details: formLogic.form.details,
+                total_quantity: Number(formLogic.form.totalQuantity),
+                category_id: categoryDirty
+                    ? finalCategoryId
+                    : product.categoryId,
+            };
+
+            console.log('formPayload:', formPayload);
+            await updateProduct(formPayload);
+
+            await mutateProduct();
+            setSelectedPath([]);
+
+            formLogic.setIsDirty(false);
+            setCategoryDirty(false);
+            setIsChangingCategory(false);
+
+        } catch (err) {
+            console.error('Update failed:', err);
+            console.error('Response:', err?.response?.data);
+        }
+    };
+
+    const handleDiscard = () => {
+        formLogic.handleDiscard();
+        setCategoryDirty(false);
+        setSelectedPath([]);
+        setIsChangingCategory(false);
+    };
+
+
     useEffect(() => {
-        if (!product) return
+        if (!product) return;
+
         const mappedImages = (product.images || []).map((img, index) => ({
-            id: img.image_url || `img-${index}`,
+            id: img.id,
             url: img.image_url,
             name: img.alt_text || `image-${index}`,
             isPrimary: img.is_primary || false,
             sortOrder: img.sort_order || index,
-
+            isNew: false,
         }));
 
-
         mappedImages.sort((a, b) => a.sortOrder - b.sortOrder);
+
         const primaryIdx = mappedImages.findIndex((img) => img.isPrimary);
         if (primaryIdx > 0) {
             const primary = mappedImages.splice(primaryIdx, 1)[0];
@@ -50,10 +105,8 @@ const ProductDetails = () => {
         }
 
         imageLogic.setImages(mappedImages);
-        variantLogic.setVariants(product.variants || []);
-        variantLogic.setEditingVariantId(null);
-        variantLogic.setVariantDraft(null);
-    }, [product]);
+
+    }, [product?.id]);
 
 
     if (isLoading) return <p>Loading...</p>;
@@ -63,11 +116,23 @@ const ProductDetails = () => {
     return (
         <div className="container-fluid">
             <form onSubmit={handleSave}>
-                <ProductHeader form={formLogic.form} isDirty={formLogic.isDirty} handleDiscard={formLogic.handleDiscard} />
+                <ProductHeader
+                    form={formLogic.form}
+                    isDirty={isAnythingDirty}
+                    handleDiscard={handleDiscard}
+                    isUpdating={isUpdating} />
+
+                {error && (
+                    <div className="alert alert-danger d-flex align-items-center gap-2 mb-3" role="alert">
+                        <i className="bi bi-exclamation-triangle-fill"></i>
+                        <span>{error}</span>
+                    </div>
+                )}
+
                 <div className="row g-3">
                     {/* LEFT — Main info */}
                     <div className="col-lg-8">
-                        <ProductGeneralInfo form={formLogic.form} handleChange={formLogic.handleChange} />
+                        <ProductGeneralInfo form={formLogic.form} handleChange={formLogic.handleChange} fieldErrors={fieldErrors} />
                         <ProductImages
                             images={imageLogic.images}
                             handleSetCover={imageLogic.handleSetCover}
@@ -76,6 +141,8 @@ const ProductDetails = () => {
                             handleDragOver={imageLogic.handleDragOver}
                             fileInputRef={imageLogic.fileInputRef}
                             handleFiles={imageLogic.handleFiles}
+                            isUploading={imageLogic.isUploading}
+                            isDeleting={imageLogic.isDeleting}
                         />
                         <ProductVariants
                             variants={variantLogic.variants}
@@ -91,12 +158,14 @@ const ProductDetails = () => {
                     {/* RIGHT — Side panels */}
                     <div className="col-lg-4">
                         <ProductStats form={formLogic.form} />
-                        <ProductPricing form={formLogic.form} handleChange={formLogic.handleChange} />
+                        <ProductPricing form={formLogic.form} handleChange={formLogic.handleChange} fieldErrors={fieldErrors} />
                         <ProductCategorization
-                            form={formLogic.form}
-                            subCategories={formLogic.subCategories}
-                            handleChange={formLogic.handleChange}
-                            handleCategoryChange={formLogic.handleCategoryChange}
+                            currentCategoryName={product.categoryName}
+                            categoryDropdowns={categoryDropdowns}
+                            breadcrumbPath={breadcrumbPath}
+                            handleCategorySelect={handleCategorySelect}
+                            isChanging={isChangingCategory}
+                            setIsChanging={setIsChangingCategory}
                         />
                         <ProductStatus form={formLogic.form} handleChange={formLogic.handleChange} />
                     </div>

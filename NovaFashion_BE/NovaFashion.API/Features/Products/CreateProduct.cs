@@ -40,6 +40,12 @@ namespace NovaFashion.API.Features.Products
                 .MaximumLength(500)
                 .WithMessage(DescriptionTooLong);
 
+            RuleFor(x => x.TotalQuantity)
+                .GreaterThan(0)
+                .WithMessage(TotalQuantityMustBeGreaterThanZero)
+                .LessThanOrEqualTo(9999)
+                .WithMessage(TotalQuantityTooLarge);
+
             RuleFor(x => x.Details)
                 .MaximumLength(1000)
                 .WithMessage(DetailsTooLong);

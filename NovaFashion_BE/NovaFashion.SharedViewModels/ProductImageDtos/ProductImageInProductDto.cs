@@ -4,6 +4,8 @@ namespace NovaFashion.SharedViewModels.ProductImageDtos
 {
     public class ProductImageInProductDto
     {
+        [JsonPropertyName("id")]
+        public Guid Id { get; set; }
         [JsonPropertyName("image_url")]
         public string ImageUrl { get; set; } = string.Empty;
 
