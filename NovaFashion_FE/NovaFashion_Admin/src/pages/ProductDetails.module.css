@@ -233,3 +233,24 @@
     color: #6b8e5a;
     border-color: #6b8e5a;
 }
+
+.errorWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.errorSpace {
+    min-height: 1rem;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+/* ── Variant Status Badge ── */
+.variantBadge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}

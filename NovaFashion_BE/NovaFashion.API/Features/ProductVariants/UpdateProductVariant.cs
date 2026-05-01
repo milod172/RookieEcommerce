@@ -1,12 +1,11 @@
-﻿using FastEndpoints;
+﻿using System.Text.Json.Serialization;
+using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
 using NovaFashion.API.Entities.Enum;
-using NovaFashion.API.Features.Products;
 using NovaFashion.API.Infrastructure.Persistence;
-using NovaFashion.SharedViewModels.ProductDtos;
 using NovaFashion.SharedViewModels.ProductVariantDtos;
 
 namespace NovaFashion.API.Features.ProductVariants
@@ -15,18 +14,20 @@ namespace NovaFashion.API.Features.ProductVariants
     {
         [BindFrom("product_id")]
         [JsonSchemaIgnore]
-        public Guid ProductId { get; init; }
+        public Guid ProductId { get; set; }
         [BindFrom("variant_id")]
         [JsonSchemaIgnore]
-        public Guid VariantId { get; init; }
-        public Size Size { get; init; }
-        public int StockQuantity { get; init; }
-        public decimal UnitPrice { get; init; }
+        public Guid VariantId { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter<Size>))]
+        public Size Size { get; set; }
+        public int StockQuantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public bool IsDeleted { get; set; }
     }
 
     public class UpdateProductVariantValidator : Validator<UpdateProductVariantRequest>
     {
-        public const string SizeRequired = "Kích thước không được để trống";
+        public const string SizeMustBeInEnum = "Kích thước không hợp lệ";
         public const string StockQuantityInvalid = "Số lượng tồn kho phải lớn hơn hoặc bằng 0";
         public const string UnitPriceMustBeGreaterThanZero = "Giá phải lớn hơn 0";
         public const string UnitPriceTooLarge = "Giá quá lớn, vui lòng điều chỉnh lại";
@@ -34,8 +35,8 @@ namespace NovaFashion.API.Features.ProductVariants
         public UpdateProductVariantValidator()
         {
             RuleFor(x => x.Size)
-                .NotEmpty()
-                .WithMessage(SizeRequired);
+                .IsInEnum()
+                .WithMessage(SizeMustBeInEnum);
 
             RuleFor(x => x.StockQuantity)
                 .GreaterThanOrEqualTo(0)
@@ -56,6 +57,7 @@ namespace NovaFashion.API.Features.ProductVariants
             e.Size = r.Size;
             e.StockQuantity = r.StockQuantity;
             e.UnitPrice = r.UnitPrice;
+            e.IsDeleted = r.IsDeleted;
             return e;
         }
         public override ProductVariantDto FromEntity(ProductVariant e)
@@ -69,6 +71,7 @@ namespace NovaFashion.API.Features.ProductVariants
                 StockQuantity = e.StockQuantity,
                 VariantSku = e.VariantSku,
                 UnitPrice = e.UnitPrice,
+                IsDeleted = e.IsDeleted,
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime
             };
@@ -81,6 +84,7 @@ namespace NovaFashion.API.Features.ProductVariants
         {
             Put("products/{product_id}/variants/{variant_id}");
             Group<ProductVariantGroup>();
+            DontThrowIfValidationFails();
         }
 
         public override async Task HandleAsync(UpdateProductVariantRequest req, CancellationToken ct)
@@ -95,6 +99,7 @@ namespace NovaFashion.API.Features.ProductVariants
             }
 
             var variant = await db.ProductVariants
+                .Include(v => v.Product)
                 .FirstOrDefaultAsync(v => v.Id == req.VariantId && v.ProductId == req.ProductId, ct);
 
             if (variant is null)
@@ -113,10 +118,12 @@ namespace NovaFashion.API.Features.ProductVariants
 
             if (projectedTotal > product!.TotalQuantity)
             {
-                ThrowError(x => x.StockQuantity,
-                     $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
-                     $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})", statusCode: 400);
+                AddError(x => x.StockQuantity,
+                    $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
+                    $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})");
             }
+
+            ThrowIfAnyErrors();
 
             Map.UpdateEntity(req, variant);
             db.ProductVariants.Update(variant);

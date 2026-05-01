@@ -3,19 +3,11 @@ import styles from './CategoryRow.module.css';
 import { Link } from 'react-router-dom';
 import { useSubCategories } from '../../../hooks/categories/useSubCategory';
 
-/*
-node: object hiện tại
-depth: độ sâu trong cây (0 với root)
-expandedIds: array chứa id của các node đang expanded
-onToggle: function toggle expand/collapse, nhận id node
-isLast: boolean, node cuối cùng trong số anh em (dùng để vẽ đường tree)
-ancestorIsLast: array boolean đánh dấu từng tổ tiên có phải là node cuối cùng không (dùng để vẽ đường tree)
-*/
 
-const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorIsLast = [] }) => {
+const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorIsLast = [], onAddSub }) => {
     const isExpanded = expandedIds.includes(node.id);
 
-    // Dùng hasChildren từ BE thay vì check subCategories.length
+    // HasChildren
     const { subCategories, isLoading } = useSubCategories(
         isExpanded && node.has_children ? node.id : null
     );
@@ -93,7 +85,7 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                     <Link to={`/categories/${node.id}`} className={`btn btn-light btn-sm ${styles.actionBtn}`}>
                         <i className="bi bi-eye"></i>
                     </Link>
-                    <button className={`btn btn-light btn-sm ${styles.actionBtn}`} title="Add Sub">
+                    <button onClick={() => onAddSub(node.id)} className={`btn btn-light btn-sm ${styles.actionBtn}`} title="Add Sub">
                         <i className="bi bi-plus-lg"></i>
                     </button>
                 </td>
@@ -109,6 +101,7 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                     onToggle={onToggle}
                     isLast={idx === subCategories.length - 1}
                     ancestorIsLast={[...ancestorIsLast, isLast]}
+                    onAddSub={onAddSub}
                 />
             ))}
         </Fragment>

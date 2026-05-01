@@ -12,14 +12,13 @@ export const useUpdateProduct = (productId) => {
         details: 'details',
         unit_price: 'basePrice',
         total_quantity: 'totalQuantity',
-        category_id: 'categoryId'
     };
 
     const { trigger, isMutating } = useSWRMutation(
         ['updateProduct', productId],
         async (_, { arg: form }) => {
             try {
-                await productApi.update(productId, form);
+                return await productApi.update(productId, form);
             } catch (err) {
                 const res = err?.response?.data;
 
@@ -30,6 +29,7 @@ export const useUpdateProduct = (productId) => {
                         if (field) mapped[field] = res.errors[key][0];
                     });
                     setFieldErrors(mapped);
+                    setError('Xảy ra lỗi trong quá trình cập nhật. Vui lòng kiểm tra lại thông tin.');
                     throw mapped;
                 }
 

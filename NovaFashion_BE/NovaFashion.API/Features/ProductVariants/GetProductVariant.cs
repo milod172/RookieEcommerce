@@ -25,6 +25,7 @@ namespace NovaFashion.API.Features.ProductVariants
                 StockQuantity = e.StockQuantity,
                 VariantSku = e.VariantSku,
                 CreatedTime = e.CreatedTime,
+                IsDeleted = e.IsDeleted,
                 ModifiedTime = e.ModifiedTime,
                 UnitPrice = e.UnitPrice,
             };

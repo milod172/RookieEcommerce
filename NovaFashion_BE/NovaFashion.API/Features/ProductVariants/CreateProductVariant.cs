@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Text.Json.Serialization;
+using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
@@ -14,15 +15,16 @@ namespace NovaFashion.API.Features.ProductVariants
     {
         [BindFrom("product_id")]
         [JsonSchemaIgnore]
-        public Guid ProductId { get; init; }
-        public Size Size { get; init; }
-        public int StockQuantity { get; init; }
-        public decimal UnitPrice { get; init; }
+        public Guid ProductId { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter<Size>))]
+        public Size Size { get; set; }
+        public int StockQuantity { get; set; }
+        public decimal UnitPrice { get; set; }
     }
 
     public class CreateProductVariantValidator : Validator<CreateProductVariantRequest>
     {
-        public const string SizeRequired = "Kích thước không được để trống";
+        public const string IsInEnum = "Kích thước không hợp lệ";
         public const string StockQuantityInvalid = "Số lượng tồn kho phải lớn hơn hoặc bằng 0";
         public const string UnitPriceMustBeGreaterThanZero = "Giá phải lớn hơn 0";
         public const string UnitPriceTooLarge = "Giá quá lớn, vui lòng điều chỉnh lại";
@@ -30,8 +32,8 @@ namespace NovaFashion.API.Features.ProductVariants
         public CreateProductVariantValidator()
         {
             RuleFor(x => x.Size)
-                .NotEmpty()
-                .WithMessage(SizeRequired);
+                .IsInEnum()
+                .WithMessage(IsInEnum);
 
             RuleFor(x => x.StockQuantity)
                 .GreaterThanOrEqualTo(0)
@@ -79,7 +81,8 @@ namespace NovaFashion.API.Features.ProductVariants
         public override void Configure()
         {
             Post("products/{product_id}/variants");
-            Group<ProductVariantGroup>();        
+            Group<ProductVariantGroup>();
+            DontThrowIfValidationFails();
         }
 
         public override async Task HandleAsync(CreateProductVariantRequest req, CancellationToken ct)
@@ -97,7 +100,7 @@ namespace NovaFashion.API.Features.ProductVariants
 
             if (sizeExist)
             {
-                ThrowError("Biến thể với kích thước này đã tồn tại", statusCode: 400);
+                AddError(x => x.Size, "Biến thể với kích thước này đã tồn tại");
             }
 
             // 2. Sum all existing variants' StockQuantity for this product
@@ -110,10 +113,12 @@ namespace NovaFashion.API.Features.ProductVariants
 
             if (projectedTotal > product.TotalQuantity)
             {
-                ThrowError(x => x.StockQuantity,
-                    $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
-                    $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})", statusCode: 400);
+                AddError(x => x.StockQuantity,
+                   $"Tổng số lượng tồn kho của các biến thể ({projectedTotal}) " +
+                   $"đang vượt quá tổng số lượng sản phẩm ({product.TotalQuantity})");
             }
+
+            ThrowIfAnyErrors();
 
             var variant = Map.ToEntity(req);
             variant.VariantSku = variant.GenerateVariantSku(product.ProductName, product.Id);

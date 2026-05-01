@@ -20,8 +20,8 @@ import { useUpdateProduct } from '../hooks/products/useUpdateProduct';
 const ProductDetails = () => {
     const { id } = useParams();
     const { product, isLoading, isError, mutateProduct } = useProductDetails(id);
-    const { updateProduct, isUpdating, fieldErrors, error, resetErrors } = useUpdateProduct(id);
-    const formLogic = useProductForm(product);
+    const { updateProduct, isUpdating, fieldErrors, error, clearFieldError, resetErrors } = useUpdateProduct(id);
+    const formLogic = useProductForm(product, clearFieldError);
     const imageLogic = useProductImages(id, mutateProduct);
 
     //Categorization
@@ -34,13 +34,12 @@ const ProductDetails = () => {
     const [categoryDirty, setCategoryDirty] = useState(false);
     const { categoryDropdowns, finalCategoryId, breadcrumbPath, handleCategorySelect: _handleCategorySelect } =
         useCategoryTree(categories, selectedPath, setSelectedPath);
-
-    const variantLogic = useProductVariants(formLogic.setIsDirty);
-
     const handleCategorySelect = (level, value) => {
         _handleCategorySelect(level, value);
         setCategoryDirty(true);
     };
+
+    const variantLogic = useProductVariants(id, formLogic.setIsDirty);
 
     const isAnythingDirty = formLogic.isDirty || categoryDirty;
 
@@ -58,14 +57,14 @@ const ProductDetails = () => {
                 category_id: categoryDirty
                     ? finalCategoryId
                     : product.categoryId,
+                is_deleted: formLogic.form.isDeleted,
             };
 
-            console.log('formPayload:', formPayload);
-            await updateProduct(formPayload);
+            const updated = await updateProduct(formPayload);
+            await mutateProduct(updated, { revalidate: false }); //updated cache bằng updated, không gọi lại api
 
-            await mutateProduct();
+            formLogic.setForm(null);
             setSelectedPath([]);
-
             formLogic.setIsDirty(false);
             setCategoryDirty(false);
             setIsChangingCategory(false);
@@ -77,6 +76,7 @@ const ProductDetails = () => {
     };
 
     const handleDiscard = () => {
+        resetErrors();
         formLogic.handleDiscard();
         setCategoryDirty(false);
         setSelectedPath([]);
@@ -145,6 +145,7 @@ const ProductDetails = () => {
                             isDeleting={imageLogic.isDeleting}
                         />
                         <ProductVariants
+                            isLoadingVariants={variantLogic.isLoadingVariants}
                             variants={variantLogic.variants}
                             editingVariantId={variantLogic.editingVariantId}
                             variantDraft={variantLogic.variantDraft}
@@ -152,6 +153,17 @@ const ProductDetails = () => {
                             cancelEditVariant={variantLogic.cancelEditVariant}
                             saveEditVariant={variantLogic.saveEditVariant}
                             handleVariantDraftChange={variantLogic.handleVariantDraftChange}
+                            addingRow={variantLogic.addingRow}
+                            addDraft={variantLogic.addDraft}
+                            startAddVariant={variantLogic.startAddVariant}
+                            cancelAddVariant={variantLogic.cancelAddVariant}
+                            saveAddVariant={variantLogic.saveAddVariant}
+                            handleAddDraftChange={variantLogic.handleAddDraftChange}
+                            SIZE_OPTIONS={variantLogic.SIZE_OPTIONS}
+                            addFieldErrors={variantLogic.addFieldErrors}
+                            addError={variantLogic.addError}
+                            editFieldErrors={variantLogic.editFieldErrors}
+                            editError={variantLogic.editError}
                         />
                     </div>
 

@@ -5,9 +5,16 @@ const ProductStatus = ({ form, handleChange }) => {
         <div className={`card border-0 shadow-sm ${styles.panel} mb-3`}>
             <h6 className={styles.sectionTitle}>Status</h6>
             <select
-                name="status"
-                value={form.status || 'active'}
-                onChange={handleChange}
+                name="isDeleted"
+                value={form.isDeleted ? 'inactive' : 'active'}
+                onChange={(e) =>
+                    handleChange({
+                        target: {
+                            name: 'isDeleted',
+                            value: e.target.value === 'inactive',
+                        },
+                    })
+                }
                 className={`form-select ${styles.inlineInput}`}
             >
                 <option value="active">Active</option>

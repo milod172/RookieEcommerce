@@ -18,9 +18,9 @@ const ProductHeader = ({ form, isDirty, handleDiscard }) => {
                     <div className="d-flex align-items-center gap-2">
                         <h5 className="fw-bold mb-0">{form.name || 'Product details'}</h5>
                         <span
-                            className={`${styles.statusPill} ${form.status === 'active' ? styles.active : styles.inactive}`}
+                            className={`${styles.statusPill} ${form.isDeleted ? styles.inactive : styles.active}`}
                         >
-                            {form.status === 'active' ? 'Active' : 'Inactive'}
+                            {form.isDeleted ? 'Inactive' : 'Active'}
                         </span>
                     </div>
                     <small className="text-muted">

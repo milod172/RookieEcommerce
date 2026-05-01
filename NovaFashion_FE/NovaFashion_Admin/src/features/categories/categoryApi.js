@@ -11,4 +11,14 @@ export const categoryApi = {
         const res = await httpClient.get(`/categories/${parentId}`);
         return res.data;
     },
+
+    getPicker: async () => {
+        const res = await httpClient.get('/categories/picker');
+        return res.data;
+    },
+
+    createCategory: async (data) => {
+        const res = await httpClient.post('/categories', data);
+        return res.data;
+    },
 };

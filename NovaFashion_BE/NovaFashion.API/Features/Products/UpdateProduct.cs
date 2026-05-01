@@ -19,6 +19,7 @@ namespace NovaFashion.API.Features.Products
         public string? Details { get; set; } = string.Empty;
         public int TotalQuantity { get; set; } = 0;
         public Guid? CategoryId { get; set; }
+        public bool IsDeleted { get; set; }
     }
 
     public class UpdateProductValidator : Validator<UpdateProductRequest>
@@ -73,6 +74,7 @@ namespace NovaFashion.API.Features.Products
             e.Details = r.Details;
             e.TotalQuantity = r.TotalQuantity;
             e.CategoryId = r.CategoryId;
+            e.IsDeleted = r.IsDeleted;
             return e;
         }
 
@@ -89,6 +91,7 @@ namespace NovaFashion.API.Features.Products
                 CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
                 CategoryName = e.Category != null ? e.Category.CategoryName : string.Empty,
                 Sku = e.Sku,
+                IsDeleted = e.IsDeleted,
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime,
             };
@@ -102,6 +105,7 @@ namespace NovaFashion.API.Features.Products
             Put("{id}");
             AllowAnonymous();
             Group<ProductGroup>();
+            DontThrowIfValidationFails();
         }
 
         public override async Task HandleAsync(UpdateProductRequest req, CancellationToken ct)
@@ -114,6 +118,18 @@ namespace NovaFashion.API.Features.Products
             {
                 ThrowError("Không tìm thấy sản phẩm", statusCode: 404);
             }
+
+            var stockVarQuantity = await db.ProductVariants
+                .Where(pv => pv.ProductId == req.Id)
+                .SumAsync(pv => pv.StockQuantity, ct);
+
+            if(req.TotalQuantity < stockVarQuantity)
+            {
+                AddError(x => x.TotalQuantity, 
+                    $"Số lượng sản phẩm phải lớn hơn hoặc bằng tổng số lượng tồn kho của các biến thể ({stockVarQuantity})");
+
+            }
+            ThrowIfAnyErrors();
 
             Map.UpdateEntity(req, product);
             db.Products.Update(product);

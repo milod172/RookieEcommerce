@@ -3,6 +3,7 @@ import styles from './Categories.module.css';
 import Pagination from '../components/Pagination';
 import { useCategories } from '../hooks/categories/useCategory';
 import CategoryRow from '../features/categories/components/CategoryRow';
+import CategoryFormModal from '../features/categories/components/CategoryFormModal';
 
 const PAGE_SIZE = 5;
 
@@ -12,6 +13,7 @@ const Categories = () => {
     const [expandedIds, setExpandedIds] = useState([]);
     const [status, setStatus] = useState("All");
     const [sort, setSort] = useState("Newest");
+    const [showModal, setShowModal] = useState(false);
 
     const { categories, totalCount, isLoading, isError } = useCategories({
         PageNumber: page,
@@ -39,7 +41,10 @@ const Categories = () => {
                         <h5 className="fw-bold mb-0">Category Management</h5>
                         <small className="text-muted">Quản lý danh sách danh mục trong cửa hàng</small>
                     </div>
-                    <button className={`btn ${styles.btnAccent}`}>
+                    <button
+                        className={`btn ${styles.btnAccent}`}
+                        onClick={() => setShowModal(true)}
+                    >
                         <i className="bi bi-plus-lg"></i> Add Category
                     </button>
                 </div>
@@ -99,11 +104,18 @@ const Categories = () => {
                                     onToggle={toggleExpand}
                                     isLast={idx === categories.length - 1}
                                     ancestorIsLast={[]}
+                                    onAddSub={() => setShowModal(true)}
                                 />
                             ))}
                         </tbody>
                     </table>
                 </div>
+
+                <CategoryFormModal
+                    show={showModal}
+                    onHide={() => setShowModal(false)}
+                    onSuccess={() => setShowModal(false)}
+                />
 
                 <Pagination
                     page={page}

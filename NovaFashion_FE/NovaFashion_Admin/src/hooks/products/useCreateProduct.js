@@ -51,6 +51,7 @@ export const useCreateProduct = () => {
                     });
 
                     setFieldErrors(mapped);
+                    setError('Xảy ra lỗi trong quá trình tạo sản phẩm. Vui lòng kiểm tra lại thông tin.');
                     throw mapped;
                 }
 

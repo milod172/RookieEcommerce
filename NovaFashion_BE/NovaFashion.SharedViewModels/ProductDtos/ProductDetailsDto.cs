@@ -31,6 +31,9 @@ namespace NovaFashion.SharedViewModels.ProductDtos
 
         [JsonPropertyName("variants")]
         public List<ProductVariantInProductDto> Variants { get; set; } = [];
+
+        [JsonPropertyName("is_deleted")]
+        public bool IsDeleted { get; set; }
         public DateTime CreatedTime { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedTime { get; set; }

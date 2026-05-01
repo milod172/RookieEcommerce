@@ -13,7 +13,6 @@ namespace NovaFashion.API.Features.Categories
 
     public class GetCategoryMapper : Mapper<PaginationQuery, PaginationList<CategoryDto>, PaginationList<Category>>
     {
-        private List<Category> _allCategories = [];
         public CategoryDto MapToDto(Category e)
         {
             return new CategoryDto

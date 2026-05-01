@@ -1,6 +1,6 @@
 import styles from '../../pages/ProductDetails.module.css';
 
-const ProductGeneralInfo = ({ form, handleChange }) => {
+const ProductGeneralInfo = ({ form, handleChange, fieldErrors }) => {
     return (
         <div className={`card border-0 shadow-sm ${styles.panel} mb-3`}>
             <h6 className={styles.sectionTitle}>General Information</h6>
@@ -24,9 +24,14 @@ const ProductGeneralInfo = ({ form, handleChange }) => {
                     name="description"
                     value={form.description || ''}
                     onChange={handleChange}
-                    className={`form-control ${styles.inlineInput}`}
+                    className={`form-control ${styles.inlineInput} ${fieldErrors.description ? 'is-invalid' : ''}`}
                     rows={3}
                 />
+                {fieldErrors.description && (
+                    <div className="invalid-feedback">
+                        {fieldErrors.description}
+                    </div>
+                )}
             </div>
 
             <div className="mb-0">
@@ -36,9 +41,14 @@ const ProductGeneralInfo = ({ form, handleChange }) => {
                     name="details"
                     value={form.details || ''}
                     onChange={handleChange}
-                    className={`form-control ${styles.inlineInput}`}
+                    className={`form-control ${styles.inlineInput} ${fieldErrors.details ? 'is-invalid' : ''}`}
                     rows={5}
                 />
+                {fieldErrors.details && (
+                    <div className="invalid-feedback">
+                        {fieldErrors.details}
+                    </div>
+                )}
             </div>
         </div>
     );

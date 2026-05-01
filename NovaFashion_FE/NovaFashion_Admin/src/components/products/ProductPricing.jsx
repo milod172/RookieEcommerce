@@ -1,6 +1,6 @@
 import styles from '../../pages/ProductDetails.module.css';
 
-const ProductPricing = ({ form, handleChange }) => {
+const ProductPricing = ({ form, handleChange, fieldErrors }) => {
     return (
         <div className={`card border-0 shadow-sm ${styles.panel} mb-3`}>
             <h6 className={styles.sectionTitle}>Pricing & Inventory</h6>
@@ -15,9 +15,14 @@ const ProductPricing = ({ form, handleChange }) => {
                         name="basePrice"
                         value={form.basePrice || 0}
                         onChange={handleChange}
-                        className={`form-control ${styles.inlineInput}`}
+                        className={`form-control ${styles.inlineInput} ${fieldErrors.basePrice ? 'is-invalid' : ''}`}
                         min="0"
                     />
+                    {fieldErrors.basePrice && (
+                        <div className="invalid-feedback">
+                            {fieldErrors.basePrice}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -29,9 +34,14 @@ const ProductPricing = ({ form, handleChange }) => {
                     name="totalQuantity"
                     value={form.totalQuantity || 0}
                     onChange={handleChange}
-                    className={`form-control ${styles.inlineInput}`}
+                    className={`form-control ${styles.inlineInput} ${fieldErrors.totalQuantity ? 'is-invalid' : ''}`}
                     min="0"
                 />
+                {fieldErrors.totalQuantity && (
+                    <div className="invalid-feedback mb-2">
+                        {fieldErrors.totalQuantity}
+                    </div>
+                )}
                 <small className="text-muted">Tổng tồn kho = tổng stock của các variants.</small>
             </div>
         </div>

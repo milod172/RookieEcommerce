@@ -13,7 +13,6 @@ export const useProductDetails = (id) => {
 
     const product = useMemo(() => {
         if (!data) return null;
-
         return {
             id: data.id,
             sku: data.sku,
@@ -27,6 +26,7 @@ export const useProductDetails = (id) => {
             categoryName: data.category_name,
             images: data.images || [],
             variants: data.variants,
+            isDeleted: data.is_deleted,
         };
     }, [data]);
 

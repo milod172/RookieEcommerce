@@ -48,6 +48,20 @@ namespace NovaFashion.API.Infrastructure.Persistence.Interceptors
                 else if (entry.State == EntityState.Modified)
                 {
                     entry.Entity.SetModified();
+                    
+                    var isDeletedProp = entry.Property(nameof(IHasAudit.IsDeleted));
+
+                    if (isDeletedProp.IsModified)
+                    {
+                        if (entry.Entity.IsDeleted)
+                        {
+                            entry.Entity.SetDeleted();
+                        }
+                        else
+                        {
+                            entry.Entity.DeletedAt = null;
+                        }
+                    }
                 }
             }
         }

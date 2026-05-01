@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 
-export const useProductForm = (product) => {
+export const useProductForm = (product, clearFieldError) => {
     const [form, setForm] = useState(null);
     const [isDirty, setIsDirty] = useState(false);
 
@@ -16,6 +16,7 @@ export const useProductForm = (product) => {
             totalSell: product.totalSell || 0,
             sku: product.sku || '',
             status: product.status || 'active',
+            isDeleted: product.isDeleted || false,
         };
     };
 
@@ -32,7 +33,7 @@ export const useProductForm = (product) => {
                 [name]: value,
             };
         });
-
+        clearFieldError(name);
         setIsDirty(true)
     };
 
