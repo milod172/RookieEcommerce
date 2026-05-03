@@ -25,6 +25,7 @@ namespace NovaFashion.API.Features.Categories
                 HasChildren = e.SubCategories.Any(),
                 SubCount = e.SubCategories.Count(),
                 ParentCategoryId = e.ParentCategoryId,
+                IsDeleted = e.IsDeleted,
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime
             };
@@ -40,7 +41,7 @@ namespace NovaFashion.API.Features.Categories
     {
         public override void Configure()
         {
-            Get("{parent_id}");
+            Get("parent/{parent_id}");
             AllowAnonymous();
             Group<CategoryGroup>();
         }
@@ -58,8 +59,8 @@ namespace NovaFashion.API.Features.Categories
 
             var categories = await db.Categories
                 .AsNoTracking()
-                .Where(c => c.ParentCategoryId == req.ParentId && c.IsDeleted == false)
-                .Include(c => c.SubCategories.Where(s => s.IsDeleted == false))
+                .Where(c => c.ParentCategoryId == req.ParentId)
+                .Include(c => c.SubCategories)
                 .ToListAsync(ct);
 
             var response = Map.FromEntity(categories);

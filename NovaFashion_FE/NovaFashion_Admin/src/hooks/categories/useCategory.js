@@ -23,6 +23,7 @@ export const useCategories = (params) => {
 
 const PICKER_KEY = 'categories/picker';
 const CREATE_KEY = 'categories/create';
+const UPDATE_KEY = 'categories/update';
 
 export const useCategoriesPicker = () => {
     const { data, error, isLoading } = useSWR(
@@ -58,5 +59,27 @@ export const useCreateCategory = () => {
         createCategory: trigger,
         isCreating: isMutating,
         createError: error,
+    };
+};
+
+export const useUpdateCategory = () => {
+    const { trigger, isMutating, error } = useSWRMutation(
+        UPDATE_KEY,
+        async (_key, { arg }) => {
+            return categoryApi.updateCategory(arg.id, arg);
+        },
+        {
+            onSuccess: () => {
+                mutate(PICKER_KEY);
+                mutate((key) => Array.isArray(key) && key[0] === 'categories');
+                mutate((key) => Array.isArray(key) && key[0] === 'subCategories');
+            },
+        }
+    );
+
+    return {
+        updateCategory: trigger,
+        isUpdating: isMutating,
+        updateError: error,
     };
 };

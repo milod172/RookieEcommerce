@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.SharedViewModels.ProductDtos;
@@ -94,7 +95,7 @@ namespace NovaFashion.API.Features.Products
         public override void Configure()
         {
             Post("");
-            AllowAnonymous();
+            Roles(Role.Admin.ToString());
             Group<ProductGroup>();
         }
 

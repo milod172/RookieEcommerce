@@ -1,0 +1,10 @@
+.wrapper {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem;
+}
+
+.card {
+    max-width: 420px;
+    width: 100%;
+    border-radius: 1rem;
+}

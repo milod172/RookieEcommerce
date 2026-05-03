@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 
 namespace NovaFashion.API.Features.Categories
@@ -16,7 +17,7 @@ namespace NovaFashion.API.Features.Categories
         public override void Configure()
         {
             Delete("{id}");
-            AllowAnonymous();
+            Roles(Role.Admin.ToString());
             Group<CategoryGroup>();
         }
 

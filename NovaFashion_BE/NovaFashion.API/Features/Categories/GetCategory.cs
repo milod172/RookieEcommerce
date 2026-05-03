@@ -22,6 +22,7 @@ namespace NovaFashion.API.Features.Categories
                 Description = e.Description,
                 HasChildren = e.SubCategories.Any(),
                 SubCount = e.SubCategories.Count(),
+                IsDeleted = e.IsDeleted,
                 CreatedTime = e.CreatedTime,
                 ModifiedTime = e.ModifiedTime
             };
@@ -53,8 +54,8 @@ namespace NovaFashion.API.Features.Categories
         {
             var query = db.Categories
                            .AsNoTracking()              
-                           .Where(c => c.ParentCategoryId == null && c.IsDeleted == false)
-                             .Include(c => c.SubCategories.Where(s => s.IsDeleted == false))
+                           .Where(c => c.ParentCategoryId == null)
+                             .Include(c => c.SubCategories)
                            .ApplyStatusFilter(req.Status)
                            .ApplySortFilter(req.SortBy);
 

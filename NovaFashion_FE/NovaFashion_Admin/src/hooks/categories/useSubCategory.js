@@ -3,7 +3,7 @@ import { categoryApi } from '../../features/categories/categoryApi';
 
 export const useSubCategories = (parentId) => {
     const { data, error, isLoading } = useSWR(
-        parentId ? ['subcategories', parentId] : null,
+        parentId ? ['subCategories', parentId] : null,
         () => categoryApi.getSubCategories(parentId),
         {
             revalidateOnFocus: false,

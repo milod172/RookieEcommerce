@@ -11,6 +11,8 @@ namespace NovaFashion.SharedViewModels.CategoryDtos
         public int SubCount { get; set; }
         public Guid? ParentCategoryId { get; set; }
         //public List<CategoryDto> SubCategories { get; set; } = new();
+
+        public bool IsDeleted { get; set; }
         public DateTime CreatedTime { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedTime { get; set; }

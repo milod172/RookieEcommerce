@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.SharedViewModels.CategoryDtos;
@@ -57,6 +58,7 @@ namespace NovaFashion.API.Features.Categories
         public override void Configure()
         {
             Post("");
+            Roles(Role.Admin.ToString());
             Group<CategoryGroup>();
         }
 

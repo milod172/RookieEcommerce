@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.CategoryDtos;
 
@@ -16,6 +17,7 @@ namespace NovaFashion.API.Features.Categories
         public string CategoryName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public Guid? ParentCategoryId { get; set; }
+        public bool IsDeleted { get; set; }
     }
 
     public class UpdateCategoryValidator : Validator<UpdateCategoryRequest>
@@ -45,7 +47,7 @@ namespace NovaFashion.API.Features.Categories
             e.CategoryName = r.CategoryName;
             e.Description = r.Description;
             e.ParentCategoryId = r.ParentCategoryId;
-
+            e.IsDeleted = r.IsDeleted;
             return e;
         }
 
@@ -57,6 +59,7 @@ namespace NovaFashion.API.Features.Categories
                 CategoryName = e.CategoryName,
                 Description = e.Description,
                 ParentCategoryId = e.ParentCategoryId,
+                IsDeleted = e.IsDeleted,
                 CreatedTime = e.CreatedTime
             };
         }
@@ -67,18 +70,28 @@ namespace NovaFashion.API.Features.Categories
         public override void Configure()
         {
             Put("{id}");
-            AllowAnonymous();
             Group<CategoryGroup>();
+            Roles(Role.Admin.ToString());
+            DontThrowIfValidationFails();
         }
 
         public override async Task HandleAsync(UpdateCategoryRequest req, CancellationToken ct)
         {
-            var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == req.Id, ct);
+            var category = await db.Categories
+                .Include(x => x.Products)
+                .FirstOrDefaultAsync(x => x.Id == req.Id, ct);
 
             if (category == null)
             {
                 ThrowError("Không tìm thấy danh mục", statusCode: 404);
             }
+
+            if (req.IsDeleted == true && category.Products.Any(x => !x.IsDeleted))
+            {
+                AddError("Không thể inactive trạng thái của danh mục đang chứa sản phẩm");
+            }
+
+            ThrowIfAnyErrors();
 
             Map.UpdateEntity(req, category);
 

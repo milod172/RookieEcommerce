@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.ProductDtos;
 
@@ -103,7 +104,7 @@ namespace NovaFashion.API.Features.Products
         public override void Configure()
         {
             Put("{id}");
-            AllowAnonymous();
+            Roles(Role.Admin.ToString());
             Group<ProductGroup>();
             DontThrowIfValidationFails();
         }

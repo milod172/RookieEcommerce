@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Services;
 
@@ -41,6 +42,7 @@ namespace NovaFashion.API.Features.ProductImages
         public override void Configure()
         {
             Delete("products/{product_id}/images/{image_id}");
+            Roles(Role.Admin.ToString());
             Group<ProductImageGroup>();
         }
 

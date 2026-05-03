@@ -13,7 +13,6 @@ namespace NovaFashion.API.Features.ProductImages
                     .ProducesProblemDetails(500)
                     .AutoTagOverride("Product Image")
                     .WithGroupName("Product Image"));
-                ep.AllowAnonymous();
             });
         }
     }

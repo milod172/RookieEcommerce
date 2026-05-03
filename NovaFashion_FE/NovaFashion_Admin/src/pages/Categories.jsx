@@ -7,13 +7,37 @@ import CategoryFormModal from '../features/categories/components/CategoryFormMod
 
 const PAGE_SIZE = 5;
 
-
 const Categories = () => {
     const [page, setPage] = useState(1);
     const [expandedIds, setExpandedIds] = useState([]);
     const [status, setStatus] = useState("All");
     const [sort, setSort] = useState("Newest");
-    const [showModal, setShowModal] = useState(false);
+
+    const [modalState, setModalState] = useState({
+        show: false,
+        mode: 'create',
+        initialValues: {},
+    });
+
+    const openCreate = () => setModalState({
+        show: true,
+        mode: 'create',
+        initialValues: {},
+    });
+
+    const openUpdate = (node) => setModalState({
+        show: true,
+        mode: 'update',
+        initialValues: {
+            id: node.id,
+            name: node.category_name,
+            description: node.description,
+            parentId: node.parent_category_id || '',
+            isActive: !node.is_deleted,
+        },
+    });
+
+    const closeModal = () => setModalState(prev => ({ ...prev, show: false }));
 
     const { categories, totalCount, isLoading, isError } = useCategories({
         PageNumber: page,
@@ -43,7 +67,7 @@ const Categories = () => {
                     </div>
                     <button
                         className={`btn ${styles.btnAccent}`}
-                        onClick={() => setShowModal(true)}
+                        onClick={openCreate}
                     >
                         <i className="bi bi-plus-lg"></i> Add Category
                     </button>
@@ -104,7 +128,7 @@ const Categories = () => {
                                     onToggle={toggleExpand}
                                     isLast={idx === categories.length - 1}
                                     ancestorIsLast={[]}
-                                    onAddSub={() => setShowModal(true)}
+                                    onEdit={openUpdate}
                                 />
                             ))}
                         </tbody>
@@ -112,9 +136,9 @@ const Categories = () => {
                 </div>
 
                 <CategoryFormModal
-                    show={showModal}
-                    onHide={() => setShowModal(false)}
-                    onSuccess={() => setShowModal(false)}
+                    {...modalState}
+                    onHide={closeModal}
+                    onSuccess={closeModal}
                 />
 
                 <Pagination

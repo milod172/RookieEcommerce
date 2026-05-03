@@ -1,0 +1,93 @@
+﻿using FastEndpoints;
+using FastEndpoints.Security;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using NovaFashion.API.Configuration;
+using NovaFashion.API.Entities;
+using NovaFashion.API.Infrastructure.Persistence;
+
+namespace NovaFashion.API.Features.Authentications
+{
+    public class MyTokenService : RefreshTokenService<TokenRequest, TokenResponse>
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly AppDbContext _db;
+
+        public MyTokenService(
+            UserManager<ApplicationUser> userManager,
+            AppDbContext db,
+            JwtSettings jwtSettings)  
+        {
+            _userManager = userManager;
+            _db = db;
+
+            Setup(o =>
+            {
+                o.TokenSigningKey = jwtSettings.SecretKey;
+                o.AccessTokenValidity = TimeSpan.FromMinutes(jwtSettings.TokenExpiryInMinutes);
+                o.RefreshTokenValidity = TimeSpan.FromDays(7);
+                o.Endpoint("/refresh-token", ep =>
+                {
+                    ep.Group<AuthGroup>();
+                    ep.AllowAnonymous();
+                });
+            });
+        }
+
+        public override async Task PersistTokenAsync(TokenResponse response)
+        {
+            var user = await _userManager.FindByIdAsync(response.UserId);
+            if (user == null) return;
+
+            // Upsert record into AspNetUserTokens
+            await _userManager.SetAuthenticationTokenAsync(
+                user,
+                loginProvider: "FastEndpoints",
+                tokenName: "RefreshToken",
+                tokenValue: response.RefreshToken);
+
+            // Update ExpiresAt
+            var tokenRecord = await _db.UserTokens.FirstOrDefaultAsync(t =>
+                t.UserId == response.UserId &&
+                t.LoginProvider == "FastEndpoints" &&
+                t.Name == "RefreshToken");
+
+            if (tokenRecord != null)
+            {
+                tokenRecord.ExpiresAt = response.RefreshExpiry;
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public override async Task RefreshRequestValidationAsync(TokenRequest req)
+        {
+            var user = await _userManager.FindByIdAsync(req.UserId);
+            if (user == null)
+            {
+                AddError("User không tồn tại");
+                return;
+            }
+
+            var tokenRecord = await _db.UserTokens.FirstOrDefaultAsync(t =>
+                t.UserId == req.UserId &&
+                t.LoginProvider == "FastEndpoints" &&
+                t.Name == "RefreshToken");
+
+            if (tokenRecord == null || tokenRecord.Value != req.RefreshToken)
+                AddError(r => r.RefreshToken, "Refresh token không hợp lệ");
+            else if (tokenRecord.ExpiresAt < DateTime.UtcNow)
+                AddError(r => r.RefreshToken, "Refresh token đã hết hạn");
+        }
+
+        public override async Task SetRenewalPrivilegesAsync(TokenRequest req, UserPrivileges privileges)
+        {
+            var user = await _userManager.FindByIdAsync(req.UserId);
+            if (user == null) return;
+
+            var roles = await _userManager.GetRolesAsync(user);
+            privileges.Roles.AddRange(roles);
+            privileges.Claims.Add(new("UserId", user.Id));
+            privileges.Claims.Add(new("Email", user.Email!));
+        }
+    }
+}

@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Shared.Extensions;
 using NovaFashion.API.Shared.Services;
@@ -72,6 +73,7 @@ namespace NovaFashion.API.Features.ProductImages
         {
             Post("products/{product_id}/images");
             AllowFileUploads();
+            Roles(Role.Admin.ToString());
             Group<ProductImageGroup>();
         }
 

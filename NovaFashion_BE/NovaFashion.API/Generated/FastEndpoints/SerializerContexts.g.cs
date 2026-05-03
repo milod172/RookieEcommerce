@@ -12,8 +12,11 @@ namespace NovaFashion_API;
 /// STJ serializer context for NovaFashion_API endpoints.
 /// </summary>
 [JsonSerializable(typeof(CloudinaryDotNet.Actions.Size), TypeInfoPropertyName = "TI_Size_CA647042")]
+[JsonSerializable(typeof(NovaFashion.API.Features.Authentications.LoginRequest), TypeInfoPropertyName = "TI_LoginRequest_D6F9CBFA")]
+[JsonSerializable(typeof(NovaFashion.API.Features.Authentications.RegisterRequest), TypeInfoPropertyName = "TI_RegisterRequest_425D435E")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Categories.CreateCategoryRequest), TypeInfoPropertyName = "TI_CreateCategoryRequest_1F53A338")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Categories.DeleteCategoryRequest), TypeInfoPropertyName = "TI_DeleteCategoryRequest_C697690E")]
+[JsonSerializable(typeof(NovaFashion.API.Features.Categories.GetCategoryDetailsQuery), TypeInfoPropertyName = "TI_GetCategoryDetailsQuery_B2666A17")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Categories.GetSubCategoryQuery), TypeInfoPropertyName = "TI_GetSubCategoryQuery_6FDBF9D6")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Categories.UpdateCategoryRequest), TypeInfoPropertyName = "TI_UpdateCategoryRequest_C69AA8A8")]
 [JsonSerializable(typeof(NovaFashion.API.Features.ProductImages.CreateProductImagesRequest), TypeInfoPropertyName = "TI_CreateProductImagesRequest_E5EECCB9")]
@@ -29,6 +32,8 @@ namespace NovaFashion_API;
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationList<NovaFashion.SharedViewModels.CategoryDtos.CategoryDto>), TypeInfoPropertyName = "TI_CategoryDto__420D6AE2")]
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationList<NovaFashion.SharedViewModels.ProductDtos.ProductDto>), TypeInfoPropertyName = "TI_ProductDto__F2205A15")]
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationQuery), TypeInfoPropertyName = "TI_PaginationQuery_78DEE636")]
+[JsonSerializable(typeof(NovaFashion.SharedViewModels.AuthenticationDtos.RegisterResponseDto), TypeInfoPropertyName = "TI_RegisterResponseDto_9531B02E")]
+[JsonSerializable(typeof(NovaFashion.SharedViewModels.CategoryDtos.CategoryDetailsDto), TypeInfoPropertyName = "TI_CategoryDetailsDto_1049A1C4")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.CategoryDtos.CategoryDto), TypeInfoPropertyName = "TI_CategoryDto_BC9C3AB9")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.CategoryDtos.CategoryPickerDto), TypeInfoPropertyName = "TI_CategoryPickerDto_AAF68AB4")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.ProductDtos.ProductDetailsDto), TypeInfoPropertyName = "TI_ProductDetailsDto_2102FEA0")]

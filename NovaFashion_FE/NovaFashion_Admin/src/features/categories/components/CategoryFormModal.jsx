@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useMemo } from 'react';
-import { useCategoriesPicker, useCreateCategory } from '../../../hooks/categories/useCategory';
+import { useCategoriesPicker, useCreateCategory, useUpdateCategory } from '../../../hooks/categories/useCategory';
 
 
 function flattenPickerItems(items = []) {
@@ -29,17 +29,22 @@ const INDENT = (level) => (level > 0 ? `${'—'.repeat(level)} ` : '');
 const EMPTY = { name: '', description: '', parentId: '' };
 
 const CategoryFormModal = ({
+    mode = 'create',
     show,
     onHide,
     onSuccess,
     initialValues = EMPTY,
-    title = 'Thêm danh mục',
+    title = mode === 'create' ? 'Tạo danh mục mới' : 'Cập nhật danh mục',
 }) => {
 
     const [name, setName] = useState(initialValues.name ?? '');
     const [description, setDescription] = useState(initialValues.description ?? '');
     const [parentId, setParentId] = useState(initialValues.parentId ?? '');
-    const [formError, setFormError] = useState('');
+    const [formError, setFormError] = useState({});
+    const [isActive, setIsActive] = useState(initialValues.isActive ?? true);
+
+    const isCreate = mode === 'create';
+    const isUpdate = mode === 'update';
 
     // Reset whenever the modal opens
     useEffect(() => {
@@ -47,42 +52,62 @@ const CategoryFormModal = ({
             setName(initialValues.name ?? '');
             setDescription(initialValues.description ?? '');
             setParentId(initialValues.parentId ?? '');
-            setFormError('');
+            setIsActive(initialValues.isActive ?? true);
+            setFormError({});
         }
     }, [show]);
 
 
     const { pickerItems, isLoading: pickerLoading, isError: pickerError } = useCategoriesPicker();
-    const { createCategory, isCreating, createError } = useCreateCategory();
-
     const flatItems = useMemo(() => flattenPickerItems(pickerItems), [pickerItems]);
+
+    const { createCategory, isCreating, createError } = useCreateCategory();
+    const { updateCategory, isUpdating, updateError } = useUpdateCategory();
+
+    const isSubmitting = isCreating || isUpdating;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setFormError('');
-
-        if (!name.trim()) {
-            setFormError('Tên danh mục không được để trống.');
-            return;
-        }
+        setFormError({});
 
         try {
-            await createCategory({
-                category_name: name.trim(),
-                description: description.trim(),
-                parent_category_id: parentId || null,
-            });
+            if (isCreate) {
+                await createCategory({
+                    category_name: name.trim(),
+                    description: description.trim(),
+                    parent_category_id: parentId || null,
+                });
+            } else {
+                const payload = {
+                    id: initialValues.id,
+                    category_name: name.trim(),
+                    description: description.trim(),
+                    parent_category_id: parentId || null,
+                    is_deleted: !isActive,
+                };
+                console.log('Update payload:', payload);
+                await updateCategory(payload);
+            }
 
             onSuccess?.();
             onHide?.();
         } catch (err) {
-            setFormError(
-                err?.response?.data?.message ||
-                'Có lỗi xảy ra khi tạo danh mục. Vui lòng thử lại.'
-            );
+            const errors = err?.response?.data?.errors;
+            if (errors) {
+
+                setFormError({
+                    name: errors?.category_name?.[0],
+                    description: errors?.description?.[0],
+                    status: errors?.general_errors?.[0],
+                });
+            } else {
+                setFormError({
+                    general: err?.response?.data?.message || `Có lỗi xảy ra khi ${isCreate ? 'tạo' : 'cập nhật'} danh mục.`,
+                });
+            }
         }
     };
-    
+
     if (!show) return null;
 
     return (
@@ -102,7 +127,7 @@ const CategoryFormModal = ({
                                 type="button"
                                 className="btn-close"
                                 onClick={onHide}
-                                disabled={isCreating}
+                                disabled={isSubmitting}
                             />
                         </div>
 
@@ -110,82 +135,102 @@ const CategoryFormModal = ({
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body pt-2">
 
-                                {/* ERROR */}
-                                {(formError || createError) && (
-                                    <div className="alert alert-danger py-2 px-3 small">
-                                        {formError || 'Có lỗi xảy ra khi tạo danh mục.'}
-                                    </div>
+                                {/* GENERAL ERROR */}
+                                {formError.general && (
+                                    <div className="alert alert-danger py-2 px-3 small">{formError.general}</div>
                                 )}
 
                                 {/* NAME */}
                                 <div className="mb-3">
-                                    <label className="form-label small fw-medium">
+                                    <label htmlFor='category-name' className="form-label small fw-medium">
                                         Tên danh mục <span className="text-danger">*</span>
                                     </label>
                                     <input
                                         type="text"
-                                        className={`form-control ${!name.trim() && formError ? 'is-invalid' : ''}`}
+                                        id='category-name'
+                                        className={`form-control ${formError.name ? 'is-invalid' : ''}`}
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        disabled={isCreating}
+                                        disabled={isSubmitting}
                                         autoFocus
+                                        required
                                     />
-                                    <div className="invalid-feedback">
-                                        Vui lòng nhập tên danh mục.
-                                    </div>
+                                    {formError.name && <div className="invalid-feedback">{formError.name}</div>}
                                 </div>
 
                                 {/* DESCRIPTION */}
                                 <div className="mb-3">
-                                    <label className="form-label small fw-medium">Mô tả</label>
+                                    <label htmlFor='category-description' className="form-label small fw-medium">Mô tả</label>
                                     <textarea
-                                        className="form-control"
+                                        id='category-description'
+                                        className={`form-control ${formError.description ? 'is-invalid' : ''}`}
                                         rows={3}
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
-                                        disabled={isCreating}
+                                        disabled={isSubmitting}
                                         style={{ resize: 'none' }}
                                     />
+                                    {formError.description && <div className="invalid-feedback">{formError.description}</div>}
                                 </div>
 
                                 {/* PARENT */}
-                                <div>
-                                    <label className="form-label small fw-medium">Danh mục cha</label>
+                                {isCreate && (
+                                    <div>
+                                        <label htmlFor='parent-category' className="form-label small fw-medium">Danh mục cha</label>
 
-                                    {pickerError ? (
-                                        <div className="alert alert-warning py-2 px-3 small">
-                                            Không thể tải danh sách danh mục.
-                                        </div>
-                                    ) : (
-                                        <div className="position-relative">
-                                            <select
-                                                className="form-select"
-                                                value={parentId}
-                                                onChange={(e) => setParentId(e.target.value)}
-                                                disabled={isCreating || pickerLoading}
-                                            >
-                                                <option value="">
-                                                    — Không có (danh mục gốc) —
-                                                </option>
-                                                {flatItems.map((c) => (
-                                                    <option key={c.id} value={c.id}>
-                                                        {`${INDENT(c.level)}${c.category_name}`}
+                                        {pickerError ? (
+                                            <div className="alert alert-warning py-2 px-3 small">
+                                                Không thể tải danh sách danh mục.
+                                            </div>
+                                        ) : (
+                                            <div className="position-relative">
+                                                <select
+                                                    id='parent-category'
+                                                    className="form-select"
+                                                    value={parentId}
+                                                    onChange={(e) => setParentId(e.target.value)}
+                                                    disabled={isSubmitting || pickerLoading}
+                                                >
+                                                    <option value="">
+                                                        — Không có (danh mục gốc) —
                                                     </option>
-                                                ))}
-                                            </select>
+                                                    {flatItems.map((c) => (
+                                                        <option key={c.id} value={c.id}>
+                                                            {`${INDENT(c.level)}${c.category_name}`}
+                                                        </option>
+                                                    ))}
+                                                </select>
 
-                                            {pickerLoading && (
-                                                <div className="position-absolute top-50 end-0 translate-middle-y me-3">
-                                                    <div className="spinner-border spinner-border-sm" />
-                                                </div>
-                                            )}
+                                                {pickerLoading && (
+                                                    <div className="position-absolute top-50 end-0 translate-middle-y me-3">
+                                                        <div className="spinner-border spinner-border-sm" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="form-text">
+                                            Dấu "—" thể hiện cấp độ danh mục.
                                         </div>
-                                    )}
-
-                                    <div className="form-text">
-                                        Dấu "—" thể hiện cấp độ danh mục.
                                     </div>
-                                </div>
+                                )}
+
+                                {isUpdate && (
+                                    <div className="mb-3">
+                                        <label htmlFor='category-status' className="form-label small fw-medium">Trạng thái</label>
+                                        <select
+                                            id='category-status'
+                                            className={`form-select ${formError.status ? 'is-invalid' : ''}`}
+                                            value={isActive ? 'active' : 'inactive'}
+                                            onChange={(e) => setIsActive(e.target.value === 'active')}
+                                            disabled={isSubmitting}
+                                        >
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                        {formError.status && <div className="invalid-feedback">{formError.status}</div>}
+                                    </div>
+                                )}
                             </div>
 
                             {/* FOOTER */}
@@ -194,7 +239,7 @@ const CategoryFormModal = ({
                                     type="button"
                                     className="btn btn-outline-secondary px-4"
                                     onClick={onHide}
-                                    disabled={isCreating}
+                                    disabled={isSubmitting}
                                 >
                                     Hủy
                                 </button>
@@ -202,12 +247,12 @@ const CategoryFormModal = ({
                                 <button
                                     type="submit"
                                     className="btn btn-success px-4 d-flex align-items-center gap-2"
-                                    disabled={isCreating || pickerLoading}
+                                    disabled={isSubmitting || pickerLoading}
                                 >
-                                    {isCreating && (
+                                    {isSubmitting && (
                                         <span className="spinner-border spinner-border-sm"></span>
                                     )}
-                                    {isCreating ? 'Đang lưu...' : 'Lưu danh mục'}
+                                    {isSubmitting ? 'Đang lưu...' : 'Lưu danh mục'}
                                 </button>
                             </div>
                         </form>

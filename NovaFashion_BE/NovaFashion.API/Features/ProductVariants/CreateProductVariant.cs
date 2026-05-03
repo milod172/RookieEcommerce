@@ -81,6 +81,7 @@ namespace NovaFashion.API.Features.ProductVariants
         public override void Configure()
         {
             Post("products/{product_id}/variants");
+            Roles(Role.Admin.ToString());
             Group<ProductVariantGroup>();
             DontThrowIfValidationFails();
         }

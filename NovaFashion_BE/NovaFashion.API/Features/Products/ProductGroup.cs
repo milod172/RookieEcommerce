@@ -13,7 +13,6 @@ namespace NovaFashion.API.Features.Products
                     .ProducesProblemDetails(500)
                     .AutoTagOverride("Product")
                     .WithGroupName("Product"));
-                ep.AllowAnonymous();
             });
         }
     }

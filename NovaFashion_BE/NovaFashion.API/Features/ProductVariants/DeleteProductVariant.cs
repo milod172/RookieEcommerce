@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Features.Products;
 using NovaFashion.API.Infrastructure.Persistence;
 
@@ -22,6 +23,7 @@ namespace NovaFashion.API.Features.ProductVariants
         public override void Configure()
         {
             Delete("products/{product_id}/variants/{variant_id}");
+            Roles(Role.Admin.ToString());
             Group<ProductVariantGroup>();
         }
 

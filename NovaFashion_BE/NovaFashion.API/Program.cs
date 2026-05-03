@@ -4,10 +4,11 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.Extensions.Options;
 using NovaFashion.API;
 using NovaFashion.API.Configuration;
+using NovaFashion.API.Infrastructure.Seed;
 using NovaFashion_API;
+using NSwag;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,22 +17,20 @@ var builder = WebApplication.CreateBuilder(args);
 var appSettings = new AppSettings();
 builder.Configuration.Bind(appSettings);
 
-
 builder.Services.AddControllers();
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
 });
 
-
-
-
 builder.Services.AddFastEndpoints();
 
 builder.Services
     .AddApiServices(builder.Configuration)
+    .AddInfrastructure(appSettings.ConnectionStrings.DefaultConnection)
     .AddApplicationServices()
-    .AddInfrastructure(appSettings.ConnectionStrings.DefaultConnection);
+    .AddJwtAuthentication(appSettings.JwtSettings);
+
 
 builder.Services.SwaggerDocument(opt =>
 {
@@ -45,16 +44,6 @@ builder.Services.SwaggerDocument(opt =>
     {
         s.Title = "Nova Fashion API";
         s.Version = "v1";
-
-      
-        //s.AddAuth("Bearer", new()
-        //{
-        //    Type = OpenApiSecuritySchemeType.ApiKey,
-        //    Name = "Authorization",
-        //    In = OpenApiSecurityApiKeyLocation.Header,
-        //    Description = "Enter: Bearer [your_token]"
-        //});
-
     };
 });
 // Register CORS
@@ -70,6 +59,8 @@ builder.Services.AddCors(options =>
    
 var app = builder.Build();
 
+await app.SeedDatabaseAsync(appSettings.AdminSettings);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -78,6 +69,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAnyOrigin");
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

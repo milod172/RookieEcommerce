@@ -1,10 +1,9 @@
 import { Fragment } from 'react';
 import styles from './CategoryRow.module.css';
-import { Link } from 'react-router-dom';
 import { useSubCategories } from '../../../hooks/categories/useSubCategory';
 
 
-const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorIsLast = [], onAddSub }) => {
+const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorIsLast = [], onEdit }) => {
     const isExpanded = expandedIds.includes(node.id);
 
     // HasChildren
@@ -31,7 +30,6 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                     )}
                 </td>
 
-                {/* ID cell — tree lines + expand cho sub rows */}
                 <td>
                     <div className="d-flex align-items-center">
                         {ancestorIsLast.map((ancIsLast, i) => (
@@ -68,7 +66,7 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                     <small className="text-muted">{node.description}</small>
                 </td>
 
-                {/* Badge: chỉ hiện khi đã fetch xong và có data */}
+
                 <td className="text-center">
                     {node.has_children
                         ? <span className={styles.countBadge}>{node.sub_count}</span>
@@ -82,17 +80,17 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                 </td>
 
                 <td className="text-end">
-                    <Link to={`/categories/${node.id}`} className={`btn btn-light btn-sm ${styles.actionBtn}`}>
+                    <button
+                        className={`btn btn-light btn-sm ${styles.actionBtn}`}
+                        onClick={() => onEdit(node)}
+                    >
                         <i className="bi bi-eye"></i>
-                    </Link>
-                    <button onClick={() => onAddSub(node.id)} className={`btn btn-light btn-sm ${styles.actionBtn}`} title="Add Sub">
-                        <i className="bi bi-plus-lg"></i>
                     </button>
                 </td>
             </tr>
 
             {/* Render sub categories sau khi fetch */}
-            {isExpanded && subCategories.map((sub, idx) => (
+            {isExpanded && subCategories?.map((sub, idx) => (
                 <CategoryRow
                     key={sub.id}
                     node={sub}
@@ -101,7 +99,7 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                     onToggle={onToggle}
                     isLast={idx === subCategories.length - 1}
                     ancestorIsLast={[...ancestorIsLast, isLast]}
-                    onAddSub={onAddSub}
+                    onEdit={onEdit}
                 />
             ))}
         </Fragment>

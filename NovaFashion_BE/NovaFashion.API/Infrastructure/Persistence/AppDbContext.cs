@@ -6,7 +6,15 @@ using NovaFashion.API.Entities;
 
 namespace NovaFashion.API.Infrastructure.Persistence
 {
-    public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
+    public class AppDbContext : IdentityDbContext<
+        ApplicationUser,
+        IdentityRole,
+        string,
+        IdentityUserClaim<string>,
+        IdentityUserRole<string>,
+        IdentityUserLogin<string>,
+        IdentityRoleClaim<string>,
+        UserRefreshToken>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
