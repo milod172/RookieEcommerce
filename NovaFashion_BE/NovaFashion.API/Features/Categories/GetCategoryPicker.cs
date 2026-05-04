@@ -10,6 +10,7 @@ namespace NovaFashion.API.Features.Categories
         public override void Configure()
         {
             Get("picker");
+            AllowAnonymous();
             Group<CategoryGroup>();
         }
         public override async Task HandleAsync(CancellationToken ct)

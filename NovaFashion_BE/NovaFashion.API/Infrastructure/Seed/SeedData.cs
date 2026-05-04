@@ -52,6 +52,7 @@ namespace NovaFashion.API.Infrastructure.Seed
                 Email = settings.Email,
                 UserName = settings.Email,
                 EmailConfirmed = true,
+                IsActive = true
             };
 
             var createResult = await userManager.CreateAsync(adminUser, settings.Password);

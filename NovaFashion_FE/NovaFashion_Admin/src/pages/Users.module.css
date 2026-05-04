@@ -1,0 +1,27 @@
+.panel {
+    padding: 1.25rem;
+    border-radius: 0.875rem;
+}
+
+.status {
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+}
+
+.active {
+    background: #d6e8cd;
+    color: #2f5d2a;
+}
+
+.inactive {
+    background: #f3e3e3;
+    color: #7a3a3a;
+}
+
+.actionBtn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid black;
+}

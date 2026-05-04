@@ -7,6 +7,7 @@ import Login from '../pages/Login';
 import './index.module.css'
 import CreateProduct from '../pages/CreateProduct';
 import ProductDetails from '../pages/ProductDetails';
+import Users from '../pages/Users';
 
 
 const ProtectedRoute = ({ children }) => {
@@ -35,6 +36,7 @@ const AppRoutes = () => {
                     <Route path=":id" element={<ProductDetails />} />
                 </Route>
 
+                <Route path="/users" element={<Users />} />
                 <Route path="/categories" element={<Categories />} />
             </Route>
 

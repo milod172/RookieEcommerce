@@ -1,0 +1,185 @@
+﻿@page
+@model ProductsModel
+@{
+	ViewData["Title"] = "Mua sắm";
+}
+
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Sidebar -->
+        <aside class="col-lg-3">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Categories</div>
+                <select class="form-select">
+                    <option>NAM</option>
+                    <option>NỮ</option>
+                    <option>TRẺ EM</option>
+                </select>
+            </div>
+
+            <div class="sidebar-card">
+                <div class="sidebar-title">Filter By Price</div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small mb-1">From</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small mb-1">To</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" placeholder="250.00">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-filter">Filter</button>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="col-lg-9">
+            <form method="get">
+                <div class="toolbar">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+
+                        <div>
+                            <label>Page size:</label>
+                            <select class="form-select form-select-sm"
+                                    name="PageSize"
+                                    onchange="this.form.submit()">
+                                <option value="5" selected="@(Model.PageSize == 5)">5</option>
+                                <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                                <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Sort By :</label>
+                            <select class="form-select form-select-sm"
+                                    name="SortBy"
+                                    onchange="this.form.submit()">
+                                <option value="Newest" selected="@(Model.SortBy == "Newest")">Mới nhất</option>  
+                                <option value="NameAsc" selected="@(Model.SortBy == "NameAsc")">Tên A → Z</option>
+                                <option value="NameDesc" selected="@(Model.SortBy == "NameDesc")">Tên Z → A</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="results-text">
+                        Showing @Model.Products.Items.Count of @Model.Products.TotalCount results
+                    </div>
+                </div>
+            </form>
+
+            <div class="row g-4">
+
+                <!-- Product card -->
+                <div class="row">
+                    @foreach (var item in Model.Products.Items)
+                    {
+                        <div class="product-card col-md-4 col-sm-6">
+                            <div class="product-img">
+                                <img src="@item.Images.FirstOrDefault()?.ImageUrl"
+                                     class="card-img-top image-default"
+                                     alt="@item.Images.FirstOrDefault()?.AltText">
+                                <img src="@item.Images.Skip(1).FirstOrDefault()?.ImageUrl"
+                                     class="card-img-top image-hover"
+                                     alt="@item.Images.Skip(1).FirstOrDefault()?.AltText">
+                            </div>
+                            <div class="product-body">
+                                
+                                <h5 class="card-title">@item.ProductName</h5>
+                                <p class="card-description">@item.Description</p>
+                                <span class="card-price">@item.UnitPrice?.ToString("N0") đ</span>
+                            </div>
+                        </div>
+                    }
+
+                    @{
+                        var page = Model.Products.PageNumber;
+                        var totalCount = Model.Products.TotalCount;
+                        var pageSize = Model.Products.PageSize;
+                        var totalPages = Model.Products.TotalPages;
+
+                        int startIdx = totalCount == 0 ? 0 : (page - 1) * pageSize + 1;
+                        int endIdx = Math.Min(page * pageSize, totalCount);
+
+                        string BuildUrl(int p) =>
+                            $"?PageNumber={p}&PageSize={Model.PageSize}&SortBy={Model.SortBy}";
+
+                        // ===== generate pageNumbers giống React =====
+                        List<object> pageNumbers = new();
+
+                        int delta = 2;
+                        int left = Math.Max(1, page - delta);
+                        int right = Math.Min(totalPages, page + delta);
+
+                        if (left > 1)
+                        {
+                            pageNumbers.Add(1);
+                            if (left > 2) pageNumbers.Add("...");
+                        }
+
+                        for (int i = left; i <= right; i++)
+                        {
+                            pageNumbers.Add(i);
+                        }
+
+                        if (right < totalPages)
+                        {
+                            if (right < totalPages - 1) pageNumbers.Add("...");
+                            pageNumbers.Add(totalPages);
+                        }
+                    }
+
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
+    
+                        <!-- TEXT -->
+                        <small class="text-muted">
+                            Hiển thị <strong>@startIdx</strong>–<strong>@endIdx</strong> trong
+                            <strong>@totalCount</strong> sản phẩm
+                        </small>
+
+                        <!-- PAGINATION -->
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+
+                                <!-- Prev -->
+                                <li class="page-item @(page == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="@(page == 1 ? "#" : BuildUrl(page - 1))">‹</a>
+                                </li>
+
+                                <!-- Page numbers -->
+                                @foreach (var n in pageNumbers)
+                                {
+                                    if (n is string)
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">…</span>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        var p = (int)n;
+                                        <li class="page-item @(page == p ? "active" : "")">
+                                            <a class="page-link" href="@BuildUrl(p)">@p</a>
+                                        </li>
+                                    }
+                                }
+
+                                <!-- Next -->
+                                <li class="page-item @(page == totalPages ? "disabled" : "")">
+                                    <a class="page-link" href="@(page == totalPages ? "#" : BuildUrl(page + 1))">›</a>
+                                </li>
+
+                            </ul>
+                        </nav>
+                    </div>
+        </main>
+    </div>
+</div>

@@ -24,7 +24,6 @@ httpClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-
 let isRefreshing = false;
 let pendingRequests = [];
 
@@ -66,6 +65,7 @@ httpClient.interceptors.response.use(
         } catch (refreshError) {
             pendingRequests = [];
             const { authApi } = await import('../features/authentications/authApi');
+
             authApi.logout();
             globalThis.location.href = '/login';
             return Promise.reject(refreshError);

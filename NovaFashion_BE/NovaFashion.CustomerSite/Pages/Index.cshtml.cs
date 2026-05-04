@@ -15,7 +15,7 @@ namespace NovaFashion.CustomerSite.Pages
             Products = await productApi.GetProductsAsync(
                 pageNumber ?? 1,
                 pageSize ?? 10,
-                sortBy ?? "Id desc",
+                sortBy ?? "IdDesc",
                 "Active"
             );
         }

@@ -12,7 +12,7 @@ namespace NovaFashion.CustomerSite.Services
                 $"&PageSize={pageSize}" +
                 $"&SortBy={Uri.EscapeDataString(sort)}" +
                 $"&Status={filterStatus}";
-
+         
             return await httpClient.GetFromJsonAsync<PaginationResponseDto<ProductDto>>(query)
                    ?? new();
         }
