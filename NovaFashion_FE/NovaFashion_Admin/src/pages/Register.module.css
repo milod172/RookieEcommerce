@@ -1,0 +1,71 @@
+.wrapper {
+    background: #f7f7f7;
+    font-family: 'Georgia', serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.registerCard {
+    background: #fff;
+    padding: 40px;
+    max-width: 520px;
+    width: 100%;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.title {
+    font-weight: 700;
+    color: #1f2a44;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #333;
+    margin-bottom: 28px;
+}
+
+.input {
+    padding: 14px 16px;
+    border-color: #e5e5e5;
+    color: #999;
+    font-style: italic;
+    border-radius: 4px;
+    box-shadow: none !important;
+}
+
+.input:focus {
+    border-color: #d18a6e;
+}
+
+.btnRegister {
+    background: #d18a6e;
+    color: #fff;
+    padding: 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+}
+
+.btnRegister:hover,
+.btnRegister:focus {
+    background: #c07a5e;
+    color: #fff;
+}
+
+.terms {
+    color: #333;
+}
+
+.loginLink {
+    color: #d18a6e;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.loginLink:hover {
+    text-decoration: underline;
+}

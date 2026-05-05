@@ -6,14 +6,14 @@ import { useProductForm } from '../hooks/products/useProductForm';
 import { useProductImages } from '../hooks/products/useProductImages';
 import { useProductVariants } from '../hooks/products/useProductVariants';
 import { useCategories } from '../hooks/categories/useCategory';
-import ProductHeader from '../components/products/ProductHeader';
-import ProductGeneralInfo from '../components/products/ProductGeneralInfo';
-import ProductImages from '../components/products/ProductImages';
-import ProductVariants from '../components/products/ProductVariants';
-import ProductStats from '../components/products/ProductStats';
-import ProductPricing from '../components/products/ProductPricing';
-import ProductCategorization from '../components/products/ProductCategorization';
-import ProductStatus from '../components/products/ProductStatus';
+import ProductHeader from '../features/products/components/ProductHeader';
+import ProductGeneralInfo from '../features/products/components/ProductGeneralInfo';
+import ProductImages from '../features/products/components/ProductImages';
+import ProductVariants from '../features/products/components/ProductVariants';
+import ProductStats from '../features/products/components/ProductStats';
+import ProductPricing from '../features/products/components/ProductPricing';
+import ProductCategorization from '../features/products/components/ProductCategorization';
+import ProductStatus from '../features/products/components/ProductStatus';
 import { useCategoryTree } from '../hooks/products/useCategoryTree';
 import { useUpdateProduct } from '../hooks/products/useUpdateProduct';
 
@@ -26,14 +26,16 @@ const ProductDetails = () => {
 
     //Categorization
     const [isChangingCategory, setIsChangingCategory] = useState(false);
-    const { categories } = useCategories({
-        pageNumber: 1,
-        pageSize: 20
-    });
     const [selectedPath, setSelectedPath] = useState([]);
     const [categoryDirty, setCategoryDirty] = useState(false);
-    const { categoryDropdowns, finalCategoryId, breadcrumbPath, handleCategorySelect: _handleCategorySelect } =
-        useCategoryTree(categories, selectedPath, setSelectedPath);
+    const { categoryDropdowns,
+        finalCategoryId,
+        breadcrumbPath,
+        handleCategorySelect: _handleCategorySelect,
+        isLoading: categoriesLoading,
+        isError: categoriesError,
+    } = useCategoryTree(selectedPath, setSelectedPath);
+
     const handleCategorySelect = (level, value) => {
         _handleCategorySelect(level, value);
         setCategoryDirty(true);
@@ -178,6 +180,8 @@ const ProductDetails = () => {
                             handleCategorySelect={handleCategorySelect}
                             isChanging={isChangingCategory}
                             setIsChanging={setIsChangingCategory}
+                            isLoading={categoriesLoading}
+                            isError={categoriesError}
                         />
                         <ProductStatus form={formLogic.form} handleChange={formLogic.handleChange} />
                     </div>

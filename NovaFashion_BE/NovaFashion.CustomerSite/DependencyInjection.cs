@@ -7,7 +7,8 @@ namespace NovaFashion.CustomerSite
         public static IServiceCollection AddApiClients(this IServiceCollection services,string baseUrl)
         {
             services
-                .AddNovaFashionApiClient<ProductApiClient>(baseUrl);
+                .AddNovaFashionApiClient<ProductApiClient>(baseUrl)
+                .AddNovaFashionApiClient<CategoryApiClient>(baseUrl);
 
             return services;
         }

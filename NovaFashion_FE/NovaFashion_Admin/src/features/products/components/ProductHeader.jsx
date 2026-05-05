@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import styles from '../../pages/ProductDetails.module.css';
+import styles from '../../../pages/ProductDetails.module.css';
 
 const ProductHeader = ({ form, isDirty, handleDiscard }) => {
     return (

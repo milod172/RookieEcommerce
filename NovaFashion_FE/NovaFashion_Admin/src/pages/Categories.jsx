@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './Categories.module.css';
 import Pagination from '../components/Pagination';
 import { useCategories } from '../hooks/categories/useCategory';
@@ -52,6 +52,10 @@ const Categories = () => {
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
         );
     };
+
+    useEffect(() => {
+        setExpandedIds([]);
+    }, [page, status, sort]);
 
     if (isLoading) return <div className="p-3">Loading...</div>;
     if (isError) return <div className="p-3 text-danger">Không thể tải danh mục.</div>;

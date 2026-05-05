@@ -1,0 +1,119 @@
+﻿@using NovaFashion.SharedViewModels
+@using NovaFashion.SharedViewModels.ProductDtos
+
+@model ProductsModel
+
+@{
+    var page = Model.Products.PageNumber;
+    var totalCount = Model.Products.TotalCount;
+    var pageSize = Model.Products.PageSize;
+    var totalPages = Model.Products.TotalPages;
+
+    int startIdx = totalCount == 0 ? 0 : (page - 1) * pageSize + 1;
+    int endIdx = Math.Min(page * pageSize, totalCount);
+
+    string BuildUrl(int p) => Url.Page(
+        "/Products/Products",
+        new
+        {
+            PageNumber = p,
+            PageSize = pageSize,
+            SortBy = Model.SortBy,
+            MinPrice = Model.MinPrice,
+            MaxPrice = Model.MaxPrice
+        }
+    )!;
+
+    List<object> pageNumbers = new();
+    int delta = 2;
+    int left = Math.Max(1, page - delta);
+    int right = Math.Min(totalPages, page + delta);
+
+    if (left > 1)
+    {
+        pageNumbers.Add(1);
+        if (left > 2) pageNumbers.Add("...");
+    }
+    for (int i = left; i <= right; i++)
+        pageNumbers.Add(i);
+    if (right < totalPages)
+    {
+        if (right < totalPages - 1) pageNumbers.Add("...");
+        pageNumbers.Add(totalPages);
+    }
+}
+@* clear error when success*@
+<div id="price-error"
+     hx-swap-oob="true"
+     style="display:none"></div>
+
+<div class="row g-4">
+    @foreach (var item in Model.Products.Items)
+    {
+        <div class="product-card col-md-4 col-sm-6">
+            <div class="product-img">
+                <img src="@item.Images.FirstOrDefault()?.ImageUrl" class="image-default">
+                <img src="@item.Images.Skip(1).FirstOrDefault()?.ImageUrl" class="image-hover">
+            </div>
+
+            <div class="product-body">
+                <h5>@item.ProductName</h5>
+                <p>@item.Description</p>
+                <span>@item.UnitPrice?.ToString("N0") đ</span>
+            </div>
+        </div>
+    }
+
+    <!-- Pagination -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
+        <small class="text-muted">
+            Hiển thị <strong>@startIdx</strong>–<strong>@endIdx</strong> trong
+            <strong>@totalCount</strong> sản phẩm
+        </small>
+
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+
+                <li class="page-item @(page <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       hx-get="@(BuildUrl(page - 1))"
+                       hx-target="#product-container"
+                       hx-swap="innerHTML"
+                       hx-push-url="true">‹</a>
+                </li>
+
+                @foreach (var n in pageNumbers)
+                {
+                    if (n is string)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    }
+                    else
+                    {
+                        var p = (int)n;
+                        <li class="page-item @(page == p ? "active" : "")">
+                            <a class="page-link"
+                               hx-get="@BuildUrl(p)"
+                               hx-target="#product-container"
+                               hx-swap="innerHTML"
+                               hx-push-url="true">@p</a>
+                        </li>
+                    }
+                }
+
+                <li class="page-item @(page >= totalPages || totalPages == 0 ? "disabled" : "")">
+                    <a class="page-link"
+                       hx-get="@(BuildUrl(page + 1))"
+                       hx-target="#product-container"
+                       hx-swap="innerHTML"
+                       hx-push-url="true">›</a>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+</div>
+
+

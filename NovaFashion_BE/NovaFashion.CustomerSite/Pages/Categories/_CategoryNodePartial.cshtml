@@ -1,0 +1,35 @@
+﻿@using NovaFashion.SharedViewModels.CategoryDtos
+@model CategoryDto
+
+@{
+    var collapseId = $"cat-{Model.Id.ToString()[..8]}";
+    var currentCategoryId = ViewData["CategoryId"] as Guid?;
+    var isSelected = currentCategoryId == Model.Id;
+}
+
+<li class="category-item">
+    @if (Model.HasChildren)
+    {
+        <div class="d-flex justify-content-between align-items-center category-parent"
+             data-bs-toggle="collapse"
+             data-bs-target="#@collapseId"
+             style="cursor:pointer">
+            <span>@Model.CategoryName</span>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+
+        <ul id="@collapseId" class="list-unstyled category-children collapse">
+            @foreach (var child in Model.SubCategories)
+            {
+                @await Html.PartialAsync("_CategoryNodePartial", child, ViewData)
+            }
+        </ul>
+    }
+    else
+    {
+        <a href="?CategoryId=@Model.Id&PageNumber=1"
+               class="d-flex align-items-center category-parent @(isSelected ? "active" : "")">
+            <span>@Model.CategoryName</span>
+        </a>
+    }
+</li>

@@ -6,11 +6,6 @@ export const categoryApi = {
         return res.data;
     },
 
-    getSubCategories: async (parentId) => {
-        const res = await httpClient.get(`/categories/parent/${parentId}`);
-        return res.data;
-    },
-
     getPicker: async () => {
         const res = await httpClient.get('/categories/picker');
         return res.data;

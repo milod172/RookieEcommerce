@@ -1,107 +1,76 @@
-import { useMemo, useState } from 'react';
-import { categoryApi } from "../../features/categories/categoryApi";
-export const useCategoryTree = (rootCategories, selectedPath, setSelectedPath) => {
+import { useMemo } from 'react';
+import { categoryApi } from '../../features/categories/categoryApi';
+import useSWR from 'swr';
 
-    // Cache tất cả sub đã fetch: { [parentId]: { options, isLoading } }
-    const [subCache, setSubCache] = useState({});
-
-    // Fetch sub theo parentId, tự update vào cache
-    const fetchSub = async (parentId) => {
-        if (!parentId || subCache[parentId]) return; // đã có cache thì thôi
-
-        setSubCache(prev => ({
-            ...prev,
-            [parentId]: { options: [], isLoading: true }
-        }));
-
-        try {
-            const data = await categoryApi.getSubCategories(parentId);
-            setSubCache(prev => ({
-                ...prev,
-                [parentId]: { options: data, isLoading: false }
-            }));
-        } catch {
-            setSubCache(prev => ({
-                ...prev,
-                [parentId]: { options: [], isLoading: false }
-            }));
+// Flat hóa toàn bộ tree đệ quy vào nodeMap
+const flattenTree = (nodes, map = {}) => {
+    nodes?.forEach(node => {
+        map[node.id] = node;
+        if (node.sub_categories?.length > 0) {
+            flattenTree(node.sub_categories, map);
         }
-    };
+    });
+    return map;
+};
 
-    // Build nodeMap từ rootCategories + tất cả sub đã cache
-    const nodeMap = useMemo(() => {
-        const map = {};
+export const useCategoryTree = (selectedPath, setSelectedPath) => {
 
-        rootCategories?.forEach(node => { map[node.id] = node; });
+    // Dùng getAll — data đã có sub_categories nested sẵn
+    const { data, isLoading, error } = useSWR(
+        'categories/tree-picker',
+        () => categoryApi.getAll({ PageNumber: 1, PageSize: 100 }),
+        { revalidateOnFocus: false }
+    );
 
-        Object.values(subCache).forEach(({ options }) => {
-            options?.forEach(node => { map[node.id] = node; });
-        });
+    // Root categories từ paginated response
+    const rootCategories = data?.items ?? [];
 
-        return map;
-    }, [rootCategories, subCache]);
+    // nodeMap flat toàn bộ tree để lookup nhanh theo id
+    const nodeMap = useMemo(() => flattenTree(rootCategories), [rootCategories]);
 
-    // Build dropdowns động theo selectedPath
+    // Build dropdowns theo selectedPath — hỗ trợ unlimited depth
     const categoryDropdowns = useMemo(() => {
-        if (!rootCategories?.length) return [];
+        if (!rootCategories.length) return [];
 
         const dropdowns = [{
             level: 0,
             options: rootCategories,
             selectedId: selectedPath[0] ?? '',
-            isLoading: false,
         }];
 
         for (let i = 0; i < selectedPath.length; i++) {
             const selectedNode = nodeMap[selectedPath[i]];
-
-            if (!selectedNode?.has_children) break;
-
-            const cached = subCache[selectedPath[i]];
+            if (!selectedNode?.sub_categories?.length) break;
 
             dropdowns.push({
                 level: i + 1,
-                options: cached?.options ?? [],
+                options: selectedNode.sub_categories,
                 selectedId: selectedPath[i + 1] ?? '',
-                isLoading: cached?.isLoading ?? false,
             });
-
-            if (!cached || cached.isLoading) break;
         }
 
         return dropdowns;
-    }, [rootCategories, selectedPath, nodeMap, subCache]);
+    }, [rootCategories, selectedPath, nodeMap]);
 
     const finalCategoryId = selectedPath.length > 0
         ? selectedPath[selectedPath.length - 1]
         : null;
 
     const breadcrumbPath = useMemo(() => {
-        if (!finalCategoryId) return null;
+        if (!selectedPath.length) return [];
         return selectedPath.map(id => nodeMap[id]).filter(Boolean);
     }, [selectedPath, nodeMap]);
 
-    // Khi user chọn 1 option → fetch sub của nó nếu has_children
     const handleCategorySelect = (level, value) => {
         if (!value) {
             setSelectedPath(prev => prev.slice(0, level));
             return;
         }
-
         setSelectedPath(prev => {
             const next = prev.slice(0, level);
             next[level] = value;
             return next;
         });
-
-        const selectedNode = nodeMap[value];
-        if (selectedNode?.has_children) {
-            fetchSub(value); // trigger fetch, tự cache
-        }
-    };
-
-    const buildPathFromId = (ancestorIds = []) => {
-        return ancestorIds.filter(Boolean);
     };
 
     return {
@@ -109,6 +78,7 @@ export const useCategoryTree = (rootCategories, selectedPath, setSelectedPath) =
         finalCategoryId,
         breadcrumbPath,
         handleCategorySelect,
-        buildPathFromId,
+        isLoading,
+        isError: !!error,
     };
 };

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using NovaFashion.CustomerSite;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,8 +9,6 @@ builder.Services.AddRazorPages();
 //Register API clients 
 var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]!;
 builder.Services.AddApiClients(apiBaseUrl);
-
-
 
 var app = builder.Build();
 

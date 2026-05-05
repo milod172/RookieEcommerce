@@ -1,4 +1,4 @@
-import styles from '../../pages/ProductDetails.module.css';
+import styles from '../../../pages/ProductDetails.module.css';
 
 const ProductPricing = ({ form, handleChange, fieldErrors }) => {
     return (

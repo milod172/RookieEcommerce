@@ -8,6 +8,7 @@ import './index.module.css'
 import CreateProduct from '../pages/CreateProduct';
 import ProductDetails from '../pages/ProductDetails';
 import Users from '../pages/Users';
+import Register from '../pages/Register';
 
 
 const ProtectedRoute = ({ children }) => {
@@ -41,6 +42,7 @@ const AppRoutes = () => {
             </Route>
 
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
         </Routes>
     );
 };

@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCreateProduct } from '../hooks/products/useCreateProduct.js';
 import { useCategoryTree } from '../hooks/products/useCategoryTree.js';
 import { useProductImages } from '../hooks/products/useProductImages.js';
-import { useCategories } from '../hooks/categories/useCategory.js';
 import CategorySection from '../features/categories/components/CategorySection.jsx';
 
 const CreateProduct = () => {
@@ -20,10 +19,6 @@ const CreateProduct = () => {
         resetErrors
     } = useCreateProduct();
 
-    const { categories, isLoading: categoriesLoading, isError: categoriesError } = useCategories({
-        pageNumber: 1,
-        pageSize: 20
-    });
 
     // ===== FORM =====
     const [form, setForm] = useState({
@@ -42,8 +37,10 @@ const CreateProduct = () => {
         categoryDropdowns,
         finalCategoryId,
         breadcrumbPath,
-        handleCategorySelect
-    } = useCategoryTree(categories, selectedPath, setSelectedPath);
+        handleCategorySelect,
+        isLoading: categoriesLoading,
+        isError: categoriesError,
+    } = useCategoryTree(selectedPath, setSelectedPath);
 
     const {
         images,

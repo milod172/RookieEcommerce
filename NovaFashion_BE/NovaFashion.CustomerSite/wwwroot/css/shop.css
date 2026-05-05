@@ -15,6 +15,42 @@
     margin-bottom: 18px;
 }
 
+.category-item {
+    margin-bottom: 10px;
+}
+
+.category-parent {
+    padding: 8px 0;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.category-parent i {
+    font-size: 12px;
+    color: #999;
+}
+
+/* Sub category */
+.category-children {
+    padding-left: 15px;
+    margin-top: 8px;
+}
+
+.category-children li {
+    padding: 6px 0;
+}
+
+.category-children a {
+    text-decoration: none;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.category-children a:hover {
+    color: #c97b54;
+}
+
 .form-select, .form-control {
     border-radius: 2px;
     font-size: 0.95rem;

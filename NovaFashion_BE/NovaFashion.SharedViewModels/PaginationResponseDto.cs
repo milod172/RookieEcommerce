@@ -12,22 +12,21 @@ namespace NovaFashion.SharedViewModels
         [JsonPropertyName("items")]
         public List<T> Items { get; set; } = [];
 
-        [JsonPropertyName("totalCount")]
+        [JsonPropertyName("total_count")]       
         public int TotalCount { get; set; }
 
-        [JsonPropertyName("pageSize")]
+        [JsonPropertyName("page_size")]          
         public int PageSize { get; set; }
 
-        [JsonPropertyName("pageNumber")]
+        [JsonPropertyName("page_number")]        
         public int PageNumber { get; set; }
 
-        [JsonPropertyName("totalPages")]
         public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
 
-        [JsonPropertyName("hasPreviousPage")]
-        public bool HasPreviousPage => PageNumber > 1;
+        [JsonPropertyName("has_previous_page")]  
+        public bool HasPreviousPage { get; set; }
 
-        [JsonPropertyName("hasNextPage")]
-        public bool HasNextPage => PageNumber < TotalPages;
+        [JsonPropertyName("has_next_page")]     
+        public bool HasNextPage { get; set; }
     }
 }

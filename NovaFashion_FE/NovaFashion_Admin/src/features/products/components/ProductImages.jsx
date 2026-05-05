@@ -1,4 +1,4 @@
-import styles from '../../pages/ProductDetails.module.css';
+import styles from '../../../pages/ProductDetails.module.css';
 
 const ProductImages = ({ images, handleSetCover, handleRemoveImage, handleDrop, handleDragOver, fileInputRef, handleFiles, isUploading, isDeleting }) => {
     return (
@@ -18,7 +18,7 @@ const ProductImages = ({ images, handleSetCover, handleRemoveImage, handleDrop, 
 
                             {/* Cover badge */}
                             {idx === 0 && (
-                                <span className={styles.coverBadge}>Cover</span>
+                                <span className={styles.coverBadge}>Main</span>
                             )}
 
                             {/* Overlay loading khi delete */}

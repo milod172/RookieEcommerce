@@ -1,79 +1,92 @@
+import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/authentications/useLogin";
 import styles from "./Login.module.css";
 
 const Login = () => {
     const { handleSubmit, error, loading } = useLogin();
+
     return (
-        <div
-            className={`d-flex align-items-center justify-content-center min-vh-100 ${styles.wrapper}`}
-        >
-            <div
-                className={`card shadow-lg border-0 ${styles.card}`}
-            >
-                <div className="card-body p-4 p-sm-5">
-                    <h2 className="card-title text-center mb-1 fw-bold">Đăng nhập</h2>
-                    <p className="text-center text-muted mb-4">
-                        Chào mừng bạn quay trở lại
-                    </p>
+        <div className={styles.wrapper}>
+            <div className={styles.card}>
+                <h2 className={styles.title}>Login</h2>
+                <p className={styles.subtitle}>
+                    Welcome back administrator.
+                </p>
 
-                    {error && (
-                        <div className="alert alert-danger py-2" role="alert">
-                            {error}
-                        </div>
-                    )}
+                {error && (
+                    <div className="alert alert-danger py-2" role="alert">
+                        {error}
+                    </div>
+                )}
 
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-3">
-                            <label htmlFor="email" className="form-label fw-semibold">
-                                Email
-                            </label>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <input
+                            type="email"
+                            name="email"
+                            className={`form-control ${styles.input}`}
+                            placeholder="Email Address"
+                            required
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <input
+                            type="password"
+                            name="password"
+                            className={`form-control ${styles.input}`}
+                            placeholder="Password"
+                            required
+                        />
+                    </div>
+
+                    <div className={`d-flex justify-content-between align-items-center mb-4`}>
+                        <div className="form-check mb-0">
                             <input
-                                type="email"
-                                className="form-control form-control-lg"
-                                id="email"
-                                name="email"
-                                placeholder="name@example.com"
-                                required
+                                className="form-check-input"
+                                type="checkbox"
+                                name="remember"
+                                id="remember"
                             />
-                        </div>
-
-                        <div className="mb-4">
-                            <label htmlFor="password" className="form-label fw-semibold">
-                                Mật khẩu
+                            <label className="form-check-label" htmlFor="remember">
+                                Remember me
                             </label>
-                            <input
-                                type="password"
-                                className="form-control form-control-lg"
-                                id="password"
-                                name="password"
-                                placeholder="••••••••"
-                                required
-                            />
                         </div>
+                        <a href="#" className={styles.forgot}>
+                            Forgot Your Password?
+                        </a>
+                    </div>
 
-                        <button
-                            type="submit"
-                            className="btn btn-primary btn-lg w-100 mb-3 fw-semibold"
-                            disabled={loading}
-                        >
-                            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+                    <button
+                        type="submit"
+                        className={`btn w-100 ${styles.btnLogin}`}
+                        disabled={loading}
+                    >
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
+
+                    {/* <div className={styles.divider}>OR</div> */}
+
+                    {/* <div className="d-flex gap-3">
+                        <button type="button" className={`btn flex-fill ${styles.btnFb}`}>
+                            Facebook
                         </button>
+                        <button type="button" className={`btn flex-fill ${styles.btnGg}`}>
+                            Google
+                        </button>
+                        <button type="button" className={`btn flex-fill ${styles.btnTw}`}>
+                            Twitter
+                        </button>
+                    </div> */}
 
-                        <div className="text-center">
-                            <span className="text-muted">Chưa có tài khoản? </span>
-                            <button
-                                type="button"
-                                className="btn btn-link p-0 fw-semibold text-decoration-none"
-                                onClick={() => console.log("Chuyển sang đăng ký")}
-                            >
-                                Đăng ký
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    {/* <p className={`text-center mt-3 ${styles.signup}`}>
+                        Don't have an account?{" "}
+                        <Link to="/register" className={styles.signupLink}>Sign up now</Link>
+                    </p> */}
+                </form>
             </div>
         </div>
     );
-}
+};
 
 export default Login;

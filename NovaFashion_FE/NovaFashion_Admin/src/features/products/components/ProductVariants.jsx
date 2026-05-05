@@ -1,5 +1,5 @@
-import { formatVnd } from '../../utils/formatters';
-import styles from '../../pages/ProductDetails.module.css';
+import { formatVnd } from '../../../utils/formatters';
+import styles from '../../../pages/ProductDetails.module.css';
 import React from 'react';
 
 const StatusBadge = ({ status }) => {

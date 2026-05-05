@@ -13,8 +13,8 @@ namespace NovaFashion.API.Shared.Validators
                 .WithMessage("PageNumber must be more than or equal to 1");
 
             RuleFor(x => x.PageSize)
-                .InclusiveBetween(5, 20)           
-                .WithMessage("PageSize must be between 5 to 20 items");
+                .GreaterThanOrEqualTo(5)           
+                .WithMessage("PageSize must be more than or equal to 5");
 
         }
     }

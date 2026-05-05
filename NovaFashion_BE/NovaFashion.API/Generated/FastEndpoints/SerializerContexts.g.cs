@@ -28,6 +28,7 @@ namespace NovaFashion_API;
 [JsonSerializable(typeof(NovaFashion.API.Features.Products.CreateProductRequest), TypeInfoPropertyName = "TI_CreateProductRequest_FC354E65")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Products.DeleteProductRequest), TypeInfoPropertyName = "TI_DeleteProductRequest_5863C0B7")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Products.GetProductDetailsRequest), TypeInfoPropertyName = "TI_GetProductDetailsRequest_AF864FB1")]
+[JsonSerializable(typeof(NovaFashion.API.Features.Products.PaginationProductQuery), TypeInfoPropertyName = "TI_PaginationProductQuery_833589EC")]
 [JsonSerializable(typeof(NovaFashion.API.Features.Products.UpdateProductRequest), TypeInfoPropertyName = "TI_UpdateProductRequest_5B0FC238")]
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationList<NovaFashion.SharedViewModels.CategoryDtos.CategoryDto>), TypeInfoPropertyName = "TI_CategoryDto__420D6AE2")]
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationList<NovaFashion.SharedViewModels.ProductDtos.ProductDto>), TypeInfoPropertyName = "TI_ProductDto__F2205A15")]

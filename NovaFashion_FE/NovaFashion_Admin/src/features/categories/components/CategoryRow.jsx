@@ -1,15 +1,12 @@
 import { Fragment } from 'react';
 import styles from './CategoryRow.module.css';
-import { useSubCategories } from '../../../hooks/categories/useSubCategory';
 
 
 const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorIsLast = [], onEdit }) => {
     const isExpanded = expandedIds.includes(node.id);
 
-    // HasChildren
-    const { subCategories, isLoading } = useSubCategories(
-        isExpanded && node.has_children ? node.id : null
-    );
+    const children = node.sub_categories ?? [];
+    const hasChildren = children.length > 0;
 
     return (
         <Fragment>
@@ -17,12 +14,9 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                 {/* Expand button col 1 — chỉ depth=0 */}
                 <td className="text-center">
                     {depth === 0 && (
-                        node.has_children ? (
+                        hasChildren ? (
                             <button className={styles.expandBtn} onClick={() => onToggle(node.id)}>
-                                {isLoading
-                                    ? <span className="spinner-border spinner-border-sm" style={{ width: '12px', height: '12px' }} />
-                                    : <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`}></i>
-                                }
+                                <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`}></i>
                             </button>
                         ) : (
                             <span className={styles.dot}></span>
@@ -44,10 +38,7 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
                             <span className={`${styles.treeBranch} ${isLast ? styles.treeBranchLast : ''}`}>
                                 {node.has_children ? (
                                     <button className={styles.expandBtn} onClick={() => onToggle(node.id)}>
-                                        {isLoading
-                                            ? <span className="spinner-border spinner-border-sm" style={{ width: '10px', height: '10px' }} />
-                                            : <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`} style={{ fontSize: '10px' }}></i>
-                                        }
+                                        <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`} style={{ fontSize: '10px' }}></i>
                                     </button>
                                 ) : (
                                     <span className={styles.dot}></span>
@@ -68,8 +59,8 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
 
 
                 <td className="text-center">
-                    {node.has_children
-                        ? <span className={styles.countBadge}>{node.sub_count}</span>
+                    {hasChildren
+                        ? <span className={styles.countBadge}>{children.length}</span>
                         : <span className="text-muted">—</span>}
                 </td>
 
@@ -90,14 +81,14 @@ const CategoryRow = ({ node, depth = 0, expandedIds, onToggle, isLast, ancestorI
             </tr>
 
             {/* Render sub categories sau khi fetch */}
-            {isExpanded && subCategories?.map((sub, idx) => (
+            {isExpanded && children?.map((sub, idx) => (
                 <CategoryRow
                     key={sub.id}
                     node={sub}
                     depth={depth + 1}
                     expandedIds={expandedIds}
                     onToggle={onToggle}
-                    isLast={idx === subCategories.length - 1}
+                    isLast={idx === children.length - 1}
                     ancestorIsLast={[...ancestorIsLast, isLast]}
                     onEdit={onEdit}
                 />

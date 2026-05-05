@@ -1,185 +1,118 @@
 ﻿@page
 @model ProductsModel
 @{
-	ViewData["Title"] = "Mua sắm";
+    ViewData["Title"] = "Mua sắm";
 }
 
 <div class="container py-5">
     <div class="row g-4">
+
         <!-- Sidebar -->
         <aside class="col-lg-3">
             <div class="sidebar-card">
-                <div class="sidebar-title">Categories</div>
-                <select class="form-select">
-                    <option>NAM</option>
-                    <option>NỮ</option>
-                    <option>TRẺ EM</option>
-                </select>
-            </div>
+                <div class="sidebar-title">Nhập khoảng giá</div>
 
-            <div class="sidebar-card">
-                <div class="sidebar-title">Filter By Price</div>
                 <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <label class="form-label small mb-1">From</label>
+                        <label class="form-label small mb-1">Từ</label>
                         <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" placeholder="0">
+                            <span class="input-group-text">đ</span>
+                            <input type="number"
+                                   id="MinPrice"
+                                   name="MinPrice"
+                                   min="0"
+                                   class="form-control"
+                                   placeholder="0"
+                                   value="@(Model.MinPrice.HasValue ? Model.MinPrice : null)" />
                         </div>
                     </div>
                     <div class="col-6">
-                        <label class="form-label small mb-1">To</label>
+                        <label class="form-label small mb-1">Đến</label>
                         <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" placeholder="250.00">
+                            <span class="input-group-text">đ</span>
+                            <input type="number"
+                                   id="MaxPrice"
+                                   name="MaxPrice"
+                                   min="0"
+                                   class="form-control"
+                                   placeholder="0"
+                                   value="@(Model.MaxPrice.HasValue ? Model.MaxPrice : null)" />
                         </div>
                     </div>
                 </div>
-                <button class="btn-filter">Filter</button>
+
+                <!-- FIX: thêm hx-on để bắt lỗi 400 từ server -->
+                <button type="button"
+                        class="btn-filter w-100"
+                        hx-get="@Url.Page("/Products/Products")"
+                        hx-target="#product-container"
+                        hx-swap="innerHTML"
+                        hx-push-url="true"
+                        hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #PageNumber"
+                        hx-on:htmx:response-error="document.getElementById('price-error').textContent = 'Khoảng giá không hợp lệ'">
+                    Áp dụng
+                </button>
+
+                <!-- FIX: error message placeholder -->
+                <div id="price-error" class="text-danger small mt-2"></div>
             </div>
         </aside>
 
         <!-- Main -->
         <main class="col-lg-9">
-            <form method="get">
-                <div class="toolbar">
-                    <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div class="toolbar">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
 
-                        <div>
-                            <label>Page size:</label>
-                            <select class="form-select form-select-sm"
-                                    name="PageSize"
-                                    onchange="this.form.submit()">
-                                <option value="5" selected="@(Model.PageSize == 5)">5</option>
-                                <option value="10" selected="@(Model.PageSize == 10)">10</option>
-                                <option value="20" selected="@(Model.PageSize == 20)">20</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label>Sort By :</label>
-                            <select class="form-select form-select-sm"
-                                    name="SortBy"
-                                    onchange="this.form.submit()">
-                                <option value="Newest" selected="@(Model.SortBy == "Newest")">Mới nhất</option>  
-                                <option value="NameAsc" selected="@(Model.SortBy == "NameAsc")">Tên A → Z</option>
-                                <option value="NameDesc" selected="@(Model.SortBy == "NameDesc")">Tên Z → A</option>
-                            </select>
-                        </div>
-
+                    <div>
+                        <label>Hiển thị:</label>
+                        <select id="PageSize"
+                                name="PageSize"
+                                class="form-select form-select-sm"
+                                hx-get="@Url.Page("/Products/Products")"
+                                hx-target="#product-container"
+                                hx-swap="innerHTML"
+                                hx-push-url="true"
+                                hx-include="#MinPrice, #MaxPrice, #SortBy, #PageNumber"
+                                hx-trigger="change">
+                            
+                            <option value="5" selected="@(Model.PageSize == 5 ? "selected" : null)">5</option>
+                            <option value="10" selected="@(Model.PageSize == 10 ? "selected" : null)">10</option>
+                            <option value="20" selected="@(Model.PageSize == 20 ? "selected" : null)">20</option>
+                        </select>
                     </div>
 
-                    <div class="results-text">
-                        Showing @Model.Products.Items.Count of @Model.Products.TotalCount results
+                    <div>
+                        <label>Sắp xếp:</label>
+                        <select id="SortBy"
+                                name="SortBy"
+                                class="form-select form-select-sm"
+                                hx-get="@Url.Page("/Products/Products")"
+                                hx-target="#product-container"
+                                hx-swap="innerHTML"
+                                hx-push-url="true"
+                                hx-include="#MinPrice, #MaxPrice, #PageSize, #PageNumber"
+                                hx-trigger="change">
+                            <option value="Newest" selected="@(Model.SortBy == "Newest" ? "selected" : null)">Mới nhất</option>
+                            <option value="NameAsc" selected="@(Model.SortBy == "NameAsc" ? "selected" : null)">Tên A → Z</option>
+                            <option value="NameDesc" selected="@(Model.SortBy == "NameDesc" ? "selected" : null)">Tên Z → A</option>
+                        </select>
                     </div>
+
                 </div>
-            </form>
+            </div>
 
             <div class="row g-4">
-
-                <!-- Product card -->
                 <div class="row">
-                    @foreach (var item in Model.Products.Items)
-                    {
-                        <div class="product-card col-md-4 col-sm-6">
-                            <div class="product-img">
-                                <img src="@item.Images.FirstOrDefault()?.ImageUrl"
-                                     class="card-img-top image-default"
-                                     alt="@item.Images.FirstOrDefault()?.AltText">
-                                <img src="@item.Images.Skip(1).FirstOrDefault()?.ImageUrl"
-                                     class="card-img-top image-hover"
-                                     alt="@item.Images.Skip(1).FirstOrDefault()?.AltText">
-                            </div>
-                            <div class="product-body">
-                                
-                                <h5 class="card-title">@item.ProductName</h5>
-                                <p class="card-description">@item.Description</p>
-                                <span class="card-price">@item.UnitPrice?.ToString("N0") đ</span>
-                            </div>
-                        </div>
-                    }
 
-                    @{
-                        var page = Model.Products.PageNumber;
-                        var totalCount = Model.Products.TotalCount;
-                        var pageSize = Model.Products.PageSize;
-                        var totalPages = Model.Products.TotalPages;
+                    <!-- FIX: bỏ comment, hidden input này bắt buộc phải có -->
+                    <input type="hidden" id="PageNumber" name="PageNumber" value="1" />
 
-                        int startIdx = totalCount == 0 ? 0 : (page - 1) * pageSize + 1;
-                        int endIdx = Math.Min(page * pageSize, totalCount);
-
-                        string BuildUrl(int p) =>
-                            $"?PageNumber={p}&PageSize={Model.PageSize}&SortBy={Model.SortBy}";
-
-                        // ===== generate pageNumbers giống React =====
-                        List<object> pageNumbers = new();
-
-                        int delta = 2;
-                        int left = Math.Max(1, page - delta);
-                        int right = Math.Min(totalPages, page + delta);
-
-                        if (left > 1)
-                        {
-                            pageNumbers.Add(1);
-                            if (left > 2) pageNumbers.Add("...");
-                        }
-
-                        for (int i = left; i <= right; i++)
-                        {
-                            pageNumbers.Add(i);
-                        }
-
-                        if (right < totalPages)
-                        {
-                            if (right < totalPages - 1) pageNumbers.Add("...");
-                            pageNumbers.Add(totalPages);
-                        }
-                    }
-
-
-                    <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
-    
-                        <!-- TEXT -->
-                        <small class="text-muted">
-                            Hiển thị <strong>@startIdx</strong>–<strong>@endIdx</strong> trong
-                            <strong>@totalCount</strong> sản phẩm
-                        </small>
-
-                        <!-- PAGINATION -->
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-
-                                <!-- Prev -->
-                                <li class="page-item @(page == 1 ? "disabled" : "")">
-                                    <a class="page-link" href="@(page == 1 ? "#" : BuildUrl(page - 1))">‹</a>
-                                </li>
-
-                                <!-- Page numbers -->
-                                @foreach (var n in pageNumbers)
-                                {
-                                    if (n is string)
-                                    {
-                                        <li class="page-item disabled">
-                                            <span class="page-link">…</span>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        var p = (int)n;
-                                        <li class="page-item @(page == p ? "active" : "")">
-                                            <a class="page-link" href="@BuildUrl(p)">@p</a>
-                                        </li>
-                                    }
-                                }
-
-                                <!-- Next -->
-                                <li class="page-item @(page == totalPages ? "disabled" : "")">
-                                    <a class="page-link" href="@(page == totalPages ? "#" : BuildUrl(page + 1))">›</a>
-                                </li>
-
-                            </ul>
-                        </nav>
+                    <div id="product-container">
+                        @await Html.PartialAsync("_ProductListPartial", Model)
                     </div>
+
+                </div>
+            </div>
         </main>
     </div>
 </div>

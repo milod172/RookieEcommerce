@@ -1,4 +1,4 @@
-import styles from '../../pages/ProductDetails.module.css';
+import styles from '../../../pages/ProductDetails.module.css';
 
 const ProductStatus = ({ form, handleChange }) => {
     return (
