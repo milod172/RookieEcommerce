@@ -34,8 +34,26 @@ namespace NovaFashion.CustomerSite.Pages.Products
 
         public async Task<IActionResult> OnGetAsync()
         {
-            ViewData["CategoryId"] = CategoryId;
+            var response = await productApi.GetProductsAsync(
+                PageNumber,
+                PageSize,
+                SortBy,
+                DefaultStatus,
+                MinPrice,
+                MaxPrice,
+                CategoryId
+            );
 
+            Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+
+            //var categoryTask = categoryApi.GetCategoriesAsync();
+            //Categories = await categoryTask;
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetFilterAsync()
+        {
             var response = await productApi.GetProductsAsync(
                 PageNumber,
                 PageSize,
@@ -55,45 +73,20 @@ namespace NovaFashion.CustomerSite.Pages.Products
 
                     if (apiError is not null)
                     {
-                       
+
                         foreach (var (key, messages) in apiError.Errors)
                             foreach (var msg in messages)
                             {
-    
                                 ModelState.AddModelError(key, msg);
-                            }           
+                            }
                     }
                 }
-               
-                if (Request.Headers["HX-Request"] == "true")
-                {
-                    Console.WriteLine("Trả _ProductFilterPartial");
-                    Response.Headers["HX-Retarget"] = "#product-filter-sidebar";
-                    Response.Headers["HX-Reswap"] = "innerHTML";
-                    return Partial("_ProductFilterPartial", this);
-                }
-
-                return Page();
             }
 
-            ModelState.Clear();
             Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
-
-            var categoryTask = categoryApi.GetCategoriesAsync();
-            Categories = await categoryTask;
-           
-            // Nếu là HTMX request → trả partial
-            if (Request.Headers["HX-Request"] == "true")
-            {
-            Response.Headers["HX-Retarget"] = "#product-container";
-            Response.Headers["HX-Reswap"] = "innerHTML"; 
-            Response.Headers["HX-Trigger"] = "filterSuccess";
-            return Partial("_ProductListPartial", this);
-            }
-
-            return Page();
-            
+            return Partial("_ProductContainerPartial", this);
         }
+
 
         public async Task<IActionResult> OnGetFilterPartialAsync()
         {
@@ -111,5 +104,67 @@ namespace NovaFashion.CustomerSite.Pages.Products
         //    return Partial("_CategoryFilterPartial", Categories);
         //}
 
+        //public async Task<IActionResult> OnGetAsync()
+        //{
+        //    ViewData["CategoryId"] = CategoryId;
+
+        //    var response = await productApi.GetProductsAsync(
+        //        PageNumber,
+        //        PageSize,
+        //        SortBy,
+        //        DefaultStatus,
+        //        MinPrice,
+        //        MaxPrice,
+        //        CategoryId
+        //    );
+
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        //        {
+        //            var rawContent = await response.Content.ReadAsStringAsync();
+        //            var apiError = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+
+        //            if (apiError is not null)
+        //            {
+
+        //                foreach (var (key, messages) in apiError.Errors)
+        //                    foreach (var msg in messages)
+        //                    {
+
+        //                        ModelState.AddModelError(key, msg);
+        //                    }           
+        //            }
+        //        }
+
+        //        if (Request.Headers["HX-Request"] == "true")
+        //        {
+        //            Console.WriteLine("Trả _ProductFilterPartial");
+        //            Response.Headers["HX-Retarget"] = "#product-filter-sidebar";
+        //            Response.Headers["HX-Reswap"] = "innerHTML";
+        //            return Partial("_ProductFilterPartial", this);
+        //        }
+
+        //        return Page();
+        //    }
+
+        //    ModelState.Clear();
+        //    Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+
+        //    var categoryTask = categoryApi.GetCategoriesAsync();
+        //    Categories = await categoryTask;
+
+        //    // Nếu là HTMX request → trả partial
+        //    if (Request.Headers["HX-Request"] == "true")
+        //    {
+        //    Response.Headers["HX-Retarget"] = "#product-container";
+        //    Response.Headers["HX-Reswap"] = "innerHTML"; 
+        //    Response.Headers["HX-Trigger"] = "filterSuccess";
+        //    return Partial("_ProductListPartial", this);
+        //    }
+
+        //    return Page();
+
+        //}
     }
 }

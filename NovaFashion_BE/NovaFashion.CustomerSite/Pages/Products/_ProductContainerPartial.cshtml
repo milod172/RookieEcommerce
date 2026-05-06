@@ -1,0 +1,16 @@
+﻿@model ProductsModel
+
+
+<div id="product-list">
+    <partial name="_ProductListPartial" model="Model" />
+</div>
+                    
+
+<div id="product-pagination">
+    <partial name="_PaginationPartial" model="Model" />
+</div>
+
+
+<div id="product-price-filter-sidebar" hx-swap-oob="true">
+    <partial name="_PriceFilterPartial" model="Model" />
+</div>

@@ -15,51 +15,15 @@
             
 
             <div id="product-price-filter-sidebar">
-                <partial name="_ProductPriceFilterPartial" model="Model" />
+                <partial name="_PriceFilterPartial" model="Model" />
             </div>
         </aside>
 
         <!-- Main -->
         <main class="col-lg-9">
-            <div class="toolbar">
-                <div class="d-flex align-items-center gap-3 flex-wrap">
 
-                    <div>
-                        <label>Hiển thị:</label>
-                        <select id="PageSize"
-                                name="PageSize"
-                                class="form-select form-select-sm"
-                                hx-get="@Url.Page("/Products/Products")"
-                                hx-target="#product-container"
-                                hx-swap="innerHTML"
-                                hx-push-url="true"
-                                hx-include="#MinPrice, #MaxPrice, #SortBy, #PageNumber"
-                                hx-trigger="change">
-                            
-                            <option value="5" selected="@(Model.PageSize == 5 ? "selected" : null)">5</option>
-                            <option value="10" selected="@(Model.PageSize == 10 ? "selected" : null)">10</option>
-                            <option value="20" selected="@(Model.PageSize == 20 ? "selected" : null)">20</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label>Sắp xếp:</label>
-                        <select id="SortBy"
-                                name="SortBy"
-                                class="form-select form-select-sm"
-                                hx-get="@Url.Page("/Products/Products")"
-                                hx-target="#product-container"
-                                hx-swap="innerHTML"
-                                hx-push-url="true"
-                                hx-include="#MinPrice, #MaxPrice, #PageSize, #PageNumber"
-                                hx-trigger="change">
-                            <option value="Newest" selected="@(Model.SortBy == "Newest" ? "selected" : null)">Mới nhất</option>
-                            <option value="NameAsc" selected="@(Model.SortBy == "NameAsc" ? "selected" : null)">Tên A → Z</option>
-                            <option value="NameDesc" selected="@(Model.SortBy == "NameDesc" ? "selected" : null)">Tên Z → A</option>
-                        </select>
-                    </div>
-
-                </div>
+            <div id="product-sortby" class="toolbar">
+                <partial name="_SortByPartial" model="Model" />
             </div>
 
             <div class="row g-4">
@@ -67,10 +31,11 @@
 
                     <input type="hidden" id="PageNumber" name="PageNumber" value="1" />
                     
-
+                    
                     <div id="product-container">
-                        <partial name="_ProductListPartial" model="Model" />              
+                        <partial name="_ProductContainerPartial" model="Model" />
                     </div>
+
                 </div>
             </div>
 
