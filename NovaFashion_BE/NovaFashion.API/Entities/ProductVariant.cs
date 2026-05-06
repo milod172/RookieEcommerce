@@ -3,7 +3,7 @@ using NovaFashion.API.Shared.Abstractions;
 
 namespace NovaFashion.API.Entities
 {
-    public class ProductVariant : IHasKey<Guid>, IHasAudit
+    public class ProductVariant : IHasAudit
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Size Size { get; set; }
@@ -20,7 +20,7 @@ namespace NovaFashion.API.Entities
         public bool IsDeleted { get; set; }
         public string? DeletedBy { get; set; }
 
-        //public virtual ICollection<CartItem> CartItems { get; set; } = [];
-        //public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
+        public virtual ICollection<CartItem> CartItems { get; set; } = [];
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
     }
 }

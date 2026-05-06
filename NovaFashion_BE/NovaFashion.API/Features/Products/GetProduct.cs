@@ -79,17 +79,19 @@ namespace NovaFashion.API.Features.Products
 
         public override async Task HandleAsync(PaginationProductQuery req, CancellationToken ct)
         {
-            if(req.MinPrice != null || req.MaxPrice != null)
+            if (req.MinPrice.HasValue || req.MaxPrice.HasValue)
             {
-                if(req.MinPrice == 0 && req.MaxPrice == 0)
+                if (req.MinPrice == 0 && req.MaxPrice == 0)
                 {
                     AddError(new ValidationFailure("price_filter_error", "Vui lòng điền khoảng giá phù hợp"));
                 }
-                else if (req.MinPrice > req.MaxPrice) { 
-                    AddError(new ValidationFailure("price_filter_error", "Vui lòng điền khoảng giá phù hợp")); 
+                else if (req.MinPrice > req.MaxPrice)
+                {
+                    AddError(new ValidationFailure("price_filter_error", "Vui lòng điền khoảng giá phù hợp"));
                 }
             }
 
+          
             ThrowIfAnyErrors();
 
             var query = db.Products
@@ -99,9 +101,9 @@ namespace NovaFashion.API.Features.Products
                 .Include(p => p.ProductVariants)
                 .ApplyStatusFilter(req.Status)
                 .ApplySortFilter(req.SortBy)
-                .ApplyPriceFilter(req.MinPrice, req.MaxPrice)  
-                .ApplyCategoryFilter(req.CategoryId);
+                .ApplyPriceFilter(req.MinPrice, req.MaxPrice);
 
+            query = await query.ApplyCategoryFilterAsync(db, req.CategoryId, ct);
 
             var pageResultEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
             var pageResultDtos = Map.FromEntity(pageResultEntities);
@@ -158,14 +160,43 @@ namespace NovaFashion.API.Features.Products
             return query;
         }
 
-        internal static IQueryable<Product> ApplyCategoryFilter(
+        internal static async Task<IQueryable<Product>> ApplyCategoryFilterAsync(
             this IQueryable<Product> query,
-            Guid? categoryId)
+            AppDbContext db,
+            Guid? categoryId,
+            CancellationToken ct)
         {
-            if (categoryId.HasValue)
-                query = query.Where(p => p.CategoryId == categoryId.Value);
+            if (!categoryId.HasValue)
+                return query;
 
-            return query;
+            // Load 1 lần duy nhất
+            var allCategories = await db.Categories
+                .AsNoTracking()
+                .Select(c => new { c.Id, c.ParentCategoryId })
+                .ToListAsync(ct);
+
+            // Build lookup: ParentId -> [ChildIds]
+            var childrenLookup = allCategories
+                .Where(c => c.ParentCategoryId.HasValue)
+                .GroupBy(c => c.ParentCategoryId!.Value)
+                .ToDictionary(g => g.Key, g => g.Select(c => c.Id).ToList());
+
+            // Duyệt cây in-memory
+            var result = new List<Guid?>();
+            var queue = new Queue<Guid>();
+            queue.Enqueue(categoryId.Value);
+
+            while (queue.Count > 0)
+            {
+                var currentId = queue.Dequeue();
+                result.Add(currentId);
+
+                if (childrenLookup.TryGetValue(currentId, out var children))
+                    foreach (var childId in children)
+                        queue.Enqueue(childId);
+            }
+
+            return query.Where(p => result.Contains(p.CategoryId));
         }
     }
 }

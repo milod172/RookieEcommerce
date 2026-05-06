@@ -12,12 +12,18 @@ namespace NovaFashion.CustomerSite.Pages
 
         public async Task OnGetAsync(int? pageNumber, int? pageSize, string? sortBy)
         {
-            Products = await productApi.GetProductsAsync(
+            var response = await productApi.GetProductsAsync(
                 pageNumber ?? 1,
                 pageSize ?? 10,
                 sortBy ?? "IdDesc",
                 "Active"
             );
+
+            if (response.IsSuccessStatusCode)
+            {
+                Products = await response.Content
+                    .ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+            }
         }
     }
 }

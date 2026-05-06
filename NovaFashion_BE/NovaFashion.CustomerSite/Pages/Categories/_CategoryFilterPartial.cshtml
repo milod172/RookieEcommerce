@@ -1,0 +1,15 @@
+﻿@using NovaFashion.SharedViewModels.CategoryDtos
+@model List<CategoryDto>
+
+<div class="sidebar-card mb-3">
+    <div class="sidebar-title">Danh mục</div>
+
+    <ul class="list-unstyled mb-0">
+        @foreach (var category in Model)
+        {
+           <partial  name="/Pages/Categories/_CategoryNodePartial.cshtml"
+                     model="category"
+                     view-data="ViewData" />
+        }
+    </ul>
+</div>

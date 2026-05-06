@@ -2,7 +2,7 @@
 
 namespace NovaFashion.API.Entities
 {
-    public class Product : IHasKey<Guid>, IHasAudit
+    public class Product :  IHasAudit
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string ProductName { get; set; } = string.Empty;
@@ -24,8 +24,8 @@ namespace NovaFashion.API.Entities
         public virtual Category? Category { get; set; }
         public virtual ICollection<ProductVariant> ProductVariants { get; set; } = [];
         public virtual ICollection<ProductImage> ProductImages { get; set; } = [];
-        //public virtual ICollection<CartItem> CartItems { get; set; } = [];
-        //public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
+        public virtual ICollection<CartItem> CartItems { get; set; } = [];
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
 
     }
 }

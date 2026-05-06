@@ -20,7 +20,8 @@
             PageSize = pageSize,
             SortBy = Model.SortBy,
             MinPrice = Model.MinPrice,
-            MaxPrice = Model.MaxPrice
+            MaxPrice = Model.MaxPrice,
+            CategoryId = Model.CategoryId
         }
     )!;
 
@@ -42,78 +43,89 @@
         pageNumbers.Add(totalPages);
     }
 }
-@* clear error when success*@
-<div id="price-error"
-     hx-swap-oob="true"
-     style="display:none"></div>
 
-<div class="row g-4">
-    @foreach (var item in Model.Products.Items)
-    {
-        <div class="product-card col-md-4 col-sm-6">
-            <div class="product-img">
-                <img src="@item.Images.FirstOrDefault()?.ImageUrl" class="image-default">
-                <img src="@item.Images.Skip(1).FirstOrDefault()?.ImageUrl" class="image-hover">
-            </div>
-
-            <div class="product-body">
-                <h5>@item.ProductName</h5>
-                <p>@item.Description</p>
-                <span>@item.UnitPrice?.ToString("N0") đ</span>
-            </div>
-        </div>
-    }
-
-    <!-- Pagination -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
-        <small class="text-muted">
-            Hiển thị <strong>@startIdx</strong>–<strong>@endIdx</strong> trong
-            <strong>@totalCount</strong> sản phẩm
-        </small>
-
-        <nav>
-            <ul class="pagination pagination-sm mb-0">
-
-                <li class="page-item @(page <= 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       hx-get="@(BuildUrl(page - 1))"
-                       hx-target="#product-container"
-                       hx-swap="innerHTML"
-                       hx-push-url="true">‹</a>
-                </li>
-
-                @foreach (var n in pageNumbers)
-                {
-                    if (n is string)
-                    {
-                        <li class="page-item disabled">
-                            <span class="page-link">…</span>
-                        </li>
-                    }
-                    else
-                    {
-                        var p = (int)n;
-                        <li class="page-item @(page == p ? "active" : "")">
-                            <a class="page-link"
-                               hx-get="@BuildUrl(p)"
-                               hx-target="#product-container"
-                               hx-swap="innerHTML"
-                               hx-push-url="true">@p</a>
-                        </li>
-                    }
-                }
-
-                <li class="page-item @(page >= totalPages || totalPages == 0 ? "disabled" : "")">
-                    <a class="page-link"
-                       hx-get="@(BuildUrl(page + 1))"
-                       hx-target="#product-container"
-                       hx-swap="innerHTML"
-                       hx-push-url="true">›</a>
-                </li>
-
-            </ul>
-        </nav>
+@if (!Model.Products.Items.Any())
+{
+    <div class="d-flex flex-column align-items-center justify-content-center py-5 text-muted">
+        <span class="fa-stack fa-3x mb-3">
+            <i class="fa-regular fa-file fa-stack-2x"></i>
+            <i class="fa-solid fa-magnifying-glass fa-stack-1x" style="margin-top: 0.4em; margin-left: 0.4em;"></i>
+        </span>
+        <p class="fs-5">Không tìm thấy sản phẩm nào.</p>
     </div>
-</div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var item in Model.Products.Items)
+        {
+            <div class="product-card col-md-4 col-sm-6">
+                <div class="product-img">
+                    <img src="@item.Images.FirstOrDefault()?.ImageUrl" class="image-default">
+                    <img src="@item.Images.Skip(1).FirstOrDefault()?.ImageUrl" class="image-hover">
+                </div>
 
+                <div class="product-body">
+                    <h5>@item.ProductName</h5>
+                    <p>@item.Description</p>
+                    <span>@item.UnitPrice?.ToString("N0") đ</span>
+                </div>
+            </div>
+        }
+
+        <!-- Pagination -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
+            <small class="text-muted">
+                Hiển thị <strong>@startIdx</strong>–<strong>@endIdx</strong> trong
+                <strong>@totalCount</strong> sản phẩm
+            </small>
+
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+
+                    <li class="page-item @(page <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           hx-get="@(BuildUrl(page - 1))"
+                           hx-target="#product-container"
+                           hx-swap="innerHTML"
+                           hx-push-url="true">‹</a>
+                    </li>
+
+                    @foreach (var n in pageNumbers)
+                    {
+                        if (n is string)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">…</span>
+                            </li>
+                        }
+                        else
+                        {
+                            var p = (int)n;
+                            <li class="page-item @(page == p ? "active" : "")">
+                                <a class="page-link"
+                                   hx-get="@BuildUrl(p)"
+                                   hx-target="#product-container"
+                                   hx-swap="innerHTML"
+                                   hx-push-url="true">@p</a>
+                            </li>
+                        }
+                    }
+
+                    <li class="page-item @(page >= totalPages || totalPages == 0 ? "disabled" : "")">
+                        <a class="page-link"
+                           hx-get="@(BuildUrl(page + 1))"
+                           hx-target="#product-container"
+                           hx-swap="innerHTML"
+                           hx-push-url="true">›</a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+
+}
 

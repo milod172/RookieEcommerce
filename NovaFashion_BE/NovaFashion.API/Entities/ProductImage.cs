@@ -2,9 +2,9 @@
 
 namespace NovaFashion.API.Entities
 {
-    public class ProductImage : IHasKey<Guid>
+    public class ProductImage
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string ImageUrl { get; set; } = string.Empty;
         public string? AltText { get; set; }
         public int SortOrder { get; set; } = 0;

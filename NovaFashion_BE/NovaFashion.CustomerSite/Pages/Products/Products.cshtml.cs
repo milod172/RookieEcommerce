@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using NovaFashion.CustomerSite.Services;
 using NovaFashion.SharedViewModels;
 using NovaFashion.SharedViewModels.CategoryDtos;
@@ -30,32 +29,87 @@ namespace NovaFashion.CustomerSite.Pages.Products
 
         private const string DefaultStatus = "Active";
 
+        [BindProperty(SupportsGet = true)]
+        public Guid? CategoryId { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
+            ViewData["CategoryId"] = CategoryId;
 
-            var productTask = productApi.GetProductsAsync(
+            var response = await productApi.GetProductsAsync(
                 PageNumber,
                 PageSize,
                 SortBy,
                 DefaultStatus,
                 MinPrice,
-                MaxPrice
+                MaxPrice,
+                CategoryId
             );
 
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var rawContent = await response.Content.ReadAsStringAsync();
+                    var apiError = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+
+                    if (apiError is not null)
+                    {
+                       
+                        foreach (var (key, messages) in apiError.Errors)
+                            foreach (var msg in messages)
+                            {
+    
+                                ModelState.AddModelError(key, msg);
+                            }           
+                    }
+                }
+               
+                if (Request.Headers["HX-Request"] == "true")
+                {
+                    Console.WriteLine("Trả _ProductFilterPartial");
+                    Response.Headers["HX-Retarget"] = "#product-filter-sidebar";
+                    Response.Headers["HX-Reswap"] = "innerHTML";
+                    return Partial("_ProductFilterPartial", this);
+                }
+
+                return Page();
+            }
+
+            ModelState.Clear();
+            Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+
             var categoryTask = categoryApi.GetCategoriesAsync();
-
-            await Task.WhenAll(productTask, categoryTask);
-            Products = await productTask;
             Categories = await categoryTask;
-
+           
             // Nếu là HTMX request → trả partial
             if (Request.Headers["HX-Request"] == "true")
             {
-                return Partial("_ProductListPartial", this);
+            Response.Headers["HX-Retarget"] = "#product-container";
+            Response.Headers["HX-Reswap"] = "innerHTML"; 
+            Response.Headers["HX-Trigger"] = "filterSuccess";
+            return Partial("_ProductListPartial", this);
             }
 
             return Page();
+            
         }
+
+        public async Task<IActionResult> OnGetFilterPartialAsync()
+        {
+           
+            return Partial("_ProductFilterPartial", this);
+        }
+
+        //public async Task<IActionResult> OnGetCategoryFilterPartialAsync([FromQuery] Guid? categoryId)
+        //{
+        //    CategoryId = categoryId;
+        //    ViewData["CategoryId"] = CategoryId;
+
+        //    Categories = await categoryApi.GetCategoriesAsync();
+
+        //    return Partial("_CategoryFilterPartial", Categories);
+        //}
 
     }
 }

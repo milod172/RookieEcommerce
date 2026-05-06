@@ -1,0 +1,53 @@
+﻿@model ProductsModel
+
+<div class="sidebar-card"
+     hx-get="@Url.Page("/Products/Products", new { handler = "FilterPartial" })"
+     hx-target="#product-filter-sidebar"
+     hx-swap="innerHTML"
+     hx-trigger="filterSuccess from:body"
+     hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #PageNumber, #CategoryId">
+
+    <input type="hidden" id="CategoryId" name="CategoryId" value="@Model.CategoryId" />
+
+    <div class="sidebar-title">Nhập khoảng giá</div>
+
+    <div class="row g-2 mb-3">
+        <div class="col-6">
+            <label class="form-label small mb-1">Từ</label>
+            <div class="input-group">
+                <span class="input-group-text">đ</span>
+                <input type="number"
+                       id="MinPrice"
+                       name="MinPrice"
+                       min="0"
+                       class="form-control @(ViewData.ModelState["price_filter_error"]?.Errors.Any() == true ? "is-invalid" : "")"
+                       value="@(Model.MinPrice.HasValue? Model.MinPrice: null)" />
+            </div>
+        </div>
+        <div class="col-6">
+            <label class="form-label small mb-1">Đến</label>
+            <div class="input-group">
+                <span class="input-group-text">đ</span>
+                <input type="number"
+                       id="MaxPrice"
+                       name="MaxPrice"
+                       min="0"
+                       class="form-control @(ViewData.ModelState["price_filter_error"]?.Errors.Any() == true ? "is-invalid" : "")"
+                       value="@(Model.MaxPrice.HasValue? Model.MaxPrice: null)" />
+            </div>
+        </div>
+    </div>
+
+    <div asp-validation-summary="All" class="text-danger small mb-2"></div>
+
+    
+    <button type="button"
+            class="btn-filter w-100"
+            hx-get="@Url.Page("/Products/Products")"
+            hx-target="#product-price-filter-sidebar"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+            hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #PageNumber, #CategoryId">
+        Áp dụng
+    </button>
+</div>

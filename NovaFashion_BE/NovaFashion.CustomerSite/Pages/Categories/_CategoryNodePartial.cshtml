@@ -7,29 +7,59 @@
     var isSelected = currentCategoryId == Model.Id;
 }
 
-<li class="category-item">
+<li class="category-item list-unstyled">
     @if (Model.HasChildren)
     {
-        <div class="d-flex justify-content-between align-items-center category-parent"
-             data-bs-toggle="collapse"
-             data-bs-target="#@collapseId"
-             style="cursor:pointer">
-            <span>@Model.CategoryName</span>
+        <a hx-get="@Url.Page("/Products/Products")"
+               hx-target="#product-container"
+               hx-swap="innerHTML"
+               hx-push-url="true"
+               hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #CategoryId"
+               hx-vals='{"CategoryId":"@Model.Id","PageNumber":"1"}'
+               class="d-flex justify-content-between align-items-center text-decoration-none text-reset category-parent @(isSelected ? "active" : "")"
+               data-bs-toggle="collapse"
+               data-bs-target="#@collapseId"
+               style="cursor:pointer">
+
+            <span class="d-flex align-items-center gap-1">
+                @if (isSelected)
+                {
+                    <span class="selected-dot"></span>
+                }
+                @Model.CategoryName
+            </span>
+           
             <i class="fa-solid fa-chevron-down"></i>
-        </div>
+         </a>
+            
+     
 
         <ul id="@collapseId" class="list-unstyled category-children collapse">
             @foreach (var child in Model.SubCategories)
             {
-                @await Html.PartialAsync("_CategoryNodePartial", child, ViewData)
+                <partial name="/Pages/Categories/_CategoryNodePartial.cshtml"
+                         model="child"
+                         view-data="ViewData" />
             }
         </ul>
     }
     else
     {
-        <a href="?CategoryId=@Model.Id&PageNumber=1"
-               class="d-flex align-items-center category-parent @(isSelected ? "active" : "")">
-            <span>@Model.CategoryName</span>
+        <a hx-get="@Url.Page("/Products/Products")"
+               hx-target="#product-container"
+               hx-swap="innerHTML"
+               hx-push-url="true"
+               hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #CategoryId"
+               hx-vals='{"CategoryId":"@Model.Id","PageNumber":"1"}'
+               class="d-flex align-items-center text-decoration-none text-reset category-parent @(isSelected ? "active" : "")">
+
+            <span class="d-flex align-items-center gap-1">
+                @if (isSelected)
+                {
+                    <span class="selected-dot"></span>
+                }
+                @Model.CategoryName
+            </span>
         </a>
     }
 </li>

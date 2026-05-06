@@ -2,11 +2,15 @@
 
 namespace NovaFashion.API.Entities
 {
-    public class Category : IHasAudit
+    public class Cart : IHasAudit
     {
         public Guid Id { get; set; } = Guid.NewGuid();
-        public string CategoryName { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        public string? CustomerId { get; set; }
+
+        public virtual ApplicationUser? Customer { get; set; }
+
+        public virtual ICollection<CartItem> CartItems { get; set; } = [];
+
         public DateTime CreatedTime { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedTime { get; set; }
@@ -15,9 +19,5 @@ namespace NovaFashion.API.Entities
         public bool IsDeleted { get; set; }
         public string? DeletedBy { get; set; }
 
-        public Guid? ParentCategoryId { get; set; }
-        public virtual Category? ParentCategory { get; set; }
-        public virtual ICollection<Category> SubCategories { get; set; } = [];
-        public virtual ICollection<Product> Products { get; set; } = [];
     }
 }

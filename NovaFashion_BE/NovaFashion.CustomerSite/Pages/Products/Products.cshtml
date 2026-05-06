@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "/shop"
 @model ProductsModel
 @{
     ViewData["Title"] = "Mua sắm";
@@ -7,54 +7,15 @@
 <div class="container py-5">
     <div class="row g-4">
 
-        <!-- Sidebar -->
+        <!-- Filter Sidebar -->
         <aside class="col-lg-3">
-            <div class="sidebar-card">
-                <div class="sidebar-title">Nhập khoảng giá</div>
+            <div id="category-filter-container" >
+                <partial name="/Pages/Categories/_CategoryFilterPartial.cshtml" model="Model.Categories" />
+            </div>
+            
 
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label class="form-label small mb-1">Từ</label>
-                        <div class="input-group">
-                            <span class="input-group-text">đ</span>
-                            <input type="number"
-                                   id="MinPrice"
-                                   name="MinPrice"
-                                   min="0"
-                                   class="form-control"
-                                   placeholder="0"
-                                   value="@(Model.MinPrice.HasValue ? Model.MinPrice : null)" />
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label small mb-1">Đến</label>
-                        <div class="input-group">
-                            <span class="input-group-text">đ</span>
-                            <input type="number"
-                                   id="MaxPrice"
-                                   name="MaxPrice"
-                                   min="0"
-                                   class="form-control"
-                                   placeholder="0"
-                                   value="@(Model.MaxPrice.HasValue ? Model.MaxPrice : null)" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FIX: thêm hx-on để bắt lỗi 400 từ server -->
-                <button type="button"
-                        class="btn-filter w-100"
-                        hx-get="@Url.Page("/Products/Products")"
-                        hx-target="#product-container"
-                        hx-swap="innerHTML"
-                        hx-push-url="true"
-                        hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #PageNumber"
-                        hx-on:htmx:response-error="document.getElementById('price-error').textContent = 'Khoảng giá không hợp lệ'">
-                    Áp dụng
-                </button>
-
-                <!-- FIX: error message placeholder -->
-                <div id="price-error" class="text-danger small mt-2"></div>
+            <div id="product-price-filter-sidebar">
+                <partial name="_ProductPriceFilterPartial" model="Model" />
             </div>
         </aside>
 
@@ -104,15 +65,15 @@
             <div class="row g-4">
                 <div class="row">
 
-                    <!-- FIX: bỏ comment, hidden input này bắt buộc phải có -->
                     <input type="hidden" id="PageNumber" name="PageNumber" value="1" />
+                    
 
                     <div id="product-container">
-                        @await Html.PartialAsync("_ProductListPartial", Model)
+                        <partial name="_ProductListPartial" model="Model" />              
                     </div>
-
                 </div>
             </div>
+
         </main>
     </div>
 </div>
