@@ -35,6 +35,7 @@ namespace NovaFashion_API;
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationList<NovaFashion.SharedViewModels.UserDtos.GetUserDto>), TypeInfoPropertyName = "TI_GetUserDto__58A9A719")]
 [JsonSerializable(typeof(NovaFashion.API.Shared.Pagination.PaginationQuery), TypeInfoPropertyName = "TI_PaginationQuery_78DEE636")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.AuthenticationDtos.RegisterResponseDto), TypeInfoPropertyName = "TI_RegisterResponseDto_9531B02E")]
+[JsonSerializable(typeof(NovaFashion.SharedViewModels.AuthenticationDtos.TokenResponse), TypeInfoPropertyName = "TI_TokenResponse_5D96A59A")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.CategoryDtos.CategoryDetailsDto), TypeInfoPropertyName = "TI_CategoryDetailsDto_1049A1C4")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.CategoryDtos.CategoryDto), TypeInfoPropertyName = "TI_CategoryDto_BC9C3AB9")]
 [JsonSerializable(typeof(NovaFashion.SharedViewModels.CategoryDtos.CategoryPickerDto), TypeInfoPropertyName = "TI_CategoryPickerDto_AAF68AB4")]

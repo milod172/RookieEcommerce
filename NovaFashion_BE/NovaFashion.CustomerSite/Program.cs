@@ -1,10 +1,12 @@
 using System.Text.Json;
 using NovaFashion.CustomerSite;
+using NovaFashion.CustomerSite.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddNovaFashionAuthentication();
 
 //Register API clients 
 var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]!;
@@ -22,9 +24,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<StatusCodeMiddleware>();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<TokenRefreshMiddleware>();
 
 app.MapStaticAssets();
 app.MapRazorPages()

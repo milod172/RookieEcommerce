@@ -1,0 +1,54 @@
+﻿@page "/login"
+@model LoginModel
+@{
+}
+
+
+<div class="auth-wrapper">
+    <h1>Đăng nhập</h1>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <form method="post" asp-page="/Auths/Login">
+        @* Anti-forgery token - bắt buộc với POST *@
+        @Html.AntiForgeryToken()
+
+        @* Giữ returnUrl nếu có *@
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div class="mb-3">
+            <label for="Email" class="form-label">Email</label>
+            <input type="email" asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-2">
+            <label for="password" class="form-label">Password</label>
+            <div class="password-wrapper">
+                <button type="button" class="toggle-eye" onclick="togglePwd()" aria-label="Show password">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" /><circle cx="12" cy="12" r="3" /></svg>
+                </button>
+                <input type="password" asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+
+        <a href="#" class="forgot">Quên mật khẩu?</a>
+
+        <button type="submit" class="btn-signin mt-4">Đăng nhập</button>
+    </form>
+
+    <div class="divider"></div>
+
+    <p class="no-account">Chưa có tài khoản?</p>
+    <a asp-page="/Auths/Register" class="btn-create">Đăng ký</a>
+</div>
+
+<script>
+    function togglePwd() {
+      const i = document.getElementById('password');
+      i.type = i.type === 'password' ? 'text' : 'password';
+    }
+</script>

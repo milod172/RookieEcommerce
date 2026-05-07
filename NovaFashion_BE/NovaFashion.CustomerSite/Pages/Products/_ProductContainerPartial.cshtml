@@ -4,13 +4,19 @@
 <div id="product-list">
     <partial name="_ProductListPartial" model="Model" />
 </div>
-                    
 
-<div id="product-pagination">
-    <partial name="_PaginationPartial" model="Model" />
-</div>
+@if (Context.Request.Headers.ContainsKey("HX-Request"))
+{
+    <div id="product-pagination" hx-swap-oob="innerHTML">
+        <partial name="_PaginationPartial" model="Model" />
+    </div>
 
+    <div id="product-price-filter-sidebar">
+        <partial name="_PriceFilterPartial" model="Model" />
+    </div>
 
-<div id="product-price-filter-sidebar" hx-swap-oob="true">
-    <partial name="_PriceFilterPartial" model="Model" />
-</div>
+    <div id="product-sortby" hx-swap-oob="innerHTML">
+        <partial name="_SortByPartial" model="Model" />
+    </div>
+
+}

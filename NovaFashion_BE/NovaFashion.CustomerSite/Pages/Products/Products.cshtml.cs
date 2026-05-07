@@ -46,9 +46,7 @@ namespace NovaFashion.CustomerSite.Pages.Products
 
             Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
 
-            //var categoryTask = categoryApi.GetCategoriesAsync();
-            //Categories = await categoryTask;
-
+  
             return Page();
         }
 
@@ -64,35 +62,35 @@ namespace NovaFashion.CustomerSite.Pages.Products
                 CategoryId
             );
 
+
             if (!response.IsSuccessStatusCode)
             {
-                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                var apiError = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+
+                if (apiError is not null)
                 {
-                    var rawContent = await response.Content.ReadAsStringAsync();
-                    var apiError = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+                    ModelState.Clear();
 
-                    if (apiError is not null)
-                    {
-
-                        foreach (var (key, messages) in apiError.Errors)
-                            foreach (var msg in messages)
-                            {
-                                ModelState.AddModelError(key, msg);
-                            }
-                    }
+                    foreach (var (key, messages) in apiError.Errors)
+                        foreach (var msg in messages)
+                            ModelState.AddModelError(key, msg);
                 }
+
+                Products = new(); 
+
+                return Partial("_ProductContainerPartial", this);
+
             }
 
+        
+
+            ModelState.Clear();
             Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
             return Partial("_ProductContainerPartial", this);
         }
 
 
-        public async Task<IActionResult> OnGetFilterPartialAsync()
-        {
-           
-            return Partial("_ProductFilterPartial", this);
-        }
+
 
         //public async Task<IActionResult> OnGetCategoryFilterPartialAsync([FromQuery] Guid? categoryId)
         //{

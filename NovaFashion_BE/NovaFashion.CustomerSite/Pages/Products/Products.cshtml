@@ -4,7 +4,7 @@
     ViewData["Title"] = "Mua sắm";
 }
 
-<div class="container py-5">
+<div class="container py-5" hx-history-elt>
     <div class="row g-4">
 
         <!-- Filter Sidebar -->
@@ -29,11 +29,12 @@
             <div class="row g-4">
                 <div class="row">
 
-                    <input type="hidden" id="PageNumber" name="PageNumber" value="1" />
-                    
-                    
                     <div id="product-container">
                         <partial name="_ProductContainerPartial" model="Model" />
+                    </div>
+
+                    <div id="product-pagination">
+                        <partial name="_PaginationPartial" model="Model" />
                     </div>
 
                 </div>
