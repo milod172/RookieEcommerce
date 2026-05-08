@@ -96,16 +96,22 @@ namespace NovaFashion.API.Features.Products
 
             var query = db.Products
                 .AsNoTracking()
-                .Include(p => p.Category)
-                .Include(p => p.ProductImages)
-                .Include(p => p.ProductVariants)
                 .ApplyStatusFilter(req.Status)
                 .ApplySortFilter(req.SortBy)
                 .ApplyPriceFilter(req.MinPrice, req.MaxPrice);
 
             query = await query.ApplyCategoryFilterAsync(db, req.CategoryId, ct);
 
-            var pageResultEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
+            var pageResultEntities = await query.PaginateAsync(
+                req.PageNumber, 
+                req.PageSize, 
+                q => q
+                    .Include(p => p.Category)
+                    .Include(p => p.ProductImages)
+                    .Include(p => p.ProductVariants),
+                ct);
+
+
             var pageResultDtos = Map.FromEntity(pageResultEntities);
 
             await Send.OkAsync(pageResultDtos, ct);

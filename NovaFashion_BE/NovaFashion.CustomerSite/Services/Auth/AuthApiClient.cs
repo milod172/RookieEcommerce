@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Headers;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using NovaFashion.SharedViewModels.AuthenticationDtos;
 
 namespace NovaFashion.CustomerSite.Services.Auth
@@ -59,5 +61,14 @@ namespace NovaFashion.CustomerSite.Services.Auth
                 return null;
             }
         }
+
+        public async Task RevokeTokenAsync(string accessToken)
+        {
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
+
+            await httpClient.PostAsync("/auth/revoke-rt", null);
+        }
+
     }
 }

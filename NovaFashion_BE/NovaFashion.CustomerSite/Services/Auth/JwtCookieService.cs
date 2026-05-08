@@ -10,20 +10,23 @@ namespace NovaFashion.CustomerSite.Services.Auth
     {
         private const string AccessTokenCookie = "nova_at";
         private const string RefreshTokenCookie = "nova_rt";
-        private const string UserIdCookie = "nova_uid";
 
 
         // Sign In: decode JWT → ClaimsPrincipal → Cookie Authentication
         public async Task SignInAsync(HttpContext context, TokenResponse token)
         {
-            var claims = DecodeJwtClaims(token.AccessToken);
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token.AccessToken);
+
+            var identity = BuildClaimsIdentity(jwt);
             var principal = new ClaimsPrincipal(identity);
 
             var authProperties = new AuthenticationProperties
             {
+                //Save cookie while Browser close
                 IsPersistent = true,
-                ExpiresUtc = token.AccessExpiry,
+                ExpiresUtc = jwt.ValidTo,
+                //Allow refresh cookie
                 AllowRefresh = true,
             };
 
@@ -36,13 +39,12 @@ namespace NovaFashion.CustomerSite.Services.Auth
 
             // 2. Lưu JWT access token vào HttpOnly cookie để attach vào API calls
             SetSecureCookie(context, AccessTokenCookie, token.AccessToken,
-                token.AccessExpiry);
+                 jwt.ValidTo);
 
             // 3. Lưu refresh token + userId để auto-refresh sau
             SetSecureCookie(context, RefreshTokenCookie, token.RefreshToken,
-                token.RefreshExpiry);
-            SetSecureCookie(context, UserIdCookie, token.UserId,
-                token.RefreshExpiry);
+                DateTime.UtcNow.AddDays(7));
+
 
             logger.LogInformation("User {UserId} signed in successfully", token.UserId);
         }
@@ -54,19 +56,31 @@ namespace NovaFashion.CustomerSite.Services.Auth
 
             DeleteCookie(context, AccessTokenCookie);
             DeleteCookie(context, RefreshTokenCookie);
-            DeleteCookie(context, UserIdCookie);
+       
 
             logger.LogInformation("User signed out");
         }
 
        
+
         // Read JWT access token from cookie when call API
         public string? GetAccessToken(HttpContext context)
             => context.Request.Cookies[AccessTokenCookie];
 
         public (string? UserId, string? RefreshToken) GetRefreshInfo(HttpContext context)
-            => (context.Request.Cookies[UserIdCookie],
-                context.Request.Cookies[RefreshTokenCookie]);
+        {
+            var accessToken = context.Request.Cookies[AccessTokenCookie];
+            var refreshToken = context.Request.Cookies[RefreshTokenCookie];
+
+            if (string.IsNullOrEmpty(accessToken))
+                return (null, refreshToken);
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(accessToken);
+            var userId = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+
+            return (userId, refreshToken);
+        }
 
         // Check access token expire 
         public bool IsAccessTokenExpired(HttpContext context)
@@ -87,31 +101,7 @@ namespace NovaFashion.CustomerSite.Services.Auth
             }
         }
 
-        
-        // Decode JWT 
-        private List<Claim> DecodeJwtClaims(string accessToken)
-        {
-            var handler = new JwtSecurityTokenHandler();
 
-            try
-            {
-                var jwt = handler.ReadJwtToken(accessToken);
-                var claims = new List<Claim>
-                {
-                    new(ClaimTypes.NameIdentifier, jwt.Claims.First(c => c.Type == "UserId").Value),
-                    new(ClaimTypes.Email,          jwt.Claims.First(c => c.Type == "Email").Value),
-                    new(ClaimTypes.Role,           jwt.Claims.First(c => c.Type == "role").Value),
-                };
-
-                logger.LogDebug("Decoded {Count} claims from JWT", claims.Count);
-                return claims;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to decode JWT claims");
-                return [];
-            }
-        }
   
         // Helpers
         private static void SetSecureCookie(
@@ -124,10 +114,22 @@ namespace NovaFashion.CustomerSite.Services.Auth
             {
                 HttpOnly = true,
                 Secure = false,                 // Use for Https
-                SameSite = SameSiteMode.Lax,   // Lax cho phép redirect từ external
+                SameSite = SameSiteMode.Lax,    // Lax cho phép redirect từ external
                 Expires = expires,
                 IsEssential = true              // GDPR: không bị chặn bởi consent
             });
+        }
+
+        private static ClaimsIdentity BuildClaimsIdentity(JwtSecurityToken jwt)
+        {
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value ?? ""),
+                new(ClaimTypes.Name,           jwt.Claims.FirstOrDefault(c => c.Type == "userName")?.Value ?? ""),
+                new(ClaimTypes.Role,           jwt.Claims.FirstOrDefault(c => c.Type == "role")?.Value ?? ""),
+            };
+
+            return new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
         private static void DeleteCookie(HttpContext context, string name)

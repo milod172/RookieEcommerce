@@ -1,4 +1,6 @@
-﻿using FastEndpoints;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using FastEndpoints;
 using FastEndpoints.Security;
 using Microsoft.AspNetCore.Identity;
 using NovaFashion.API.Entities;
@@ -17,6 +19,7 @@ namespace NovaFashion.API.Features.Authentications
         {
             Post("/login");
             Group<AuthGroup>();
+            AllowAnonymous();
         }
 
         public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
@@ -30,11 +33,12 @@ namespace NovaFashion.API.Features.Authentications
 
             var roles = await userManager.GetRolesAsync(user);
 
+            //Combined with JwtCreationOptions setup from DI
             var response = await CreateTokenWith<MyTokenService>(user.Id, u =>
             {
                 u.Roles.AddRange(roles);
-                u.Claims.Add(new("UserId", user.Id));
-                u.Claims.Add(new("Email", user.Email!));
+                u.Claims.Add(new(JwtRegisteredClaimNames.Sub, user.Id));
+                u.Claims.Add(new("userName",$"{user.FirstName} {user.LastName}"));
             });
 
             await Send.OkAsync(response, cancellation: ct);

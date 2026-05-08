@@ -42,12 +42,13 @@
 
             <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
                 <a class="page-link"
-                   hx-get="/shop?handler=Filter"      
+                   hx-get="/shop"      
                    hx-target="#product-container"
-                   hx-swap="innerHTML"
+                   hx-swap="innerHTML show:window:top"
+                   hx-push-url="true"
                    hx-include="#SortBy, #MinPrice, #MaxPrice, #CategoryId, #PageSize"
                    hx-vals='{"PageNumber": "@(currentPage - 1)"}'
-                   hx-push-url="true">‹</a>
+                  >‹</a>
             </li>
 
             @foreach (var n in pageNumbers)
@@ -63,24 +64,26 @@
                     var p = (int)n;
                     <li class="page-item @(currentPage == p ? "active" : "")">
                         <a class="page-link"
-                           hx-get="/shop?handler=Filter"
+                           hx-get="/shop"
                            hx-target="#product-container"
-                           hx-swap="innerHTML"
+                           hx-push-url="true"
+                           hx-swap="innerHTML show:window:top"
                            hx-include="#SortBy, #MinPrice, #MaxPrice, #CategoryId, #PageSize"
                            hx-vals='{"PageNumber": "@p"}'
-                           hx-push-url="true">@p</a>
+                           >@p</a>
                     </li>
                 }
             }
 
             <li class="page-item @(currentPage >= totalPages || totalPages == 0 ? "disabled" : "")">
                 <a class="page-link"
-                   hx-get="/shop?handler=Filter"         
+                   hx-get="/shop"         
                    hx-target="#product-container"
-                   hx-swap="innerHTML"
+                   hx-push-url ="true"
+                   hx-swap="innerHTML show:window:top"
                    hx-include="#SortBy, #MinPrice, #MaxPrice, #CategoryId, #PageSize"
                    hx-vals='{"PageNumber": "@(currentPage + 1)"}'
-                   hx-push-url="true">›</a>
+                   >›</a>
             </li>
 
         </ul>

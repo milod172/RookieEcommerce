@@ -39,13 +39,13 @@
 
             <!-- HEADER-NAV -->
             <div class="col-md-4 d-md-block d-none">
-                <nav class="d-md-flex justify-content-center gap-5 header_nav">
+                <nav class="d-md-flex justify-content-center gap-5 header_nav" >
                     <a asp-page="/Index" class="header_nav-link">TRANG CHỦ</a>
                     <a asp-page="/Products/Products" 
                        asp-route-SortBy="Newest"
                        asp-route-PageNumber="1"
                        asp-route-PageSize="5"                 
-                        class="header_nav-link">MUA SẮM</a>
+                       class="header_nav-link">MUA SẮM</a>
                     <a href="" class="header_nav-link">LIÊN HỆ</a>
                 </nav>
             </div>
@@ -53,37 +53,99 @@
             <!-- HEADER-ACTION -->
             <div class="col-md-4 col-3 pe-md-5 d-flex justify-content-end">
                 <ul class="list-group list-group-horizontal">
-                    <li class="list-group-item d-none d-md-block border-0">
-                        <a asp-page="/Auths/Login" title="Account">
-                            <i class="fa-regular fa-user text-black"></i>
-                        </a>
-                    </li>
-                    <li class="list-group-item d-none d-md-block border-0">
-                        <a href="#" title="Search">
-                            <i class="fa-brands fa-sistrix text-black"></i>
-                        </a>
-                    </li>
-                    <li class="list-group-item d-none d-md-block border-0">
-                        <a href="#" title="Wishlist">
-                            <i class="fa-regular fa-heart text-black"></i>
-                        </a>
-                    </li>
-                    <li class="list-group-item border-0 d-md-block">
-                        <a href="#" class="cart-icon" title="Shopping Cart">
-                            <i class="fa-solid fa-bag-shopping text-black"></i>
-                            <!-- <span class="cart-count">0</span> -->
-                        </a>
-                    </li>
+
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="list-group-item d-none d-md-block border-0">
+                            <a href="#" title="Search">
+                                <i class="fa-brands fa-sistrix text-black"></i>
+                            </a>
+                        </li>
+
+                       <li class="list-group-item d-none d-md-block border-0">
+                            <div class="dropdown">
+                                <a href="#" 
+                                   class="dropdown-toggle" 
+                                   data-bs-toggle="dropdown" 
+                                   aria-expanded="false"
+                                   title="Account">
+                                    <i class="fa-regular fa-user text-black"></i>
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end profile-menu">
+                                    <li>
+                                        <div class="greeting px-3 py-2">
+                                            Xin chào, <strong>@User.Identity?.Name</strong>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item menu-item" href="/Orders">
+                                            <i class="fa-solid fa-bag-shopping"></i> Đơn Hàng
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form method="post" asp-page="/Auths/Logout">
+                                            <button type="submit" class="dropdown-item menu-item">
+                                                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+           
+                        <li class="list-group-item border-0 d-md-block">
+                            <a href="#" class="cart-icon" title="Shopping Cart">
+                                <i class="fa-solid fa-bag-shopping text-black"></i>
+                                <!-- <span class="cart-count">0</span> -->
+                            </a>
+                        </li>
+
+                        @* <li class="list-group-item d-none d-md-flex border-0 align-items-center gap-2">
+
+                            <span class="text-black">
+                                Hello, @User.Identity.Name
+                            </span>
+
+                            <form method="post" asp-page="/Auths/Logout">
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-dark">
+                                    Logout
+                                </button>
+                            </form>
+
+                        </li> *@
+                    }
+                    else
+                    {
+                         <li class="list-group-item d-none d-md-block border-0">
+                            <a href="#" title="Search">
+                                <i class="fa-brands fa-sistrix text-black"></i>
+                            </a>
+                        </li>
+
+                        <li class="list-group-item d-none d-md-block border-0">
+                            <a asp-page="/Auths/Login" title="Account">
+                                <i class="fa-regular fa-user text-black"></i>
+                            </a>
+                        </li>  
+                   
+                        <li class="list-group-item border-0 d-md-block">
+                            <a href="#" class="cart-icon" title="Shopping Cart">
+                                <i class="fa-solid fa-bag-shopping text-black"></i>
+                                <!-- <span class="cart-count">0</span> -->
+                            </a>
+                        </li>
+                    }                                 
                 </ul>
-
-
             </div>
         </div>
 
         <hr class="my-0 border-1 border-black">
     </header>
 
-    <main  style="flex: 1;">
+    <main style="flex: 1;">
         @RenderBody()
     </main>
 

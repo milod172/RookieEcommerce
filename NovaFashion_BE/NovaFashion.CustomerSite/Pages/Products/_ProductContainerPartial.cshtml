@@ -1,22 +1,27 @@
 ﻿@model ProductsModel
 
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Filter Sidebar -->
+        <aside class="col-lg-3">
+            
+            <partial name="/Pages/Categories/_CategoryFilterPartial.cshtml" model="Model.Categories" />
+            <partial name="_PriceFilterPartial" model="Model" />
+            
+        </aside>
 
-<div id="product-list">
-    <partial name="_ProductListPartial" model="Model" />
+        <!-- Main -->
+        <div class="col-lg-9">
+
+            <partial name="_SortByPartial" model="Model" />
+
+            <div class="row g-4">
+
+                <partial name="_ProductListPartial" model="Model" />
+                <partial name="_PaginationPartial" model="Model" />
+
+            </div>
+
+        </div>
+    </div>
 </div>
-
-@if (Context.Request.Headers.ContainsKey("HX-Request"))
-{
-    <div id="product-pagination" hx-swap-oob="innerHTML">
-        <partial name="_PaginationPartial" model="Model" />
-    </div>
-
-    <div id="product-price-filter-sidebar">
-        <partial name="_PriceFilterPartial" model="Model" />
-    </div>
-
-    <div id="product-sortby" hx-swap-oob="innerHTML">
-        <partial name="_SortByPartial" model="Model" />
-    </div>
-
-}

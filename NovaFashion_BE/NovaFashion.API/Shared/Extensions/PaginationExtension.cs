@@ -23,6 +23,28 @@ namespace NovaFashion.API.Shared.Extensions
             return new PaginationList<T>(items, count, pageNumber, pageSize);
         }
 
+        public static async Task<PaginationList<T>> PaginateAsync<T>(
+           this IQueryable<T> query,
+           int pageNumber,
+           int pageSize,
+           Func<IQueryable<T>, IQueryable<T>>? include = null,
+           CancellationToken ct = default)
+        {
+            var count = await query.CountAsync(ct);
+
+            var pagedQuery = query
+               .Skip((pageNumber - 1) * pageSize)
+               .Take(pageSize);
+
+            if (include != null)
+                pagedQuery = include(pagedQuery);
+
+            var items = await pagedQuery.ToListAsync(ct);
+
+            return new PaginationList<T>(items, count, pageNumber, pageSize);
+        }
+
+
         public static IQueryable<T> ApplySorting<T>(this IQueryable<T> query, string sortBy)
         { 
             var sort = sortBy.Trim().ToLower();

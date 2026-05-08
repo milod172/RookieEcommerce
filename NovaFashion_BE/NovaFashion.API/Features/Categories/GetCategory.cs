@@ -25,10 +25,10 @@ namespace NovaFashion.API.Features.Categories
             ModifiedTime = e.ModifiedTime
         };
 
-        public PaginationList<CategoryDto> FromEntity(PaginationList<Category> e, List<Category> allDescendants)
+        public PaginationList<CategoryDto> FromEntity(PaginationList<Category> e, List<Category> allCategories)
         {
-            // 1. Map toàn bộ các item (bao gồm cả con cháu)
-            var allDtos = allDescendants.Select(MapToDto).ToList();
+            // 1. Map toàn bộ các item 
+            var allDtos = allCategories.Select(MapToDto).ToList();
             var lookup = allDtos.ToDictionary(d => d.Id);
 
             // 2. Xây dựng cây từ flat list
@@ -44,7 +44,7 @@ namespace NovaFashion.API.Features.Categories
             var rootIds = e.Items.Select(x => x.Id).ToHashSet();
             var pagedDtos = allDtos.Where(d => rootIds.Contains(d.Id)).ToList();
 
-            // 4. Update các field thống kê (tùy chọn)
+            // 4. Update các field thống kê 
             foreach (var d in allDtos)
             {
                 d.HasChildren = d.SubCategories.Any();

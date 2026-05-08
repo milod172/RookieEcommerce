@@ -13,7 +13,6 @@ namespace NovaFashion.API.Features.Authentications
                     .ProducesProblemDetails(500)
                     .AutoTagOverride("Authentication")
                     .WithGroupName("Authentication"));
-                ep.AllowAnonymous();
             });
         }
     }

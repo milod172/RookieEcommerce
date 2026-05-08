@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
-using FastEndpoints.Security;
 using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
 using NovaFashion.API.Entities.Enum;
@@ -47,7 +46,7 @@ namespace NovaFashion.API.Features.Users
 
         public override async Task HandleAsync(PaginationQuery req, CancellationToken ct)
         {
-            var currentUserId = User.ClaimValue("UserId");
+            var currentUserId = User.FindFirstValue("sub");
 
             var query = db.Users
                 .Where(u => u.Id != currentUserId)

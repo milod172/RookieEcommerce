@@ -13,13 +13,6 @@ namespace NovaFashion.API.Infrastructure.Persistence.Configurations
                 .HasForeignKey(x => x.CartId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(x => x.Product)
-                 .WithMany(x => x.CartItems)
-                 .HasForeignKey(x => x.ProductId);
-
-            builder.HasOne(x => x.ProductVariant)
-                .WithMany(x => x.CartItems)
-                .HasForeignKey(x => x.ProductVariantId);
         }
     }
 }

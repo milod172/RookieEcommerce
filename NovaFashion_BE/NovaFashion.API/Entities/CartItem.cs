@@ -6,16 +6,10 @@ namespace NovaFashion.API.Entities
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public int Quantity { get; private set; }
-
         public Guid CartId { get; private set; }
         public virtual Cart? Cart { get; private set; }
-
         public Guid ProductId { get; private set; }
-        public virtual Product? Product { get; private set; }
-
-        public Guid? ProductVariantId { get; private set; }
-        public virtual ProductVariant? ProductVariant { get; private set; }
-
+        public Guid? ProductVariantId { get; private set; } 
         public DateTime CreatedTime { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? ModifiedTime { get; set; }

@@ -7,9 +7,9 @@
         <select id="PageSize"
                 name="PageSize"
                 class="form-select form-select-sm"
-                hx-get='@Url.Page("/Products/Products", new { handler = "Filter" })'
+                hx-get="/shop"
                 hx-target="#product-container"
-                hx-swap="innerHTML"
+                hx-swap="innerHTML" 
                 hx-push-url="true"
                 hx-include="#MinPrice, #MaxPrice, #SortBy"
                 hx-vals='{"PageNumber": "1"}'
@@ -26,9 +26,9 @@
         <select id="SortBy"
                 name="SortBy"
                 class="form-select form-select-sm"
-                hx-get='@Url.Page("/Products/Products", new { handler = "Filter" })'
+                hx-get="/shop"
                 hx-target="#product-container"
-                hx-swap="innerHTML"
+                hx-swap="innerHTML"  
                 hx-push-url="true"
                 hx-include="#MinPrice, #MaxPrice, #PageSize"
                 hx-vals='{"PageNumber": "1"}'

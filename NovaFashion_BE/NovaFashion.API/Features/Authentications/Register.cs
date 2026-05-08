@@ -54,6 +54,7 @@ namespace NovaFashion.API.Features.Authentications
         {
             Post("/register");
             Group<AuthGroup>();
+            AllowAnonymous();
         }
 
         public override async Task HandleAsync(RegisterRequest req, CancellationToken ct)

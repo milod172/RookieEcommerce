@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NovaFashion.CustomerSite.Services;
@@ -7,6 +8,8 @@ using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.CustomerSite.Pages.Products
 {
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    [Authorize]
     public class ProductsModel(ProductApiClient productApi, CategoryApiClient categoryApi) : PageModel
     {
         public PaginationResponseDto<ProductDto> Products { get; set; } = new();
@@ -34,6 +37,7 @@ namespace NovaFashion.CustomerSite.Pages.Products
 
         public async Task<IActionResult> OnGetAsync()
         {
+            ModelState.Clear();
             var response = await productApi.GetProductsAsync(
                 PageNumber,
                 PageSize,
@@ -44,54 +48,33 @@ namespace NovaFashion.CustomerSite.Pages.Products
                 CategoryId
             );
 
-            Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+            if (Request.Headers.ContainsKey("HX-Request"))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    var apiError = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
 
-  
+                    if (apiError is not null)
+                    {
+                        ModelState.Clear();
+                        foreach (var (key, messages) in apiError.Errors)
+                            foreach (var msg in messages)
+                                ModelState.AddModelError(key, msg);
+                    }
+
+                    return Partial("_ProductContainerPartial", this);
+                }
+
+               
+                Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+                return Partial("_ProductContainerPartial", this);
+            }
+
+            Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
             return Page();
         }
 
-        public async Task<IActionResult> OnGetFilterAsync()
-        {
-            var response = await productApi.GetProductsAsync(
-                PageNumber,
-                PageSize,
-                SortBy,
-                DefaultStatus,
-                MinPrice,
-                MaxPrice,
-                CategoryId
-            );
-
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var apiError = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-
-                if (apiError is not null)
-                {
-                    ModelState.Clear();
-
-                    foreach (var (key, messages) in apiError.Errors)
-                        foreach (var msg in messages)
-                            ModelState.AddModelError(key, msg);
-                }
-
-                Products = new(); 
-
-                return Partial("_ProductContainerPartial", this);
-
-            }
-
         
-
-            ModelState.Clear();
-            Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
-            return Partial("_ProductContainerPartial", this);
-        }
-
-
-
-
         //public async Task<IActionResult> OnGetCategoryFilterPartialAsync([FromQuery] Guid? categoryId)
         //{
         //    CategoryId = categoryId;

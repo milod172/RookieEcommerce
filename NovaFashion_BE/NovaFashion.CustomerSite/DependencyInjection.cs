@@ -29,7 +29,9 @@ namespace NovaFashion.CustomerSite
         }
 
         public static IServiceCollection AddNovaFashionAuthentication(
-            this IServiceCollection services)
+            this IServiceCollection services,
+            int expireTimeSpan
+            )
         {
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -39,13 +41,13 @@ namespace NovaFashion.CustomerSite
                     options.LogoutPath = "/logout";
                     options.AccessDeniedPath = "/access-denied";
 
-                    options.Cookie.Name = "nova_session";
+                    options.Cookie.Name = "nova_cookie";
                     options.Cookie.HttpOnly = true;
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                     options.Cookie.SameSite = SameSiteMode.Lax;
                     options.Cookie.IsEssential = true;
 
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(expireTimeSpan);
                     options.SlidingExpiration = true;
                 });
 

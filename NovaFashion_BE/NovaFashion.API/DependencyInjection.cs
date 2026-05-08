@@ -62,6 +62,8 @@ namespace NovaFashion.API
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
         {
             services.AddSingleton(jwtSettings);
+
+            //Verify login
             services.AddAuthenticationJwtBearer(
             s =>  //JwtSigningOptions             
             {
@@ -80,13 +82,12 @@ namespace NovaFashion.API
   
             services.AddAuthorization();
 
-            //For every login request, jwt token using here
+            //Sign and swap token for login
             services.Configure<JwtCreationOptions>(o =>
             {
                 o.SigningKey = jwtSettings.SecretKey;
                 o.Issuer = jwtSettings.Issuer;
                 o.Audience = jwtSettings.Audience;
-                //o.ExpireAt = DateTime.UtcNow.AddMinutes(jwtSettings.TokenExpiryInMinutes);
             });
 
             // Override jwtbeare scheme instead default cookie scheme

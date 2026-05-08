@@ -4,42 +4,9 @@
     ViewData["Title"] = "Mua sắm";
 }
 
-<div class="container py-5" hx-history-elt>
-    <div class="row g-4">
 
-        <!-- Filter Sidebar -->
-        <aside class="col-lg-3">
-            <div id="category-filter-container" >
-                <partial name="/Pages/Categories/_CategoryFilterPartial.cshtml" model="Model.Categories" />
-            </div>
-            
-
-            <div id="product-price-filter-sidebar">
-                <partial name="_PriceFilterPartial" model="Model" />
-            </div>
-        </aside>
-
-        <!-- Main -->
-        <main class="col-lg-9">
-
-            <div id="product-sortby" class="toolbar">
-                <partial name="_SortByPartial" model="Model" />
-            </div>
-
-            <div class="row g-4">
-                <div class="row">
-
-                    <div id="product-container">
-                        <partial name="_ProductContainerPartial" model="Model" />
-                    </div>
-
-                    <div id="product-pagination">
-                        <partial name="_PaginationPartial" model="Model" />
-                    </div>
-
-                </div>
-            </div>
-
-        </main>
-    </div>
+<div id="product-container">
+    <partial name="_ProductContainerPartial" model="Model" />
 </div>
+
+@* Layout = Request.Headers.ContainsKey("HX-Request") ? null : "_Layout";  *@

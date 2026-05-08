@@ -1,6 +1,6 @@
 ﻿@model ProductsModel
 
-<div id="product-price-filter-sidebar">
+
     <div class="sidebar-card">
 
         <div class="sidebar-title">Nhập khoảng giá</div>
@@ -34,15 +34,21 @@
             </div>
         </div>
 
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="text-danger small">
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+
         <button type="button"
                 class="btn-filter w-100"
-                hx-get="/shop?handler=Filter"
+                hx-get="/shop"
                 hx-target="#product-container"
                 hx-swap="innerHTML"
-                hx-push-url="true"      
+                hx-push-url="true"
                 hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #CategoryId"
                 hx-vals='{"PageNumber": "1"}'>
             Áp dụng
         </button>
     </div>
-</div>

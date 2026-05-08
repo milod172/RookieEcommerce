@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.IdentityModel.Tokens.Jwt;
+using FastEndpoints;
 using FastEndpoints.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,6 @@ namespace NovaFashion.API.Features.Authentications
                 o.Endpoint("/refresh-token", ep =>
                 {
                     ep.Group<AuthGroup>();
-                    ep.AllowAnonymous();
                 });
             });
         }
@@ -39,24 +39,29 @@ namespace NovaFashion.API.Features.Authentications
             var user = await _userManager.FindByIdAsync(response.UserId);
             if (user == null) return;
 
-            // Upsert record into AspNetUserTokens
-            await _userManager.SetAuthenticationTokenAsync(
-                user,
-                loginProvider: "FastEndpoints",
-                tokenName: "RefreshToken",
-                tokenValue: response.RefreshToken);
-
-            // Update ExpiresAt
             var tokenRecord = await _db.UserTokens.FirstOrDefaultAsync(t =>
                 t.UserId == response.UserId &&
                 t.LoginProvider == "FastEndpoints" &&
                 t.Name == "RefreshToken");
 
-            if (tokenRecord != null)
+            if (tokenRecord == null)
             {
-                tokenRecord.ExpiresAt = response.RefreshExpiry;
-                await _db.SaveChangesAsync();
+                _db.UserTokens.Add(new UserRefreshToken
+                {
+                    UserId = response.UserId,
+                    LoginProvider = "FastEndpoints",
+                    Name = "RefreshToken",
+                    Value = response.RefreshToken,
+                    ExpiresAt = response.RefreshExpiry
+                });
             }
+            else
+            {
+                tokenRecord.Value = response.RefreshToken;
+                tokenRecord.ExpiresAt = response.RefreshExpiry;
+            }
+
+            await _db.SaveChangesAsync();
         }
 
         public override async Task RefreshRequestValidationAsync(TokenRequest req)
@@ -86,8 +91,7 @@ namespace NovaFashion.API.Features.Authentications
 
             var roles = await _userManager.GetRolesAsync(user);
             privileges.Roles.AddRange(roles);
-            privileges.Claims.Add(new("UserId", user.Id));
-            privileges.Claims.Add(new("Email", user.Email!));
+            privileges.Claims.Add(new(JwtRegisteredClaimNames.Sub, user.Id));
         }
     }
 }
