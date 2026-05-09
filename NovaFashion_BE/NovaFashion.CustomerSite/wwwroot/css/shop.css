@@ -158,8 +158,12 @@
     color: #222;
 }
 
+.product-description {
+    color: #6c757d;
+}
+
 .product-price {
-    color: #e63946;
+    color: black;
     font-weight: 600;
     font-size: 1rem;
 }

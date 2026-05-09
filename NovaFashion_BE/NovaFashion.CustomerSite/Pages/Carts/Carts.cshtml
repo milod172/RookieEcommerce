@@ -1,0 +1,114 @@
+﻿@page "/cart"
+@model NovaFashion.CustomerSite.Pages.Carts.CartsModel
+@{
+}
+
+<div class="container py-5">
+    <div class="row gx-5">
+
+        <div class="col-lg-8">
+            <h1 class="cart-page-title">Shopping Bag</h1>
+            <div class="cart-item-count">1 item</div>
+            <hr class="cart-divider" />
+
+            <div class="d-flex gap-4">
+                <div class="cart-product-img">
+                    <img src="shirt.jpg" alt="Brown LOEWE Paula's Ibiza shirt">
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="cart-brand">LOEWE</div>
+                            <div class="cart-product-name">+ Paula's Ibiza Logo-Embroidered Cotton Shirt</div>
+                        </div>
+                        <button class="cart-btn-remove" title="Remove from bag"
+                                onclick="this.closest('.d-flex.gap-4').parentElement.style.display='none'">
+                            ✕
+                        </button>
+                    </div>
+                    <div class="cart-meta">
+                        <strong>Brown</strong><span class="cart-meta-sep">•</span>
+                        <strong>EU 40</strong>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="cart-qty-control" data-price="635">
+                            <button type="button" onclick="changeQty(this,-1)">−</button>
+                            <span class="cart-qty-value">1</span>
+                            <button type="button" onclick="changeQty(this,1)">+</button>
+                        </div>
+                        <span class="cart-price mb-0" data-line-total>£635</span>
+                    </div>
+                    <div class="cart-stock">ONLY TWO LEFT</div>
+                </div>
+            </div>
+
+            <div class="cart-item-actions mt-4">
+                <a href="#">Remove from Bag</a>
+                <span class="cart-item-actions-dot">•</span>
+                <a href="#">Move to your Wish List</a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mt-5 mt-lg-0">
+            <div class="cart-summary-card">
+                <h2>Order summary</h2>
+                <div class="cart-summary-row">
+                    <span><strong>Item Sub-Total</strong></span>
+                    <span><strong>£635</strong></span>
+                </div>
+                <hr class="cart-divider my-2" />
+                <div class="cart-summary-row cart-summary-total">
+                    <span>Total (GBP)</span>
+                    <span>£635</span>
+                </div>
+
+                <div class="cart-alert-tax">
+                    <i class="bi">ⓘ</i>
+                    <span>I accept to pay any applicable taxes and/or duties when my order arrives at customs.</span>
+                </div>
+
+                <div class="cart-promo-title">Add a promo code</div>
+                <div class="d-flex gap-2">
+                    <input type="text" class="form-control cart-promo-input" placeholder="Enter code">
+                    <button class="cart-btn-apply">Apply</button>
+                </div>
+
+                <button class="cart-btn-purchase">
+                    <span>🔒</span> Proceed to purchase
+                </button>
+
+                <div class="cart-payments">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Maestro_2016.svg" alt="Maestro">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB">
+                </div>
+                <div class="cart-payments">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/1d/UnionPay_logo.svg" alt="UnionPay">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/97/Delta_logo.svg" alt="Delta" style="height:20px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Discover_Card_logo.svg" alt="Discover">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Diners_Club_Logo3.svg" alt="Diners">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay">
+                </div>
+                <div class="cart-paypal">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function changeQty(btn, delta) {
+            const wrap = btn.parentElement;
+            const valEl = wrap.querySelector('.cart-qty-value');
+            let v = Math.max(1, parseInt(valEl.textContent, 10) + delta);
+            valEl.textContent = v;
+            const price = parseFloat(wrap.dataset.price);
+            const lineEl = wrap.parentElement.querySelector('[data-line-total]');
+            lineEl.textContent = (price * v) + 'đ';
+        }
+    </script>
+}

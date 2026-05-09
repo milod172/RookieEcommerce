@@ -9,7 +9,7 @@ using NovaFashion.SharedViewModels.ProductDtos;
 namespace NovaFashion.CustomerSite.Pages.Products
 {
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-    [Authorize]
+   
     public class ProductsModel(ProductApiClient productApi, CategoryApiClient categoryApi) : PageModel
     {
         public PaginationResponseDto<ProductDto> Products { get; set; } = new();

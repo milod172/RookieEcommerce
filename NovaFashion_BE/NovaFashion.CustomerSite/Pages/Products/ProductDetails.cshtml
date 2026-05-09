@@ -4,6 +4,10 @@
     ViewData["Title"] = "Chi tiết sản phẩm";
 }
 
+<script>
+    const IS_AUTHENTICATED = @Json.Serialize(User.Identity?.IsAuthenticated == true);
+</script>
+
 <div class="container-fluid px-md-5">
     <div class="row">
         <div class="col-lg-8 col-md-12">
@@ -24,15 +28,12 @@
             <p class="product-name">@Model.Product.Description</p>
             <div class="price" id="product-price">@Model.Product.UnitPrice?.ToString("N0") đ</div>
 
-            @* <p class="text-muted small">Colour: <strong>Green</strong></p> *@
-
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="size-label mb-0">Size:</span>
-                @* <a href="#" class="text-dark small text-decoration-underline">View size guide</a> *@
             </div>
 
             <div class="size-grid">
-                @foreach(var item in Model.Product.Variants)
+                @foreach (var item in Model.Product.Variants)
                 {
                     <div class="size-item"
                          data-price="@item.UnitPrice"
@@ -40,30 +41,70 @@
                          onclick="selectVariant(this)">
                         @item.Size
                     </div>
-				}
+                }
             </div>
 
-            <button class="btn btn-add-cart">Thêm vào giỏ hàng</button>
-           
+            <p id="size-error" class="text-danger small mt-1 d-none">Vui lòng chọn kích thước.</p>
+
+            <button class="btn btn-add-cart" onclick="addToCart()">Thêm vào giỏ hàng</button>
+
             <div class="description-header">
-                <span>Chi tiết sản phẩm</span>     
+                <span>Chi tiết sản phẩm</span>
             </div>
             <div class="description-content">
                 "@Model.Product.Details"
             </div>
         </div>
     </div>
+
+    <div id="toast-success" class="toast-success d-none">
+        Thêm sản phẩm vào giỏ hàng thành công
+    </div>
 </div>
 
+@section Scripts {
+    <script>
+        let selectedVariantId = null;
 
-<script>
-    
-    function selectVariant(variant) {
-        const price = variant.getAttribute("data-price");
- 
-        document.getElementById("product-price").innerText = parseFloat(price).toLocaleString("vi-VN") + " đ";
- 
-        document.querySelectorAll(".size-item").forEach(x => x.classList.remove("active"));
-        variant.classList.add("active");
-    }
-</script>
+        function selectVariant(el) {
+            document.querySelectorAll(".size-item").forEach(x => x.classList.remove("active"));
+            el.classList.add("active");
+
+            selectedVariantId = el.dataset.id;
+
+            const price = parseFloat(el.dataset.price);
+            document.getElementById("product-price").textContent =
+                price.toLocaleString("vi-VN") + " đ";
+
+            document.getElementById("size-error").classList.add("d-none");
+        }
+
+        function addToCart() {
+            if (!IS_AUTHENTICATED) {
+                window.location.href = `/login?returnUrl=${encodeURIComponent(window.location.pathname)}`;
+                return;
+            }
+
+            if (!selectedVariantId) {
+                document.getElementById("size-error").classList.remove("d-none");
+                return;
+            }
+
+            CartService.add(selectedVariantId, 1);
+            showToast();
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast-success");
+            toast.classList.remove("d-none");
+        
+            requestAnimationFrame(() => toast.classList.add("show"));
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.classList.add("d-none"), 300);
+            }, 2500);
+        }
+
+    </script>
+}

@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "fastendpoints.generator.cli": {
-      "version": "8.2.0-beta.35",
+      "version": "8.2.0-beta.36",
       "commands": [
         "fastendpoints-generator"
       ],
