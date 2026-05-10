@@ -35,16 +35,6 @@ namespace NovaFashion.API.Infrastructure.Persistence.Configurations
                .WithOne(x => x.Product)
                .HasForeignKey(x => x.ProductId);
 
-            //builder.HasMany(x => x.OrderItems)
-            //    .WithOne(x => x.Product)
-            //    .HasForeignKey(x => x.ProductId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.HasMany(x => x.CartItems)
-            //   .WithOne(x => x.Product)
-            //   .HasForeignKey(x => x.ProductId);
-
-
         }
     }
 }

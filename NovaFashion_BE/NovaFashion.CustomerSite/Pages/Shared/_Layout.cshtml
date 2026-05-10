@@ -96,26 +96,14 @@
                         </li>
            
                         <li class="list-group-item border-0 d-md-block">
-                            <a href="#" class="cart-icon" title="Shopping Cart">
+                            <a asp-page="/Carts/Carts" class="cart-icon" title="Shopping Cart">
                                 <i class="fa-solid fa-bag-shopping text-black"></i>
-                                <!-- <span class="cart-count">0</span> -->
+                                <span id="cart-badge" class="cart-count">0</span>   
                             </a>
+                                           
                         </li>
 
-                        @* <li class="list-group-item d-none d-md-flex border-0 align-items-center gap-2">
-
-                            <span class="text-black">
-                                Hello, @User.Identity.Name
-                            </span>
-
-                            <form method="post" asp-page="/Auths/Logout">
-                                <button type="submit"
-                                        class="btn btn-sm btn-outline-dark">
-                                    Logout
-                                </button>
-                            </form>
-
-                        </li> *@
+                        
                     }
                     else
                     {
@@ -132,9 +120,8 @@
                         </li>  
                    
                         <li class="list-group-item border-0 d-md-block">
-                            <a href="#" class="cart-icon" title="Shopping Cart">
-                                <i class="fa-solid fa-bag-shopping text-black"></i>
-                                <!-- <span class="cart-count">0</span> -->
+                            <a asp-page="/Auths/Login" class="cart-icon" title="Shopping Cart">
+                                <i class="fa-solid fa-bag-shopping text-black"></i>                          
                             </a>
                         </li>
                     }                                 
@@ -207,6 +194,11 @@
             </div>
         </div>
     </footer>
+
+   <input type="hidden"
+       id="cart-user-id"
+       value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value" />
+
 
     <script src="https://kit.fontawesome.com/22c7ec7d54.js" crossorigin="anonymous"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

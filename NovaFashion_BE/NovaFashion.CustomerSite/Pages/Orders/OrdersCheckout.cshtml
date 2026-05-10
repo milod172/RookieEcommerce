@@ -1,0 +1,202 @@
+﻿@page "/checkout"
+@model NovaFashion.CustomerSite.Pages.Orders.OrdersCheckoutModel
+@{
+}
+<div class="container pb-5 mt-5">
+    <div class="row g-5">
+
+        <!-- FORM -->
+        <div class="col-lg-7">
+
+            <form id="checkout-form">
+
+                <h2 class="checkout-section-title serif">
+                    Thông tin đặt hàng
+                </h2>
+
+                <div class="row g-3 mb-3">
+
+                    <div class="col-md-4">
+                        <label class="checkout-form-label">Họ</label>
+                        <input type="text" class="checkout-form-control form-control" placeholder="Nguyễn">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="checkout-form-label">Tên</label>
+                        <input type="text" class="checkout-form-control form-control" placeholder="Văn A">
+                    </div>
+
+                </div>
+
+                <div class="mb-4">
+                    <label class="checkout-form-label">Địa chỉ</label>
+                    <input type="text" class="checkout-form-control form-control"
+                           placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố">
+                </div>
+
+                <div class="mb-4">
+                    <label class="checkout-form-label">Số điện thoại</label>
+                    <input type="tel" class="checkout-form-control form-control" placeholder="0901 234 567">
+                </div>
+
+                <h2 class="checkout-section-title serif mt-5">
+                    Phương thức thanh toán
+                </h2>
+
+                <label class="checkout-payment-option">
+                    <input type="radio" name="payment" value="cod" checked>
+                    <div>
+                        <div class="checkout-payment-label">COD - Thanh toán khi nhận hàng</div>
+                        <div class="checkout-payment-desc">
+                            Trả tiền mặt khi nhận sản phẩm.
+                        </div>
+                    </div>
+                </label>
+
+                <label class="checkout-payment-option">
+                    <input type="radio" name="payment" value="vnpay">
+                    <div>
+                        <div class="checkout-payment-label">VNPay</div>
+                        <div class="checkout-payment-desc">
+                            Thanh toán trực tuyến qua VNPay.
+                        </div>
+                    </div>
+
+                    <img src="https://vnpay.vn/s1/statics.vnpay.vn/2023/6/0oxhzjmxbksr1686814746087.png"
+                         alt="VNPay">
+                </label>
+
+                <button type="submit" class="checkout-submit-btn mt-4">
+                    THANH TOÁN
+                </button>
+
+            </form>
+
+        </div>
+
+      
+        <div class="col-lg-5">
+
+            <div class="checkout-summary-panel">
+
+                
+                <div id="checkout-items"></div>
+
+               
+                <div id="checkout-totals"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        let checkoutItems = [];
+
+        async function loadCheckoutCart() {
+
+            const localItems = CartService.getItems();
+
+            if (!localItems || localItems.length === 0) {
+                window.location.href = "/cart";
+                return;
+            }
+
+            const res = await fetch("?handler=LoadOrder", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(localItems)
+            });
+
+            if (!res.ok) return;
+
+            const items = await res.json();
+            checkoutItems = items;
+
+            renderOrderSummary(items);
+        }
+
+        function renderOrderSummary(items) {
+
+            const itemsContainer = document.getElementById("checkout-items");
+            const totalsContainer = document.getElementById("checkout-totals");
+
+            const subtotal = items.reduce((s, x) => s + x.total_price, 0);
+
+            // ITEMS
+            itemsContainer.innerHTML = `
+                <div class="checkout-summary-title">
+                    SẢN PHẨM (${items.length})
+                </div>
+
+                ${items.map(x => `
+                    <div class="checkout-product-row">
+
+                        <img src="${x.image_url}" />
+
+                        <div>
+
+                            <div class="checkout-product-brand">
+                                ${x.product_name}
+                            </div>
+
+                            <div class="checkout-product-name">
+                                ${x.sku}
+                            </div>
+
+                            <div class="checkout-product-meta">
+                                Size: ${x.size} · Qty: ${x.quantity}
+                            </div>
+
+                            <div class="checkout-product-price">
+                                ${formatCurrency(x.total_price)}
+                            </div>
+
+                            ${x.is_exceed_stock || !x.is_available
+                                ? `<div class="checkout-product-stock">
+                                      Vượt tồn kho / không khả dụng
+                                   </div>`
+                                : ""
+                            }
+
+                        </div>
+
+                    </div>
+                `).join("")}
+            `;
+
+            // TOTALS
+            totalsContainer.innerHTML = `
+                <div class="checkout-totals">
+
+                    <div class="checkout-total-row">
+                        <span>Vận chuyển</span>
+                        <span>FREE</span>
+                    </div>
+
+                    <div class="checkout-total-row checkout-grand-total">
+                        <span>Tổng tiền</span>
+                        <span>${formatCurrency(subtotal)}</span>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND"
+            }).format(value);
+        }
+
+        document.addEventListener("DOMContentLoaded", loadCheckoutCart);
+
+    </script>
+}

@@ -9,7 +9,6 @@ namespace NovaFashion.API.Entities
         public DateTime CreatedDate { get; set; } 
         public DateTime? ModifiedDate { get; set; }
         public bool IsActive { get; set; } = true;
-        public virtual Cart? Cart { get; set; }
-        public virtual ICollection<Order> Orders { get; set; } = [];
+        public virtual ICollection<Orders> Orders { get; set; } = [];
     }
 }

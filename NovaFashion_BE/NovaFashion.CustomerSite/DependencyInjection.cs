@@ -11,19 +11,19 @@ namespace NovaFashion.CustomerSite
             this IServiceCollection services,
             string baseUrl)
         {
-            // Handler để tự động attach JWT
+            // Register attach JWT handler
             services.AddHttpContextAccessor();
             services.AddScoped<JwtCookieService>();
             services.AddTransient<AuthenticatedHttpClientHandler>();
 
-            // Auth API client — KHÔNG dùng AuthenticatedHandler (anonymous calls)
+            // Auth API client — (anonymous calls)
             services.AddNovaFashionApiClient<AuthApiClient>(baseUrl)
                     .AddNovaFashionApiClient<ProductApiClient>(baseUrl)
                     .AddNovaFashionApiClient<CategoryApiClient>(baseUrl);
 
 
-            // Các client cần authentication → dùng AuthenticatedHttpClientHandler
-            //services.AddNovaFashionAuthenticatedApiClient<ProductApiClient>(baseUrl);
+            // Auth API client - (need attach JWT)
+            services.AddNovaFashionAuthenticatedApiClient<CartApiClient>(baseUrl);
 
             return services;
         }

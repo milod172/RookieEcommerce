@@ -1,114 +1,367 @@
 ﻿@page "/cart"
 @model NovaFashion.CustomerSite.Pages.Carts.CartsModel
+
 @{
 }
 
 <div class="container py-5">
     <div class="row gx-5">
-
         <div class="col-lg-8">
-            <h1 class="cart-page-title">Shopping Bag</h1>
-            <div class="cart-item-count">1 item</div>
+            <h1 class="cart-page-title">Giỏ hàng</h1>
+            <div class="cart-item-count" id="cart-item-count"></div>
             <hr class="cart-divider" />
-
-            <div class="d-flex gap-4">
-                <div class="cart-product-img">
-                    <img src="shirt.jpg" alt="Brown LOEWE Paula's Ibiza shirt">
-                </div>
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="cart-brand">LOEWE</div>
-                            <div class="cart-product-name">+ Paula's Ibiza Logo-Embroidered Cotton Shirt</div>
-                        </div>
-                        <button class="cart-btn-remove" title="Remove from bag"
-                                onclick="this.closest('.d-flex.gap-4').parentElement.style.display='none'">
-                            ✕
-                        </button>
-                    </div>
-                    <div class="cart-meta">
-                        <strong>Brown</strong><span class="cart-meta-sep">•</span>
-                        <strong>EU 40</strong>
-                    </div>
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <div class="cart-qty-control" data-price="635">
-                            <button type="button" onclick="changeQty(this,-1)">−</button>
-                            <span class="cart-qty-value">1</span>
-                            <button type="button" onclick="changeQty(this,1)">+</button>
-                        </div>
-                        <span class="cart-price mb-0" data-line-total>£635</span>
-                    </div>
-                    <div class="cart-stock">ONLY TWO LEFT</div>
-                </div>
-            </div>
-
-            <div class="cart-item-actions mt-4">
-                <a href="#">Remove from Bag</a>
-                <span class="cart-item-actions-dot">•</span>
-                <a href="#">Move to your Wish List</a>
+            <div id="cart-list"></div>
+            <div id="cart-empty" class="text-start d-none">
+                <p>Giỏ hàng trống.</p>
+                <a asp-page="/Products/Products" class="btn btn-dark">Tiếp tục mua sắm</a>
             </div>
         </div>
 
         <div class="col-lg-4 mt-5 mt-lg-0">
             <div class="cart-summary-card">
-                <h2>Order summary</h2>
+                <h2>Tổng đơn hàng</h2>
                 <div class="cart-summary-row">
-                    <span><strong>Item Sub-Total</strong></span>
-                    <span><strong>£635</strong></span>
+                    <span><strong>Tạm tính</strong></span>
+                    <span><strong id="cart-subtotal">0 đ</strong></span>
                 </div>
                 <hr class="cart-divider my-2" />
                 <div class="cart-summary-row cart-summary-total">
-                    <span>Total (GBP)</span>
-                    <span>£635</span>
+                    <span>Tổng cộng</span>
+                    <span id="cart-total">0 đ</span>
                 </div>
-
-                <div class="cart-alert-tax">
-                    <i class="bi">ⓘ</i>
-                    <span>I accept to pay any applicable taxes and/or duties when my order arrives at customs.</span>
-                </div>
-
-                <div class="cart-promo-title">Add a promo code</div>
-                <div class="d-flex gap-2">
-                    <input type="text" class="form-control cart-promo-input" placeholder="Enter code">
-                    <button class="cart-btn-apply">Apply</button>
-                </div>
-
-                <button class="cart-btn-purchase">
-                    <span>🔒</span> Proceed to purchase
+                <button class="cart-btn-purchase" onclick="handleCheckout()">
+                     Mua hàng
                 </button>
-
-                <div class="cart-payments">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Maestro_2016.svg" alt="Maestro">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JCB_logo.svg" alt="JCB">
-                </div>
-                <div class="cart-payments">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/1d/UnionPay_logo.svg" alt="UnionPay">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/97/Delta_logo.svg" alt="Delta" style="height:20px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Discover_Card_logo.svg" alt="Discover">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Diners_Club_Logo3.svg" alt="Diners">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" alt="Apple Pay">
-                </div>
-                <div class="cart-paypal">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal">
-                </div>
             </div>
+        </div>
+
+        <div id="empty-cart-toast"
+             class="cart-toast d-none">
+            Giỏ hàng trống, vui lòng thêm sản phẩm vào giỏ hàng
+        </div>
+
+        <div id="stock-error-toast"
+             class="cart-toast d-none">
+
+            Một số sản phẩm đã vượt quá số lượng tồn kho,
+            vui lòng kiểm tra lại giỏ hàng
+
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        function changeQty(btn, delta) {
-            const wrap = btn.parentElement;
-            const valEl = wrap.querySelector('.cart-qty-value');
-            let v = Math.max(1, parseInt(valEl.textContent, 10) + delta);
-            valEl.textContent = v;
-            const price = parseFloat(wrap.dataset.price);
-            const lineEl = wrap.parentElement.querySelector('[data-line-total]');
-            lineEl.textContent = (price * v) + 'đ';
+
+        let cartItemsCache = [];
+
+        async function renderCart() {
+            const localItems = CartService.getItems();
+            const listEl     = document.getElementById("cart-list");
+            const emptyEl    = document.getElementById("cart-empty");
+            const countEl    = document.getElementById("cart-item-count");
+            const subtotalEl = document.getElementById("cart-subtotal");
+            const totalEl    = document.getElementById("cart-total");
+            const checkoutBtn = document.querySelector(".cart-btn-purchase");
+
+            // Empty cart
+            if (localItems.length === 0) {
+
+                cartItemsCache = [];
+
+                listEl.innerHTML = "";
+
+                emptyEl.classList.remove("d-none");
+
+                countEl.textContent = "";
+
+                subtotalEl.textContent = formatCurrency(0);
+                totalEl.textContent    = formatCurrency(0);
+
+                return;
+            }
+
+            // Load cart from server
+            const response = await fetch("?handler=LoadCart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(localItems)
+            });
+
+            // API error
+            if (!response.ok) {
+
+                listEl.innerHTML =
+                    `<p class="text-danger">Lỗi tải giỏ hàng.</p>`;
+
+                checkoutBtn.disabled = true;
+
+                return;
+            }
+
+            const items = await response.json();
+
+            // Cache current server validated items
+            cartItemsCache = items;
+
+            // Check invalid stock
+            const hasInvalidItems = items.some(
+                x => x.is_exceed_stock || !x.is_available
+            );
+
+            // Disable checkout
+            checkoutBtn.disabled = hasInvalidItems;
+
+            // Optional text change
+            checkoutBtn.textContent = hasInvalidItems
+                ? "Vui lòng kiểm tra giỏ hàng"
+                : "Mua hàng";
+
+            emptyEl.classList.add("d-none");
+
+            countEl.textContent =
+                `${items.length} sản phẩm`;
+
+            // Render items
+            listEl.innerHTML = items.map(item => `
+
+                <div
+                    class="d-flex gap-4 mb-4"
+                    id="row-${item.product_variant_id}"
+                >
+
+                    <div class="cart-product-img">
+                        <a href="/Products/ProductDetails/${item.product_id}">
+                            <img
+                                src="${item.image_url}"
+                                alt="${item.product_name}"
+                            >
+                        </a>
+                    </div>
+
+                    <div class="flex-grow-1">
+
+                        <div class="d-flex justify-content-between align-items-start">
+
+                            <div>
+
+                                <div class="cart-brand">
+                                    <a href="/Products/ProductDetails/${item.product_id}">
+                                        ${item.product_name}
+                                    </a>
+                                </div>
+
+                                <div class="cart-product-name">
+                                    ${item.sku}
+                                </div>
+
+                            </div>
+
+                            <button
+                                class="cart-btn-remove"
+                                onclick="removeItem('${item.product_variant_id}')"
+                            >
+                                ✕
+                            </button>
+
+                        </div>
+
+                        <div class="cart-meta">
+                            <strong>Size: ${item.size}</strong>
+                        </div>
+
+                        <div class="cart-stock-quantity
+                            ${item.available_stock <= 5 ? "low-stock" : ""}">
+    
+                            Còn lại: ${item.available_stock} sản phẩm
+
+                        </div>
+
+                        ${
+                            !item.is_available
+                            ? `
+                                <div class="cart-stock-error">
+                                    Sản phẩm hiện không khả dụng
+                                </div>
+                              `
+                            : ""
+                        }
+
+                        ${
+                            item.is_exceed_stock
+                            ? `
+                                <div class="cart-stock-error">
+                                    Chỉ còn ${item.available_stock} sản phẩm trong kho
+                                </div>
+                              `
+                            : ""
+                        }
+
+                        <div class="d-flex align-items-center gap-3 mb-2">
+
+                            <div
+                                class="cart-qty-control"
+                                data-price="${item.unit_price}"
+                                data-id="${item.product_variant_id}"
+                            >
+
+                                <button
+                                    type="button"
+                                    onclick="changeQty(this, -1)"
+                                >
+                                    −
+                                </button>
+
+                                <span class="cart-qty-value">
+                                    ${item.quantity}
+                                </span>
+
+                                <button
+                                    type="button"
+                                    onclick="changeQty(this, 1)"
+                                    ${item.quantity >= item.available_stock
+                                        || !item.is_available
+                                        ? "disabled"
+                                        : ""}
+                                >
+                                    +
+                                </button>
+
+                            </div>
+
+                            <span
+                                class="cart-price mb-0"
+                                data-line-total
+                            >
+                                ${formatCurrency(item.total_price)}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `).join("");
+
+            // Total
+            const grandTotal = items.reduce(
+                (sum, x) => sum + x.total_price,
+                0
+            );
+
+            subtotalEl.textContent =
+                formatCurrency(grandTotal);
+
+            totalEl.textContent =
+                formatCurrency(grandTotal);
         }
+
+        function changeQty(btn, delta) {
+
+            const wrap = btn.parentElement;
+
+            const productVariantId =
+                wrap.dataset.id;
+
+            if (delta > 0) {
+                CartService.increase(productVariantId);
+            }
+            else {
+                CartService.decrease(productVariantId);
+            }
+
+            renderCart();
+        }
+
+        function removeItem(productVariantId) {
+
+            CartService.remove(productVariantId);
+
+            renderCart();
+        }
+
+        function formatCurrency(value) {
+
+            return new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND"
+            }).format(value);
+        }
+
+        function handleCheckout() {
+
+            const localItems =
+                CartService.getItems();
+
+            // Empty cart
+            if (!localItems || localItems.length === 0) {
+
+                showEmptyCartToast();
+
+                return;
+            }
+
+            // Invalid stock
+            const hasInvalidItems = cartItemsCache.some(
+                x => x.is_exceed_stock || !x.is_available
+            );
+
+            if (hasInvalidItems) {
+
+                showStockErrorToast();
+
+                return;
+            }
+
+            // Go checkout
+            window.location.href = "/checkout";
+        }
+
+        function showEmptyCartToast() {
+
+            showToast(
+                "empty-cart-toast"
+            );
+        }
+
+        function showStockErrorToast() {
+
+            showToast(
+                "stock-error-toast"
+            );
+        }
+
+        function showToast(id) {
+
+            const toast =
+                document.getElementById(id);
+
+            if (!toast) return;
+
+            toast.classList.remove("d-none");
+
+            requestAnimationFrame(() => {
+                toast.classList.add("show");
+            });
+
+            setTimeout(() => {
+
+                toast.classList.remove("show");
+
+                setTimeout(() => {
+                    toast.classList.add("d-none");
+                }, 300);
+
+            }, 2500);
+        }
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            renderCart
+        );
+
     </script>
 }

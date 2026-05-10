@@ -18,7 +18,7 @@
             if (context != null)
             {
                 var token = jwtCookieService.GetAccessToken(context);
-
+                Console.WriteLine($"Token: {token}");
                 if (!string.IsNullOrEmpty(token))
                 {
                     request.Headers.Authorization =

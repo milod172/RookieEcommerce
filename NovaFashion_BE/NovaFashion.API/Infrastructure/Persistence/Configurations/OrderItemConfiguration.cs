@@ -16,16 +16,14 @@ namespace NovaFashion.API.Infrastructure.Persistence.Configurations
                 .HasColumnType("decimal(18,2)");
 
             builder.HasOne(x => x.Order)
-                .WithMany(x => x.OrderItems)
-                .HasForeignKey(x => x.OrderId);
-
-            builder.HasOne(x => x.Product)
-                .WithMany(x => x.OrderItems)
-                .HasForeignKey(x => x.ProductId);
+             .WithMany(x => x.OrderItems)
+             .HasForeignKey(x => x.OrderId)
+             .OnDelete(DeleteBehavior.Cascade);         
 
             builder.HasOne(x => x.ProductVariant)
                 .WithMany(x => x.OrderItems)
-                .HasForeignKey(x => x.ProductVariantId);
+                .HasForeignKey(x => x.ProductVariantId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

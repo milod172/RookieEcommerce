@@ -6,5 +6,7 @@
         public Cloudinary Cloudinary { get; set; } = new();
         public JwtSettings JwtSettings { get; set; } = new();
         public AdminSettings AdminSettings { get; set; } = new();
+
+        public VNPay VNPay { get; set; } = new();
     }
 }

@@ -1,76 +1,144 @@
-﻿const CART_KEY = "cart";
+﻿const CartService = {
 
-const CartService = {
+    _getKey() {
+        const userId =
+            document.getElementById("cart-user-id")?.value ?? "guest";
 
-    // Đọc cart từ LocalStorage
+        return `cart__${userId}`;
+    },
+
     getItems() {
-        const raw = localStorage.getItem(CART_KEY);
-        return raw ? JSON.parse(raw) : [];
+
+        const raw =
+            localStorage.getItem(CartService._getKey());
+
+        if (!raw) return [];
+
+        const cart = JSON.parse(raw);
+
+        if (cart.expiredAt && Date.now() > cart.expiredAt) {
+
+            localStorage.removeItem(CartService._getKey());
+
+            CartService.updateBadge();
+
+            return [];
+        }
+
+        return cart.items ?? [];
     },
 
-    // Ghi cart xuống LocalStorage
     _save(items) {
-        localStorage.setItem(CART_KEY, JSON.stringify(items));
+
+        const cart = {
+            items,
+            expiredAt: Date.now() + 7 * 24 * 60 * 60 * 1000
+        };
+
+        localStorage.setItem(
+            CartService._getKey(),
+            JSON.stringify(cart)
+        );
+
         CartService.updateBadge();
     },
 
-    // Thêm hoặc tăng quantity
     add(productVariantId, quantity = 1) {
+
         const items = CartService.getItems();
-        const existing = items.find(x => x.productVariantId === productVariantId);
+
+        const existing = items.find(
+            x => x.product_variant_id === productVariantId
+        );
+
         if (existing) {
+
             existing.quantity += quantity;
+
         } else {
-            items.push({ productVariantId, quantity });
+
+            items.push({
+                product_variant_id: productVariantId,
+                quantity
+            });
         }
+
         CartService._save(items);
     },
 
-    // Tăng 1
     increase(productVariantId) {
+
         const items = CartService.getItems();
-        const item = items.find(x => x.productVariantId === productVariantId);
-        if (item) item.quantity += 1;
-        CartService._save(items);
-    },
 
-    // Giảm 1, nếu về 0 thì xoá
-    decrease(productVariantId) {
-        let items = CartService.getItems();
-        const item = items.find(x => x.productVariantId === productVariantId);
-        if (!item) return;
-        item.quantity -= 1;
-        if (item.quantity <= 0) {
-            items = items.filter(x => x.productVariantId !== productVariantId);
+        const item = items.find(
+            x => x.product_variant_id === productVariantId
+        );
+
+        if (item) {
+            item.quantity += 1;
         }
+
         CartService._save(items);
     },
 
-    // Xoá 1 item
+    decrease(productVariantId) {
+
+        let items = CartService.getItems();
+
+        const item = items.find(
+            x => x.product_variant_id === productVariantId
+        );
+
+        if (!item) return;
+
+        item.quantity -= 1;
+
+        if (item.quantity <= 0) {
+
+            items = items.filter(
+                x => x.product_variant_id !== productVariantId
+            );
+        }
+
+        CartService._save(items);
+    },
+
     remove(productVariantId) {
+
         const items = CartService.getItems()
-            .filter(x => x.productVariantId !== productVariantId);
+            .filter(
+                x => x.product_variant_id !== productVariantId
+            );
+
         CartService._save(items);
     },
 
-    // Xoá toàn bộ cart (sau checkout)
     clear() {
-        localStorage.removeItem(CART_KEY);
+
+        localStorage.removeItem(CartService._getKey());
+
         CartService.updateBadge();
     },
 
-    // Tổng số lượng item trong giỏ
     totalCount() {
-        return CartService.getItems().reduce((sum, x) => sum + x.quantity, 0);
+
+        return CartService.getItems()
+            .reduce((sum, x) => sum + x.quantity, 0);
     },
 
-    // Cập nhật badge số lượng trên header
     updateBadge() {
-        const badge = document.getElementById("cart-badge");
+
+        const badge =
+            document.getElementById("cart-badge");
+
         if (!badge) return;
+
         const count = CartService.totalCount();
+
         badge.textContent = count;
-        badge.style.display = count > 0 ? "inline-flex" : "none";
+
+        badge.style.display =
+            count > 0 ? "inline-flex" : "none";
     },
 };
 

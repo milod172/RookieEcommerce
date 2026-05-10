@@ -4,9 +4,9 @@ using NovaFashion.API.Entities;
 
 namespace NovaFashion.API.Infrastructure.Persistence.Configurations
 {
-    public class OrderConfiguration : IEntityTypeConfiguration<Order>
+    public class OrderConfiguration : IEntityTypeConfiguration<Orders>
     {
-        public void Configure(EntityTypeBuilder<Order> builder)
+        public void Configure(EntityTypeBuilder<Orders> builder)
         {
             builder.Property(x => x.TotalAmount)
                 .IsRequired()
@@ -40,10 +40,6 @@ namespace NovaFashion.API.Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasConversion<string>();
 
-            builder.HasMany(x => x.OrderItems)
-                .WithOne(x => x.Order)
-                .HasForeignKey(x => x.OrderId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Customer)
                 .WithMany(x => x.Orders)

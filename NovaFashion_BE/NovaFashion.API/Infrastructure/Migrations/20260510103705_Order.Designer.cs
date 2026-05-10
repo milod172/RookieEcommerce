@@ -12,7 +12,7 @@ using NovaFashion.API.Infrastructure.Persistence;
 namespace NovaFashion.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260506102228_Order")]
+    [Migration("20260510103705_Order")]
     partial class Order
     {
         /// <inheritdoc />
@@ -219,95 +219,6 @@ namespace NovaFashion.API.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("NovaFashion.API.Entities.Cart", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId")
-                        .IsUnique()
-                        .HasFilter("[CustomerId] IS NOT NULL");
-
-                    b.ToTable("Carts");
-                });
-
-            modelBuilder.Entity("NovaFashion.API.Entities.CartItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CartId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ProductVariantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CartId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductVariantId");
-
-                    b.ToTable("CartItems");
-                });
-
             modelBuilder.Entity("NovaFashion.API.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -463,9 +374,6 @@ namespace NovaFashion.API.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("ProductVariantId")
                         .HasColumnType("uniqueidentifier");
 
@@ -478,8 +386,6 @@ namespace NovaFashion.API.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
 
                     b.HasIndex("ProductVariantId");
 
@@ -747,41 +653,6 @@ namespace NovaFashion.API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NovaFashion.API.Entities.Cart", b =>
-                {
-                    b.HasOne("NovaFashion.API.Entities.ApplicationUser", "Customer")
-                        .WithOne("Cart")
-                        .HasForeignKey("NovaFashion.API.Entities.Cart", "CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("NovaFashion.API.Entities.CartItem", b =>
-                {
-                    b.HasOne("NovaFashion.API.Entities.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NovaFashion.API.Entities.Product", "Product")
-                        .WithMany("CartItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NovaFashion.API.Entities.ProductVariant", "ProductVariant")
-                        .WithMany("CartItems")
-                        .HasForeignKey("ProductVariantId");
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("ProductVariant");
-                });
-
             modelBuilder.Entity("NovaFashion.API.Entities.Category", b =>
                 {
                     b.HasOne("NovaFashion.API.Entities.Category", "ParentCategory")
@@ -810,21 +681,13 @@ namespace NovaFashion.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NovaFashion.API.Entities.Product", "Product")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("NovaFashion.API.Entities.ProductVariant", "ProductVariant")
                         .WithMany("OrderItems")
                         .HasForeignKey("ProductVariantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Order");
-
-                    b.Navigation("Product");
 
                     b.Navigation("ProductVariant");
                 });
@@ -891,14 +754,7 @@ namespace NovaFashion.API.Migrations
 
             modelBuilder.Entity("NovaFashion.API.Entities.ApplicationUser", b =>
                 {
-                    b.Navigation("Cart");
-
                     b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("NovaFashion.API.Entities.Cart", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("NovaFashion.API.Entities.Category", b =>
@@ -915,10 +771,6 @@ namespace NovaFashion.API.Migrations
 
             modelBuilder.Entity("NovaFashion.API.Entities.Product", b =>
                 {
-                    b.Navigation("CartItems");
-
-                    b.Navigation("OrderItems");
-
                     b.Navigation("ProductImages");
 
                     b.Navigation("ProductVariants");
@@ -926,8 +778,6 @@ namespace NovaFashion.API.Migrations
 
             modelBuilder.Entity("NovaFashion.API.Entities.ProductVariant", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618

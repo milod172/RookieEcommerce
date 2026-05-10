@@ -18,16 +18,12 @@ var appSettings = new AppSettings();
 builder.Configuration.Bind(appSettings);
 
 builder.Services.AddControllers();
-builder.Services.Configure<JsonOptions>(options =>
-{
-    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-});
 
 builder.Services.AddFastEndpoints();
 
 builder.Services
     .AddApiServices(builder.Configuration)
-    .AddInfrastructure(appSettings.ConnectionStrings.DefaultConnection)
+    .AddInfrastructure(appSettings)
     .AddApplicationServices()
     .AddJwtAuthentication(appSettings.JwtSettings);
 

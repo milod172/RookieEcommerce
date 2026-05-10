@@ -4,10 +4,6 @@
     ViewData["Title"] = "Chi tiết sản phẩm";
 }
 
-<script>
-    const IS_AUTHENTICATED = @Json.Serialize(User.Identity?.IsAuthenticated == true);
-</script>
-
 <div class="container-fluid px-md-5">
     <div class="row">
         <div class="col-lg-8 col-md-12">
@@ -65,6 +61,7 @@
 @section Scripts {
     <script>
         let selectedVariantId = null;
+        const IS_AUTHENTICATED = @Json.Serialize(User.Identity?.IsAuthenticated == true);
 
         function selectVariant(el) {
             document.querySelectorAll(".size-item").forEach(x => x.classList.remove("active"));

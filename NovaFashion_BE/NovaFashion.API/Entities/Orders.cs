@@ -4,7 +4,7 @@ using NovaFashion.API.Shared.Abstractions;
 
 namespace NovaFashion.API.Entities
 {
-    public class Order : IHasAudit
+    public class Orders : IHasAudit
     {
         public Guid Id { get; set; }  = Guid.NewGuid();
         public string FirstName { get; set; } = string.Empty;

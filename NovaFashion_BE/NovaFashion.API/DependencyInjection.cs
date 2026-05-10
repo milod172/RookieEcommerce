@@ -10,6 +10,7 @@ using NovaFashion.API.Features.Authentications;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.API.Infrastructure.Persistence.Interceptors;
 using NovaFashion.API.Shared.Services;
+using VNPAY.Extensions;
 
 namespace NovaFashion.API
 {
@@ -33,19 +34,27 @@ namespace NovaFashion.API
             return services;
         }
 
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, AppSettings appSettings)
         {
             services.AddScoped<AuditInterceptor>();
 
             services.AddDbContext<AppDbContext>((serviceProvider, options) =>
             {
-                options.UseSqlServer(connectionString);
+                options.UseSqlServer(appSettings.ConnectionStrings.DefaultConnection);
                 options.AddInterceptors(serviceProvider.GetRequiredService<AuditInterceptor>());
             });
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddVnpayClient(config =>
+            {
+                config.TmnCode = appSettings.VNPay.TmnCode;
+                config.HashSecret = appSettings.VNPay.HashSecret;
+                config.CallbackUrl = appSettings.VNPay.CallbackUrl;
+                config.BaseUrl = appSettings.VNPay.BaseUrl;
+            });
 
             services.Configure<IdentityOptions>(options =>
             {

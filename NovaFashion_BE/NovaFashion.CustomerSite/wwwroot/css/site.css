@@ -46,6 +46,30 @@ body {
         }
 }
 
+.cart-icon {
+    position: relative;
+    text-decoration: none;
+}
+
+.cart-count {
+    position: absolute;
+    top: -0.3125rem;
+    right: -0.9375rem;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #000;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    border: 1.5px solid #fff;
+}
+
 .product-title {
     font-size: 1.5rem;
     font-weight: 700;
@@ -278,11 +302,11 @@ footer {
     margin-bottom: 10px;
 }
 
-..toast-success {
+.toast-success {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    background-color: #22c55e;
+    background-color: #16a34a;
     color: #fff;
     padding: 14px 24px;
     border-radius: 8px;
@@ -712,6 +736,10 @@ hr.cart-divider {
     font-weight: 600;
     letter-spacing: .5px;
     font-size: .95rem;
+        & a{
+            text-decoration: none;
+            color: black;
+        }
 }
 
 .cart-product-name {
@@ -740,11 +768,18 @@ hr.cart-divider {
     margin-bottom: .25rem;
 }
 
-.cart-stock {
-    color: #8a6d3b;
-    font-size: .75rem;
-    letter-spacing: 1px;
+
+.cart-stock-quantity {
+    font-size: 0.82rem;
+    color: #666;
+    margin-top: 0.3rem;
+    margin-bottom: 0.5rem;
 }
+
+    .cart-stock-quantity.low-stock {
+        color: #c62828;
+        font-weight: 600;
+    }
 
 .cart-item-actions {
     font-size: .85rem;
@@ -910,4 +945,390 @@ hr.cart-divider {
     .cart-paypal img {
         height: 22px;
     }
+
+.cart-toast {
+    position: fixed;
+    top: 4.5rem;
+    right: 0rem;
+    background: #111;
+    color: #fff;
+    padding: 0.9rem 1.2rem;
+    border-radius: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+    .cart-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+.cart-stock-error {
+    color: #c62828;
+    font-size: 0.82rem;
+    margin-top: 0.4rem;
+    font-weight: 500;
+}
+
 /* End Carts */
+
+.page-link {
+    cursor: pointer;
+}
+
+
+/* CHECKOUT PAGE */
+
+.checkout-section-title {
+    font-size: 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.checkout-form-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    color: #1a1a1a;
+}
+
+.checkout-form-control,
+.checkout-form-select {
+    border-radius: 0;
+    border: 1px solid #cfcfcf;
+    padding: 0.65rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+    .checkout-form-control:focus,
+    .checkout-form-select:focus {
+        box-shadow: none;
+        border-color: #1a1a1a;
+    }
+
+.checkout-submit-btn {
+    background: #000;
+    color: #fff;
+    border-radius: 0;
+    padding: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    width: 100%;
+    border: none;
+}
+
+    .checkout-submit-btn:hover {
+        background: #333;
+        color: #fff;
+    }
+
+
+.checkout-payment-option {
+    border: 1px solid #cfcfcf;
+    padding: 1rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    cursor: pointer;
+    margin-bottom: 0.6rem;
+    transition: border-color .15s;
+}
+
+    .checkout-payment-option:hover {
+        border-color: #1a1a1a;
+    }
+
+    .checkout-payment-option input {
+        accent-color: #000;
+    }
+
+.checkout-payment-label {
+    font-weight: 500;
+}
+
+.checkout-payment-desc {
+    font-size: 0.78rem;
+    color: #6b6b6b;
+}
+
+.checkout-payment-option img {
+    height: 22px;
+    margin-left: auto;
+}
+
+
+.checkout-summary-panel {
+    background: #f5f3f0;
+    padding: 1.75rem 1.5rem;
+}
+
+.checkout-summary-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    border-bottom: 1px solid #d9d6d1;
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.checkout-product-row {
+    display: flex;
+    gap: 1rem;
+}
+
+    .checkout-product-row img {
+        width: 110px;
+        height: 140px;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: #fff;
+    }
+
+.checkout-product-brand {
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.checkout-product-name {
+    font-size: 0.88rem;
+    line-height: 1.35;
+    margin: 0.25rem 0 0.5rem;
+}
+
+.checkout-product-meta {
+    font-size: 0.78rem;
+    color: #6b6b6b;
+}
+
+.checkout-product-price {
+    font-weight: 600;
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+}
+
+.checkout-product-stock {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    color: #8a6b3a;
+    margin-top: 0.25rem;
+}
+
+
+
+.checkout-totals {
+    border-top: 1px solid #d9d6d1;
+    margin-top: 2rem;
+    padding-top: 1rem;
+}
+
+.checkout-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.45rem 0;
+    font-size: 0.9rem;
+}
+
+.checkout-grand-total {
+    font-weight: 600;
+    font-size: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid #d9d6d1;
+    margin-top: 0.5rem;
+}
+
+
+.checkout-page-header {
+    border-bottom: 1px solid #e5e5e5;
+    padding: 1.25rem 0;
+    margin-bottom: 2.5rem;
+}
+
+.checkout-page-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+}
+
+/* End Checkout Page */
+
+
+/*Start OrderDetails*/
+.order-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 1.25rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.order-details-title {
+    font-size: 1.75rem;
+    margin: 0;
+}
+
+.order-details-id {
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    color: #6b6b6b;
+    margin-top: 0.4rem;
+}
+
+
+.order-details-section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.85rem;
+    text-transform: uppercase;
+}
+
+
+.order-details-card {
+    border: 1px solid #e5e5e5;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.25rem;
+}
+
+.order-details-label {
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    color: #8a8a8a;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+}
+
+.order-details-value {
+    font-size: 0.92rem;
+    color: #1a1a1a;
+    margin-bottom: 0.85rem;
+}
+
+
+.order-details-status-pill {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border: 1px solid;
+}
+
+.order-details-pill-paid {
+    color: #1f6b3a;
+    border-color: #1f6b3a;
+    background: #f0f7f2;
+}
+
+
+.order-details-btn-outline {
+    background: #fff;
+    color: #000;
+    border: 1px solid #1a1a1a;
+    border-radius: 0;
+    padding: 0.85rem 1.25rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+
+    .order-details-btn-outline:hover {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+
+.order-details-items-panel {
+    background: #f5f3f0;
+    padding: 1.75rem 1.5rem;
+}
+
+.order-details-items-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    border-bottom: 1px solid #d9d6d1;
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+
+.order-details-product-row {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e8e5df;
+}
+
+    .order-details-product-row:last-of-type {
+        border-bottom: none;
+    }
+
+    .order-details-product-row img {
+        width: 100px;
+        height: 130px;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: #fff;
+    }
+
+.order-details-product-brand {
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.order-details-product-name {
+    font-size: 0.88rem;
+    line-height: 1.35;
+    margin: 0.25rem 0 0.5rem;
+}
+
+.order-details-product-meta {
+    font-size: 0.78rem;
+    color: #6b6b6b;
+}
+
+.order-details-product-price {
+    font-weight: 600;
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+}
+
+.order-details-totals {
+    border-top: 1px solid #d9d6d1;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+}
+
+.order-details-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.45rem 0;
+    font-size: 0.9rem;
+}
+
+.order-details-grand-total {
+    font-weight: 600;
+    font-size: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid #d9d6d1;
+    margin-top: 0.5rem;
+}
+
+
+/*End OrderDetails*/

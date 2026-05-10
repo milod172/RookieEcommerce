@@ -4,21 +4,17 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using NovaFashion.CustomerSite.Services;
 using NovaFashion.SharedViewModels.CartDtos;
 
-namespace NovaFashion.CustomerSite.Pages.Carts
+namespace NovaFashion.CustomerSite.Pages.Orders
 {
     [Authorize]
     [IgnoreAntiforgeryToken]
-    public class CartsModel(CartApiClient cartApi) : PageModel
+    public class OrdersCheckoutModel(CartApiClient cartApi) : PageModel
     {
-       
-        public List<CartItemDto> CartItems { get; set; } = [];
-
-        public IActionResult OnGet()
+        public void OnGet()
         {
-            return Page();
         }
 
-        public async Task<IActionResult> OnPostLoadCartAsync([FromBody] List<CartItemRequest> items)
+        public async Task<IActionResult> OnPostLoadOrderAsync([FromBody] List<CartItemRequest> items)
         {
             if (items is not { Count: > 0 })
                 return new JsonResult(new List<CartItemDto>());
@@ -33,11 +29,9 @@ namespace NovaFashion.CustomerSite.Pages.Carts
                 };
             }
 
-            var result =
-                await response.Content.ReadFromJsonAsync<List<CartItemDto>>() ?? [];
+            var result = await response.Content.ReadFromJsonAsync<List<CartItemDto>>() ?? [];
 
             return new JsonResult(result);
         }
     }
-
 }
