@@ -1,6 +1,8 @@
-﻿namespace NovaFashion.API.Entities
+﻿using NovaFashion.API.Shared.Abstractions;
+
+namespace NovaFashion.API.Entities
 {
-    public class OrderItem
+    public class OrderItem : IHasAudit
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public int Quantity { get; set; }

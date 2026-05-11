@@ -1,4 +1,4 @@
-﻿@page "/order-details"
+﻿@page "/order-details/{id:Guid}"
 @model NovaFashion.CustomerSite.Pages.Orders.OrderDetailsModel
 @{
 }
@@ -8,7 +8,7 @@
     <div class="order-details-header">
         <div>
             <h2 class="order-details-title serif">Chi tiết đơn hàng</h2>
-            <div class="order-details-id">MÃ ĐƠN: #A3F9C2D7-4B81</div>
+            <div class="order-details-id">MÃ ĐƠN: #@Model.Order.Id</div>
         </div>
     </div>
 
@@ -26,24 +26,24 @@
 
                     <div class="col-md-6">
                         <div class="order-details-label">Họ và tên</div>
-                        <div class="order-details-value">Nguyễn Văn A</div>
+                        <div class="order-details-value">@Model.Order.FullName</div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="order-details-label">Số điện thoại</div>
-                        <div class="order-details-value">0901 234 567</div>
+                        <div class="order-details-value">@Model.Order.PhoneNumber</div>
                     </div>
 
                     <div class="col-md-12">
                         <div class="order-details-label">Địa chỉ giao hàng</div>
                         <div class="order-details-value">
-                            123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh
+                            @Model.Order.Address
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="order-details-label">Ngày tạo</div>
-                        <div class="order-details-value">10/05/2026 14:32</div>
+                        <div class="order-details-value">@Model.Order.CreateTime</div>
                     </div>
 
                 </div>
@@ -59,14 +59,14 @@
 
                     <div class="col-md-6">
                         <div class="order-details-label">Phương thức</div>
-                        <div class="order-details-value">VNPay</div>
+                        <div class="order-details-value">@Model.Order.PaymentMethod</div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="order-details-label">Trạng thái</div>
                         <div class="order-details-value">
                             <span class="order-details-status-pill order-details-pill-paid">
-                                Đã thanh toán
+                                @Model.Order.OrderStatus
                             </span>
                         </div>
                     </div>
@@ -76,9 +76,9 @@
             </div>
 
             <div class="d-flex gap-2 mt-4 flex-wrap">
-                <button class="order-details-btn-outline">
+                <a asp-page="/Orders/OrdersList" class="order-details-btn-outline text-decoration-none">
                     QUAY LẠI DANH SÁCH
-                </button>
+                </a>
             </div>
 
         </div>
@@ -87,44 +87,42 @@
         <div class="col-lg-5">
 
             <div class="order-details-items-panel">
+                @foreach(var item in Model.Order.OrderItems)
+                {
+                    <div class="order-details-items-title">
+                        SẢN PHẨM ĐÃ ĐẶT (@Model.Order.OrderItems.Count())
+                    </div>
 
-                <div class="order-details-items-title">
-                    SẢN PHẨM ĐÃ ĐẶT (1)
-                </div>
+                    <!-- ITEM -->
+                    <div class="order-details-product-row">
 
-                <!-- ITEM -->
-                <div class="order-details-product-row">
+                        <img src="@item.ImageUrl" alt="@item.ProductName">
 
-                    <img src="shirt.jpg" alt="LOEWE shirt">
+                        <div>
 
-                    <div>
+                            <div class="order-details-product-brand">@item.ProductName</div>
 
-                        <div class="order-details-product-brand">LOEWE</div>
+                            <div class="order-details-product-name">
+                                @item.ProductDescription
+                            </div>
 
-                        <div class="order-details-product-name">
-                            + Paula's Ibiza Logo-Embroidered Cotton Shirt
-                        </div>
+                            <div class="order-details-product-meta">
+                                 Size: @item.Size · Sl: @item.Quantity
+                            </div>
 
-                        <div class="order-details-product-meta">
-                            Brown · EU 40 · Qty: 1
-                        </div>
+                            <div class="order-details-product-price">
+                                @item.TotalPrice.ToString("N0") ₫
+                            </div>
 
-                        <div class="order-details-product-price">
-                            £635
                         </div>
 
                     </div>
-
-                </div>
-
+                }
+                
                 <!-- TOTALS -->
-                <div class="order-details-totals">
-
-                    <div class="order-details-total-row order-details-grand-total">
-                        <span>TỔNG CỘNG</span>
-                        <span>£635.00</span>
-                    </div>
-
+                <div class="order-details-total-row order-details-grand-total">
+                    <span>TỔNG CỘNG</span>
+                    <span>@Model.Order.TotalAmount.ToString("N0") ₫</span>
                 </div>
 
             </div>

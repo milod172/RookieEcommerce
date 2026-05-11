@@ -51,6 +51,8 @@ namespace NovaFashion.API.Features.Products
                         Id = pv.Id,
                         Size = pv.Size.ToString(),
                         StockQuantity = pv.StockQuantity,
+                        IsAvailable = pv.StockQuantity > 0,
+                        IsExceedStock = pv.Product.TotalQuantity > pv.StockQuantity,
                         UnitPrice = pv.UnitPrice,
                         VariantSku = pv.VariantSku
                     })

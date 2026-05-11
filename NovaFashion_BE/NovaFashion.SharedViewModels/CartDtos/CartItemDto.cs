@@ -11,6 +11,9 @@ namespace NovaFashion.SharedViewModels.CartDtos
 
         [JsonPropertyName("product_name")]
         public string ProductName { get; set; } = string.Empty;
+        [JsonPropertyName("product_description")]
+        public string ProductDescription { get; set;} = string.Empty; 
+
         [JsonPropertyName("image_url")]
         public string ImageUrl { get; set; } = string.Empty;
         [JsonPropertyName("size")]

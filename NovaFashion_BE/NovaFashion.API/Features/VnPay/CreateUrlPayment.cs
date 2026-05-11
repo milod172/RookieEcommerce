@@ -33,7 +33,7 @@ namespace NovaFashion.API.Features.VnPay
                 return;
             }
 
-            var order = await db.Orders.FirstOrDefaultAsync(x => x.CustomerId == currentUserId, ct);
+            var order = await db.Orders.FirstOrDefaultAsync(x => x.Id == req.OrderId && x.CustomerId == currentUserId, ct);
 
             if (order == null)
             {
@@ -51,12 +51,16 @@ namespace NovaFashion.API.Features.VnPay
             var request = new VnpayPaymentRequest
             {
                 Money = (double)order.TotalAmount,
-                Description = $"Thanh toán đơn hàng {order.Id.ToString()[..6]}",
+                Description = order.Id.ToString(),
                 BankCode = BankCode.ANY
             };
 
+            Console.WriteLine($"VnPay Request - Money: {request.Money}, Description: {request.Description}");
+
             var paymentUrlInfo = vnpayClient.CreatePaymentUrl(request);
             var paymentUrl = paymentUrlInfo.Url;
+
+            Console.WriteLine($"{paymentUrlInfo.Url}");
 
             await Send.OkAsync(paymentUrl, ct);
         }

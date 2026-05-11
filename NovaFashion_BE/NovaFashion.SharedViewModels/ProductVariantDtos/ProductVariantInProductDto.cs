@@ -17,5 +17,9 @@ namespace NovaFashion.SharedViewModels.ProductVariantDtos
         public int StockQuantity { get; set; }
         [JsonPropertyName("unit_price")]
         public decimal UnitPrice { get; set; }
+        [JsonPropertyName("is_available")]
+        public bool IsAvailable { get; set; }
+        [JsonPropertyName("is_exceed_stock")]
+        public bool IsExceedStock { get; set; }
     }
 }

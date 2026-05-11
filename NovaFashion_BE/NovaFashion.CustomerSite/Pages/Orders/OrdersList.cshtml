@@ -1,0 +1,167 @@
+﻿@page "/orders"
+@model NovaFashion.CustomerSite.Pages.Orders.OrdersListModel
+@{
+    string GetStatusClass(string status) => status switch
+    {
+        "Completed" => "orders-list-status-completed",
+        "Pending" => "orders-list-status-pending",
+        "Cancelled" => "orders-list-status-cancelled",
+        _ => "orders-list-status-processing"
+    };
+
+    string GetStatusText(string status) => status switch
+    {
+        "Completed" => "Hoàn thành",
+        "Pending" => "Đang chờ",
+        "Cancelled" => "Đã huỷ",
+        "Processing" => "Đang xử lý",
+        _ => status
+    };
+}
+
+<div class="container order-page-header"> 
+    <div class="sub">Tài khoản của bạn</div> 
+    <h1 class="serif">Đơn hàng của tôi</h1> 
+</div>
+
+@if (!Model.Orders.Items.Any())
+{
+    <div class="orders-empty-state">
+        Bạn chưa có đơn hàng nào.
+    </div>
+}
+else
+{
+    @foreach (var order in Model.Orders.Items)
+    {
+        <div class="orders-list-card">
+
+            <!-- Header -->
+            <div class="orders-list-card-header">
+
+                <div class="orders-list-order-id">
+                    Mã đơn · <strong>#@order.Id</strong>
+                </div>
+
+                <span class="orders-list-status @GetStatusClass(order.OrderStatus)">
+                    @GetStatusText(order.OrderStatus)
+                </span>
+
+            </div>
+
+            <!-- Products -->
+            @foreach (var item in order.Items)
+            {
+                <div class="orders-list-product-row">
+
+                    <div class="orders-list-product-image">
+                        <img src="@item.ImageUrl"
+                             alt="@item.ProductName">
+                    </div>
+
+                    <div class="orders-list-product-info">
+
+                        <div class="orders-list-product-name">
+                            @item.ProductName
+                        </div>
+
+                        <div class="orders-list-product-meta">
+                            <span>Size: @item.Size</span>
+                            <span>SL: @item.Quantity</span>
+                        </div>
+
+                    </div>
+
+                    <div class="orders-list-product-price">
+                        @item.TotalPrice.ToString("N0") ₫
+                    </div>
+
+                </div>
+            }
+
+            <!-- Footer -->
+            <div class="orders-list-card-footer">
+
+                <div>
+
+                    <span class="orders-list-total-label">
+                        Tổng cộng
+                    </span>
+
+                    <span class="orders-list-total-amount">
+                        @order.TotalAmount.ToString("N0") ₫
+                    </span>
+
+                </div>
+
+                <a asp-page="/Orders/OrderDetails"
+                       asp-route-id="@order.Id"
+                       class="orders-list-button text-decoration-none">
+                    Xem chi tiết
+                </a>
+
+            </div>
+
+        </div>
+    }
+
+    <!-- Pagination -->
+    @if (Model.Orders.TotalPages > 1)
+    {
+        <div class="orders-pagination-wrapper">
+
+            <ul class="pagination orders-pagination">
+
+                <!-- Previous -->
+                <li class="page-item @(Model.Orders.HasPreviousPage ? "" : "disabled")">
+
+                    <a class="page-link orders-pagination__link"
+                           asp-page="/Orders/Index"
+                           asp-route-PageNumber="@(Model.PageNumber - 1)"
+                           asp-route-PageSize="@Model.PageSize"
+                           asp-route-SortBy="@Model.SortBy">
+
+                        ‹ Trước
+
+                    </a>
+
+                </li>
+
+                <!-- Page Numbers -->
+                @for (int i = 1; i <= Model.Orders.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+
+                        <a class="page-link orders-pagination__link"
+                               asp-page="/Orders/Index"
+                               asp-route-PageNumber="@i"
+                               asp-route-PageSize="@Model.PageSize"
+                               asp-route-SortBy="@Model.SortBy">
+
+                            @i
+
+                        </a>
+
+                    </li>
+                }
+
+                <!-- Next -->
+                <li class="page-item @(Model.Orders.HasNextPage ? "" : "disabled")">
+
+                    <a class="page-link orders-pagination__link"
+                           asp-page="/Orders/Index"
+                           asp-route-PageNumber="@(Model.PageNumber + 1)"
+                           asp-route-PageSize="@Model.PageSize"
+                           asp-route-SortBy="@Model.SortBy">
+
+                        Sau ›
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+        </div>
+    }
+}

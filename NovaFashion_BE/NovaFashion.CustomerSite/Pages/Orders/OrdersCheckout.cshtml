@@ -8,7 +8,7 @@
         <!-- FORM -->
         <div class="col-lg-7">
 
-            <form id="checkout-form">
+            <form id="checkout-form">     
 
                 <h2 class="checkout-section-title serif">
                     Thông tin đặt hàng
@@ -18,25 +18,25 @@
 
                     <div class="col-md-4">
                         <label class="checkout-form-label">Họ</label>
-                        <input type="text" class="checkout-form-control form-control" placeholder="Nguyễn">
+                        <input name="FirstName" type="text" class="checkout-form-control form-control" placeholder="Nguyễn">
                     </div>
 
                     <div class="col-md-4">
                         <label class="checkout-form-label">Tên</label>
-                        <input type="text" class="checkout-form-control form-control" placeholder="Văn A">
+                        <input name="LastName" type="text" class="checkout-form-control form-control" placeholder="Văn A">
                     </div>
 
                 </div>
 
                 <div class="mb-4">
                     <label class="checkout-form-label">Địa chỉ</label>
-                    <input type="text" class="checkout-form-control form-control"
+                    <input name="Address" type="text" class="checkout-form-control form-control"
                            placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố">
                 </div>
 
                 <div class="mb-4">
                     <label class="checkout-form-label">Số điện thoại</label>
-                    <input type="tel" class="checkout-form-control form-control" placeholder="0901 234 567">
+                    <input name="Phone" type="tel" class="checkout-form-control form-control" placeholder="0901 234 567">
                 </div>
 
                 <h2 class="checkout-section-title serif mt-5">
@@ -136,8 +136,7 @@
                 </div>
 
                 ${items.map(x => `
-                    <div class="checkout-product-row">
-
+                    <div class="checkout-product-row">                 
                         <img src="${x.image_url}" />
 
                         <div>
@@ -196,7 +195,74 @@
             }).format(value);
         }
 
-        document.addEventListener("DOMContentLoaded", loadCheckoutCart);
+       async function handleCheckout(e) {
+            e.preventDefault();
+
+            // Validate còn hàng không
+            const hasInvalid = checkoutItems.some(x => x.is_exceed_stock || !x.is_available);
+            if (hasInvalid) {
+                alert("Một số sản phẩm không còn đủ hàng. Vui lòng kiểm tra lại giỏ hàng.");
+                return;
+            }
+
+            const form = document.getElementById("checkout-form");
+
+            const payload = {
+                last_name:      form.LastName.value,
+                first_name:     form.FirstName.value,
+                address:       form.Address.value,
+                phone_number:         form.Phone.value,
+                payment_method: form.querySelector('input[name="payment"]:checked').value,
+                items: checkoutItems.map(x => ({
+                    product_variant_id: x.product_variant_id,
+                    quantity:         x.quantity
+                }))
+            };
+
+            console.log("Payload:", JSON.stringify(payload, null, 2));
+
+            // Validate form
+            if (!payload.last_name || !payload.first_name || !payload.address || !payload.phone_number) {
+                alert("Vui lòng điền đầy đủ thông tin.");
+                return;
+            }
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Đang xử lý...";
+
+            try {
+                const res = await fetch("?handler=Checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    alert("Đặt hàng thất bại. Vui lòng thử lại.");
+                    return;
+                }
+
+                const data = await res.json();
+
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Có lỗi xảy ra. Vui lòng thử lại.");
+
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "THANH TOÁN";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCheckoutCart();
+            document.getElementById("checkout-form").addEventListener("submit", handleCheckout);
+        });
 
     </script>
 }

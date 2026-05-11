@@ -232,3 +232,34 @@
 .product-img:hover .image-default {
     opacity: 0;
 }
+
+.category-toggle-btn {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d9d9d9;
+    background: #ffffff;
+    padding: 0;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+    /* Hover */
+    .category-toggle-btn:hover {
+        border-color: #3a5a40;
+        color: #3a5a40;
+        background: #f8f8f8;
+    }
+
+    /* Chevron Icon */
+    .category-toggle-btn i {
+        font-size: .85rem;
+        transition: transform .25s ease;
+    }
+
+    /* Rotate when expanded */
+    .category-toggle-btn[aria-expanded="true"] i {
+        transform: rotate(180deg);
+    }

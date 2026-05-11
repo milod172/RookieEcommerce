@@ -4,8 +4,16 @@
     <div class="row g-4">
         <!-- Filter Sidebar -->
         <aside class="col-lg-3">
-            
-            <partial name="/Pages/Categories/_CategoryFilterPartial.cshtml" model="Model.Categories" />
+
+            <input type="hidden"
+                   id="CategoryId"
+                   name="CategoryId"
+                   value="@Model.CategoryId" />
+
+           <partial name="/Pages/Categories/_CategoryFilterPartial.cshtml"
+                     model="Model.Categories"
+                     view-data="ViewData" />
+
             <partial name="_PriceFilterPartial" model="Model" />
             
         </aside>

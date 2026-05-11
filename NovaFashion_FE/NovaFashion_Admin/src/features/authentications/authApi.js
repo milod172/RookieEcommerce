@@ -5,7 +5,7 @@ export const authApi = {
         const res = await httpClient.post('/auth/login', credentials);
         localStorage.setItem('access_token', res.data.access_token);
         localStorage.setItem('refresh_token', res.data.refresh_token);
-        localStorage.setItem('user_id', res.data.user_id);
+        // localStorage.setItem('user_id', res.data.user_id);
         return res.data;
     },
 
@@ -17,11 +17,11 @@ export const authApi = {
     logout: () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user_id');
+        // localStorage.removeItem('user_id');
     },
 
     refreshToken: async () => {
-        const userId = localStorage.getItem('user_id');
+        const userId = authApi.getPayload()?.sub;
         const refreshToken = localStorage.getItem('refresh_token');
 
         const res = await refreshClient.post('/auth/refresh-token', {

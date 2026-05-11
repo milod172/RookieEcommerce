@@ -3,44 +3,62 @@
 
 @{
     var collapseId = $"cat-{Model.Id.ToString()[..8]}";
-    var currentCategoryId = ViewData["CategoryId"] as Guid?;
+    var currentCategoryId = ViewData["CategoryId"] != null
+    ? (Guid?)ViewData["CategoryId"]
+    : null;
     var isSelected = currentCategoryId == Model.Id;
 }
 
 <li class="category-item list-unstyled">
     @if (Model.HasChildren)
     {
-        <a hx-get="@Url.Page("/Products/Products")"
-               hx-target="#product-container"
-               hx-swap="innerHTML"
-               hx-push-url="true"
-               hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #CategoryId"
-               hx-vals='{"CategoryId":"@Model.Id","PageNumber":"1"}'
-               class="d-flex justify-content-between align-items-center text-decoration-none text-reset category-parent @(isSelected ? "active" : "")"
-               data-bs-toggle="collapse"
-               data-bs-target="#@collapseId"
-               style="cursor:pointer">
+        <div class="d-flex justify-content-between align-items-center">
 
-            <span class="d-flex align-items-center gap-1">
-                @if (isSelected)
-                {
-                    <span class="selected-dot"></span>
-                }
-                @Model.CategoryName
-            </span>
-           
-            <i class="fa-solid fa-chevron-down"></i>
-         </a>
-            
-     
+            <!-- Filter -->
+            <a hx-get="@Url.Page("/Products/Products")"
+                   hx-target="#product-container"
+                   hx-swap="innerHTML"
+                   hx-push-url="true"
+                   hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #CategoryId"
+                   hx-vals='{"CategoryId":"@Model.Id","PageNumber":"1"}'
+                   onclick="document.getElementById('CategoryId').value='@Model.Id'"
+                   class="text-decoration-none text-reset category-parent @(isSelected ? "active" : "")">
 
-        <ul id="@collapseId" class="list-unstyled category-children collapse">
+                <span class="d-flex align-items-center gap-1">
+
+                    @if (isSelected)
+                    {
+                        <span class="selected-dot"></span>
+                    }
+
+                    @Model.CategoryName
+
+                </span>
+
+            </a>
+
+            <!-- Collapse Toggle -->
+            <button type="button"
+                    class="category-toggle-btn"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#@collapseId">
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </button>
+
+        </div>
+
+        <ul id="@collapseId"
+            class="list-unstyled category-children collapse">
+
             @foreach (var child in Model.SubCategories)
             {
                 <partial name="/Pages/Categories/_CategoryNodePartial.cshtml"
                          model="child"
                          view-data="ViewData" />
             }
+
         </ul>
     }
     else
@@ -51,15 +69,21 @@
                hx-push-url="true"
                hx-include="#MinPrice, #MaxPrice, #PageSize, #SortBy, #CategoryId"
                hx-vals='{"CategoryId":"@Model.Id","PageNumber":"1"}'
+               onclick="document.getElementById('CategoryId').value='@Model.Id'"
                class="d-flex align-items-center text-decoration-none text-reset category-parent @(isSelected ? "active" : "")">
 
             <span class="d-flex align-items-center gap-1">
+
                 @if (isSelected)
                 {
                     <span class="selected-dot"></span>
                 }
+
                 @Model.CategoryName
+
             </span>
+
         </a>
     }
+
 </li>

@@ -1,18 +1,17 @@
 ﻿using System.Security.Claims;
+using System.Text.Json.Serialization;
 using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NovaFashion.API.Entities;
 using NovaFashion.API.Entities.Enum;
-using NovaFashion.API.Features.Products;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.CartDtos;
 using NovaFashion.SharedViewModels.OrderDtos;
-using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.OrdersTable
 {
-    public class OrderCheckoutRequest
+    public class CreateOrderRequest
     {
         public List<CartItemRequest> Items { get; set; } = [];
 
@@ -20,22 +19,22 @@ namespace NovaFashion.API.Features.OrdersTable
         public string LastName { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public PaymentMethod PaymentMethod { get; set; }
     }
 
-    public class OrderCheckoutValidator : Validator<OrderCheckoutRequest>
+    public class CreateOrderValidator : Validator<CreateOrderRequest>
     {
         public const string FirstNameRequired = "Họ không được để trống";
         public const string FirstNameTooLong = "Họ không được vượt quá 100 ký tự";
         public const string LastNameRequired = "Tên không được để trống";
         public const string LastNameTooLong = "Tên không được vượt quá 100 ký tự";
         public const string PhoneNumberRequired = "Số điện thoại không được để trống";
-        public const string PhoneNumberInvalid = "Số điện thoại không hợp lệ";
         public const string AddressRequired = "Địa chỉ không được để trống";
         public const string AddressTooLong = "Địa chỉ không được vượt quá 225 ký tự";
         public const string PaymentMethodInvalid = "Phương thức thanh toán phải là 'COD' hoặc 'VNPay'";
 
-        public OrderCheckoutValidator()
+        public CreateOrderValidator()
         {
             RuleFor(x => x.FirstName)
                 .NotEmpty()
@@ -51,9 +50,8 @@ namespace NovaFashion.API.Features.OrdersTable
 
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty()
-                .WithMessage(PhoneNumberRequired)
-                .Matches(@"^(0[3|5|7|8|9])+([0-9]{8})$")
-                .WithMessage(PhoneNumberInvalid);
+                .WithMessage(PhoneNumberRequired);
+          
 
             RuleFor(x => x.Address)
                 .NotEmpty()
@@ -67,9 +65,9 @@ namespace NovaFashion.API.Features.OrdersTable
         }
     }
 
-    public class OrderCheckoutMapper : Mapper<OrderCheckoutRequest, OrderDetailsDto, Orders>
+    public class CreateOrderMapper : Mapper<CreateOrderRequest, OrderDetailsDto, Orders>
     {
-        
+
         public override OrderDetailsDto FromEntity(Orders e)
         {
             return new OrderDetailsDto
@@ -97,8 +95,7 @@ namespace NovaFashion.API.Features.OrdersTable
             };
         }
     }
-
-    public class OrderCheckout(AppDbContext db) : Endpoint<OrderCheckoutRequest, OrderDetailsDto, OrderCheckoutMapper>
+    public class CreateOrder(AppDbContext db) : Endpoint<CreateOrderRequest, OrderDetailsDto, CreateOrderMapper>
     {
         public override void Configure()
         {
@@ -108,7 +105,7 @@ namespace NovaFashion.API.Features.OrdersTable
             DontThrowIfValidationFails();
         }
 
-        public override async Task HandleAsync(OrderCheckoutRequest req, CancellationToken ct)
+        public override async Task HandleAsync(CreateOrderRequest req, CancellationToken ct)
         {
             var currentUserId = User.FindFirstValue("sub");
 
@@ -194,7 +191,6 @@ namespace NovaFashion.API.Features.OrdersTable
             db.Orders.Add(order);
             await db.SaveChangesAsync(ct);
 
-           
             var result = await db.Orders
                 .Where(x => x.Id == order.Id)
                 .Include(x => x.OrderItems)

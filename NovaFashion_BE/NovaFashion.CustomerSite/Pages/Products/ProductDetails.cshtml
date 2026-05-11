@@ -34,11 +34,13 @@
                     <div class="size-item"
                          data-price="@item.UnitPrice"
                          data-id="@item.Id"
+                         data-stock="@item.StockQuantity"
                          onclick="selectVariant(this)">
                         @item.Size
                     </div>
                 }
             </div>
+            <p id="stock-info" class="small mt-1 text-muted"></p>
 
             <p id="size-error" class="text-danger small mt-1 d-none">Vui lòng chọn kích thước.</p>
 
@@ -61,6 +63,8 @@
 @section Scripts {
     <script>
         let selectedVariantId = null;
+        let selectedStock = 0;
+
         const IS_AUTHENTICATED = @Json.Serialize(User.Identity?.IsAuthenticated == true);
 
         function selectVariant(el) {
@@ -70,10 +74,24 @@
             selectedVariantId = el.dataset.id;
 
             const price = parseFloat(el.dataset.price);
+            selectedStock = parseInt(el.dataset.stock);
+
             document.getElementById("product-price").textContent =
                 price.toLocaleString("vi-VN") + " đ";
 
+            document.getElementById("stock-info").textContent =`Còn lại: ${selectedStock} sản phẩm`;
+
             document.getElementById("size-error").classList.add("d-none");
+
+            const btn = document.querySelector(".btn-add-cart");
+
+            if (selectedStock <= 0) {
+                btn.disabled = true;
+                btn.textContent = "Hết hàng";
+            } else {
+                btn.disabled = false;
+                btn.textContent = "Thêm vào giỏ hàng";
+            }
         }
 
         function addToCart() {
@@ -84,6 +102,16 @@
 
             if (!selectedVariantId) {
                 document.getElementById("size-error").classList.remove("d-none");
+                return;
+            }
+
+            const items = CartService.getItems();
+            const existing = items.find(x => x.product_variant_id === selectedVariantId);
+
+            const currentQty = existing ? existing.quantity : 0;
+
+            if (currentQty + 1 > selectedStock) {
+                alert("Không thể thêm vượt quá số lượng tồn kho");
                 return;
             }
 

@@ -1,12 +1,20 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using NovaFashion.CustomerSite.Services;
+using NovaFashion.SharedViewModels.OrderDtos;
+using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.CustomerSite.Pages.Orders
 {
-    public class OrderDetailsModel : PageModel
+    [Authorize]
+    [IgnoreAntiforgeryToken]
+    public class OrderDetailsModel(OrderApiClient orderApi) : PageModel
     {
-        public void OnGet()
+        public OrderDetailsDto Order { get; set; } = new();
+        public async Task OnGetAsync(Guid id)
         {
+            Order = await orderApi.GetOrderDetailsAsync(id);
         }
     }
 }

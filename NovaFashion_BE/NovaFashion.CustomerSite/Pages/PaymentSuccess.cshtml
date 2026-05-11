@@ -1,0 +1,98 @@
+﻿@page "/payment-success/{orderId:Guid}"
+@model NovaFashion.CustomerSite.Pages.PaymentSuccessModel
+@{
+    ViewData["Title"] = "Thanh toán thành công";
+}
+
+
+<div class="payment-success-container mt-5 mb-4">
+    <div class="payment-success-checkmark">
+        <i class="fa-solid fa-check"></i>
+    </div>
+
+    <div class="payment-success-eyebrow">
+        Đơn hàng đã xác nhận
+    </div>
+
+    <h1 class="serif payment-success-title">
+        Cảm ơn bạn.
+    </h1>
+
+    <p class="payment-success-description">
+        Thanh toán của bạn đã được xử lý thành công.
+        Chúng tôi sẽ gửi email xác nhận cùng thông tin vận chuyển
+        trong thời gian sớm nhất.
+    </p>
+
+    <div class="payment-success-order">
+        <div class="payment-success-order-row">
+            <span class="payment-success-order-label">
+                Mã đơn hàng
+            </span>
+
+            <span class="payment-success-order-value">
+                #@Model.SuccessState.OrderId.ToString()[..8].ToUpper()
+            </span>
+        </div>
+
+        <div class="payment-success-order-row">
+            <span class="payment-success-order-label">
+                Ngày
+            </span>
+
+            <span class="payment-success-order-value">
+                @Model.SuccessState.CreateTime
+            </span>
+        </div>
+
+        <div class="payment-success-order-row">
+            <span class="payment-success-order-label">
+                Sản phẩm
+            </span>
+
+            <span class="payment-success-order-value">
+                @Model.SuccessState.ProductName
+            </span>
+        </div>
+
+        <div class="payment-success-order-row">
+            <span class="payment-success-order-label">
+                Phương thức
+            </span>
+
+            <span class="payment-success-order-value">
+                @Model.SuccessState.PaymentMethod
+            </span>
+        </div>
+
+        <div class="payment-success-order-row total">
+            <span class="payment-success-order-label">
+                Tổng cộng
+            </span>
+
+            <span class="payment-success-order-value">
+                @Model.SuccessState.TotalAmount.ToString("N0") ₫
+            </span>
+        </div>
+    </div>
+
+    <div class="payment-success-actions">
+        <a asp-page="/Orders/OrderDetails"
+           asp-route-id="@Model.SuccessState.OrderId"
+           class="payment-success-button payment-success-button-primary">
+            Xem đơn hàng
+        </a>
+
+        <a asp-page="/Products/Products" class="payment-success-button payment-success-button-outline">
+            Tiếp tục mua sắm
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            CartService.clear();
+        });
+    </script>
+}

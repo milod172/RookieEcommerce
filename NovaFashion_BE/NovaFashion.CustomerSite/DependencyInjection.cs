@@ -24,6 +24,8 @@ namespace NovaFashion.CustomerSite
 
             // Auth API client - (need attach JWT)
             services.AddNovaFashionAuthenticatedApiClient<CartApiClient>(baseUrl);
+            services.AddNovaFashionAuthenticatedApiClient<OrderApiClient>(baseUrl);
+            services.AddNovaFashionAuthenticatedApiClient<VnPayApiClient>(baseUrl);
 
             return services;
         }

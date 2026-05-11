@@ -37,7 +37,12 @@ namespace NovaFashion.CustomerSite.Pages.Products
 
         public async Task<IActionResult> OnGetAsync()
         {
+            Categories = await categoryApi.GetCategoriesAsync();
+
+            ViewData["CategoryId"] = CategoryId;
+
             ModelState.Clear();
+
             var response = await productApi.GetProductsAsync(
                 PageNumber,
                 PageSize,
@@ -57,24 +62,32 @@ namespace NovaFashion.CustomerSite.Pages.Products
                     if (apiError is not null)
                     {
                         ModelState.Clear();
+
                         foreach (var (key, messages) in apiError.Errors)
+                        {
                             foreach (var msg in messages)
+                            {
                                 ModelState.AddModelError(key, msg);
+                            }
+                        }
                     }
 
                     return Partial("_ProductContainerPartial", this);
                 }
 
-               
-                Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+                Products = await response.Content
+                    .ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+
                 return Partial("_ProductContainerPartial", this);
             }
 
-            Products = await response.Content.ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+            Products = await response.Content
+                .ReadFromJsonAsync<PaginationResponseDto<ProductDto>>() ?? new();
+
             return Page();
         }
 
-        
+
         //public async Task<IActionResult> OnGetCategoryFilterPartialAsync([FromQuery] Guid? categoryId)
         //{
         //    CategoryId = categoryId;
