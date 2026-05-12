@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom';
 import styles from './Products.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useProducts } from '../hooks/products/useProducts.js';
 import Pagination from '../components/Pagination.jsx';
+import { useCategoriesPicker } from '../hooks/categories/useCategory.js';
 
 const PAGE_SIZE = 5;
 
 const Products = () => {
     const [page, setPage] = useState(1);
+    const [category, setCategory] = useState("");
+    const [searchInput, setSearchInput] = useState("");
+    const [search, setSearch] = useState("");
     const [status, setStatus] = useState("All");
     const [sort, setSort] = useState("Newest");
 
@@ -17,7 +21,24 @@ const Products = () => {
         PageSize: PAGE_SIZE,
         SortBy: sort,
         Status: status,
+        CategoryId: category || undefined,
+        Search: search
     });
+
+    //Search
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setSearch(searchInput);
+            setPage(1);
+        }, 1000);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchInput]);
+
+    const { pickerItems } = useCategoriesPicker();
+
 
     if (isLoading) return <div className="p-3">Loading...</div>;
 
@@ -27,16 +48,33 @@ const Products = () => {
 
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h5 className="fw-bold mb-0">Product Management</h5>
-                        <small className="text-muted">
-                            Quản lý danh sách sản phẩm
-                        </small>
+
+                    {/* LEFT SIDE */}
+                    <div className="d-flex align-items-center gap-5">
+                        <div>
+                            <h5 className="fw-bold mb-0">Product Management</h5>
+                            <small className="text-muted">
+                                Quản lý danh sách sản phẩm
+                            </small>
+                        </div>
+
+                        <div className={`ms-5 position-relative ${styles.searchBox}`}>
+                            <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input
+                                type="text"
+                                className="form-control rounded-pill ps-5"
+                                placeholder="Search..."
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                            />
+                        </div>
                     </div>
 
+                    {/* RIGHT SIDE */}
                     <Link to="/products/add" className={`btn ${styles.btnAccent}`}>
                         <i className="bi bi-plus-lg"></i> Add Product
                     </Link>
+
                 </div>
 
                 {/* Filters */}
@@ -63,10 +101,22 @@ const Products = () => {
                     >
                         <option value="Newest">Sort by: Mới nhất</option>
                         <option value="Oldest">Sort by: Cũ nhất</option>
-                        <option value="NameAsc">Sort by: Tên từ A - Z</option>
-                        <option value="NameDesc">Sort by: Tên từ Z - A</option>
-                        <option value="IdAsc">Sort by: Id tăng dần</option>
-                        <option value="IdDesc">Sort by: Id giảm dần</option>
+                    </select>
+
+                    <select
+                        className="form-select w-auto"
+                        value={category}
+                        onChange={(e) => {
+                            setCategory(e.target.value);
+                            setPage(1);
+                        }}
+                    >
+                        <option value="">Tất cả danh mục</option>
+                        {pickerItems.map((c) => (
+                            <option key={c.id} value={c.id}>
+                                {c.category_name}
+                            </option>
+                        ))}
                     </select>
                 </div>
 

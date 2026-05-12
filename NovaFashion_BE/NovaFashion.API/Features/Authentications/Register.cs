@@ -47,7 +47,7 @@ namespace NovaFashion.API.Features.Authentications
         }
     }
 
-    public class RegisterEndpoint(UserManager<ApplicationUser> userManager) : Endpoint<RegisterRequest, RegisterResponseDto>
+    public class RegisterEndpoint(UserManager<ApplicationUser> userManager) : Endpoint<RegisterRequest, RegisterDto>
     {
         
         public override void Configure()
@@ -81,7 +81,7 @@ namespace NovaFashion.API.Features.Authentications
       
             await userManager.AddToRoleAsync(user, Role.Customer.ToString());
 
-            await Send.OkAsync(new RegisterResponseDto
+            await Send.OkAsync(new RegisterDto
             {
                 Message = "Đăng ký thành công"
             }, cancellation: ct);

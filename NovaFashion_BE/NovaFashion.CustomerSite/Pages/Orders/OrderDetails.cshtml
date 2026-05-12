@@ -87,11 +87,12 @@
         <div class="col-lg-5">
 
             <div class="order-details-items-panel">
+                <div class="order-details-items-title">
+                    SẢN PHẨM ĐÃ ĐẶT (@Model.Order.OrderItems.Count())
+                </div>
+
                 @foreach(var item in Model.Order.OrderItems)
                 {
-                    <div class="order-details-items-title">
-                        SẢN PHẨM ĐÃ ĐẶT (@Model.Order.OrderItems.Count())
-                    </div>
 
                     <!-- ITEM -->
                     <div class="order-details-product-row">

@@ -7,7 +7,7 @@ namespace NovaFashion.CustomerSite.Services
 {
     public class OrderApiClient(HttpClient httpClient)
     {
-        public async Task<PaginationResponseDto<OrderDto>> GetOrdersAsync(
+        public async Task<PaginationResponseDto<OrderCustomerDto>> GetOrdersAsync(
            int page,
            int pageSize,
            string sort,
@@ -18,8 +18,8 @@ namespace NovaFashion.CustomerSite.Services
                 $"&SortBy={Uri.EscapeDataString(sort)}" +
                 $"&Status={filterStatus}";
 
-            return await httpClient.GetFromJsonAsync<PaginationResponseDto<OrderDto>>(query)
-                   ?? new PaginationResponseDto<OrderDto>();
+            return await httpClient.GetFromJsonAsync<PaginationResponseDto<OrderCustomerDto>>(query)
+                   ?? new PaginationResponseDto<OrderCustomerDto>();
         }
 
         public async Task<HttpResponseMessage> CreateOrderAsync(OrderCheckoutRequest request)

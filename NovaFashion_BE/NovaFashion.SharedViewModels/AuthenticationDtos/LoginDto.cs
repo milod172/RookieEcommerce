@@ -1,7 +1,7 @@
 ﻿
 namespace NovaFashion.SharedViewModels.AuthenticationDtos
 {
-    public class LoginResponseDto
+    public class LoginDto
     {
         public string Token { get; set; } = string.Empty;
     }

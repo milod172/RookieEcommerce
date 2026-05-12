@@ -8,5 +8,7 @@
         NameDesc = 3,
         Newest = 4,
         Oldest = 5,
+        PriceDesc = 6,
+        PriceAsc = 7,
     }
 }

@@ -69,10 +69,9 @@ namespace NovaFashion.API.Features.OrdersTable
                 return;
             }
 
-            var order = await db.Orders.FirstOrDefaultAsync(
-                x => x.Id == req.Id 
-                && x.CustomerId == currentUserId, ct);
-
+            var isAdmin = User.IsInRole(Role.Admin.ToString());
+  
+            var order = await db.Orders.FirstOrDefaultAsync(x => x.Id == req.Id, ct);
             if (order == null)
             {
                 ThrowError("Không tìm thấy Order", statusCode: 404);
@@ -80,12 +79,24 @@ namespace NovaFashion.API.Features.OrdersTable
             }
 
             var result = await db.Orders
-                .Where(x => x.Id == order.Id)
-                .Include(x => x.OrderItems)
-                    .ThenInclude(x => x.ProductVariant)
-                        .ThenInclude(x => x.Product)
-                            .ThenInclude(x => x.ProductImages)
-                .FirstAsync(ct);
+               .Where(x => x.Id == order.Id)
+               .Include(x => x.OrderItems)
+                   .ThenInclude(x => x.ProductVariant)
+                       .ThenInclude(x => x.Product)
+                           .ThenInclude(x => x.ProductImages)
+               .FirstAsync(ct);
+
+            if (isAdmin)
+            {
+                await Send.OkAsync(Map.FromEntity(result), ct);
+                return;
+            }
+
+            if(order.CustomerId != currentUserId)
+            {
+                ThrowError("Không tìm thấy Order", statusCode: 404);
+                return;
+            }
 
             await Send.OkAsync(Map.FromEntity(result), ct);
         }

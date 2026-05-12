@@ -5,7 +5,6 @@ import { useProductDetails } from '../hooks/products/useProductDetails';
 import { useProductForm } from '../hooks/products/useProductForm';
 import { useProductImages } from '../hooks/products/useProductImages';
 import { useProductVariants } from '../hooks/products/useProductVariants';
-import { useCategories } from '../hooks/categories/useCategory';
 import ProductHeader from '../features/products/components/ProductHeader';
 import ProductGeneralInfo from '../features/products/components/ProductGeneralInfo';
 import ProductImages from '../features/products/components/ProductImages';

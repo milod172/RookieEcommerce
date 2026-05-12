@@ -18,14 +18,6 @@ const Header = ({ title }) => {
             <h4 className="fw-bold mb-0">{title}</h4>
 
             <div className="d-flex align-items-center gap-2">
-                <div className={`position-relative ${styles.searchBox}`}>
-                    <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                    <input
-                        type="text"
-                        className="form-control rounded-pill ps-5"
-                        placeholder="Search..."
-                    />
-                </div>
 
                 <img
                     src="https://i.pravatar.cc/40?img=12"

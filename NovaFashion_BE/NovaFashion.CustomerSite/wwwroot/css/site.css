@@ -46,6 +46,10 @@ body {
         }
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .cart-icon {
     position: relative;
     text-decoration: none;
@@ -1179,6 +1183,11 @@ hr.cart-divider {
     }
 }
 
+.orders-empty-state{
+    margin-left: 11.5rem;
+    margin-bottom: 5rem;
+}
+
 .orders-list-card {
     border: 1px solid #e9e7e2;
     background: #ffffff;
@@ -1519,7 +1528,6 @@ hr.cart-divider {
     font-weight: 600;
     font-size: 1rem;
     padding-top: 0.9rem;
-    border-top: 1px solid #d9d6d1;
     margin-top: 0.5rem;
 }
 

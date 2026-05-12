@@ -30,6 +30,21 @@
     color: #7a3a3a;
 }
 
+.pending {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.paid {
+    background: #d6e8cd;
+    color: #2f5d2a;
+}
+
+.completed {
+    background: #d6e8cd;
+    color: #2f5d2a;
+}
+
 .btnAccent {
     background: #6b8e5a;
     color: #fff;

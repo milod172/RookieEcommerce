@@ -263,3 +263,13 @@
     .category-toggle-btn[aria-expanded="true"] i {
         transform: rotate(180deg);
     }
+
+.search-box {
+    max-width: 280px;
+}
+
+.search-input {
+    padding-left: 14px;
+    padding-right: 14px;
+    border-radius: 999px;
+}

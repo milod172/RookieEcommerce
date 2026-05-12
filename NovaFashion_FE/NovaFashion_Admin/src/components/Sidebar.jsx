@@ -7,7 +7,7 @@ const Sidebar = () => {
         { id: 2, name: 'Products', icon: 'bi-box-seam', url: '/products' },
         { id: 3, name: 'Customers', icon: 'bi-people', url: '/users' },
         { id: 4, name: 'Category', icon: 'bi-tag', url: '/categories' },
-        { id: 5, name: 'Orders', icon: 'bi-cart3' },
+        { id: 5, name: 'Orders', icon: 'bi-cart3', url: '/orders' },
         { id: 6, name: 'Settings', icon: 'bi-gear' },
     ];
 

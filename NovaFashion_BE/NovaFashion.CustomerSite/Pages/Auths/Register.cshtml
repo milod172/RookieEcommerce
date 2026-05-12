@@ -5,64 +5,85 @@
 
 <div class="auth-wrapper">
     <h1>Đăng ký tài khoản</h1>
-    <form>
+
+    <form method="post">
+
         <div class="row">
             <div class="col-6 mb-3">
-                <label for="lastName" class="form-label">Họ</label>
-                <input type="text" id="lastName" class="form-control" />
+                <label asp-for="Input.LastName" class="form-label">Họ</label>
+                <input asp-for="Input.LastName" class="form-control" />
+                <span asp-validation-for="Input.LastName" class="text-danger small"></span>
             </div>
+
             <div class="col-6 mb-3">
-                <label for="firstName" class="form-label">Tên</label>
-                <input type="text" id="firstName" class="form-control" />
+                <label asp-for="Input.FirstName" class="form-label">Tên</label>
+                <input asp-for="Input.FirstName" class="form-control" />
+                <span asp-validation-for="Input.FirstName" class="text-danger small"></span>
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" class="form-control" />
+            <label asp-for="Input.Email" class="form-label">Email</label>
+            <input asp-for="Input.Email" class="form-control" />
+            <span asp-validation-for="Input.Email" class="text-danger small"></span>
         </div>
 
         <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
+            <label asp-for="Input.Password" class="form-label">Password</label>
+
             <div class="password-wrapper">
-                <button type="button" class="toggle-eye" onclick="togglePwd('password')" aria-label="Show password">
+                <button type="button" class="toggle-eye"
+                        onclick="togglePwd('password')"
+                        aria-label="Show password">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor"
                          stroke-width="1.5" viewBox="0 0 24 24">
                         <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
                         <circle cx="12" cy="12" r="3" />
                     </svg>
                 </button>
-                <input type="password" id="password" class="form-control" />
+
+                <input asp-for="Input.Password" id="password" class="form-control" />
             </div>
-            @* <p class="hint">Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa và số.</p> *@
+
+            <span asp-validation-for="Input.Password" class="text-danger small"></span>
         </div>
 
         <div class="mb-3">
-            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
+
             <div class="password-wrapper">
-                <button type="button" class="toggle-eye" onclick="togglePwd('confirmPassword')" aria-label="Show password">
+                <button type="button" class="toggle-eye"
+                        onclick="togglePwd('confirmPassword')"
+                        aria-label="Show password">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor"
                          stroke-width="1.5" viewBox="0 0 24 24">
                         <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
                         <circle cx="12" cy="12" r="3" />
                     </svg>
                 </button>
-                <input type="password" id="confirmPassword" class="form-control" />
+
+                <input asp-for="Input.ConfirmPassword" id="confirmPassword" class="form-control" />
             </div>
+
+            <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
         </div>
 
         <button type="submit" class="btn-register">Đăng Ký</button>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger small mt-2"></div>
+
     </form>
 
     <div class="divider"></div>
 
     <p class="have-account">Đã có tài khoản?</p>
+
     <a asp-page="/Auths/Login" class="btn-signin-link">Đăng nhập</a>
 </div>
 
 <script>
     function togglePwd(id) {
-      const i = document.getElementById(id);
-      i.type = i.type === 'password' ? 'text' : 'password';
+        const i = document.getElementById(id);
+        i.type = i.type === 'password' ? 'text' : 'password';
     }
 </script>

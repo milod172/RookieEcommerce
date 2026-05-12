@@ -11,7 +11,7 @@ namespace NovaFashion.CustomerSite.Pages.Orders
     [IgnoreAntiforgeryToken]
     public class OrdersListModel(OrderApiClient orderApi) : PageModel
     {
-        public PaginationResponseDto<OrderDto> Orders { get; set; } = new();
+        public PaginationResponseDto<OrderCustomerDto> Orders { get; set; } = new();
 
         [BindProperty(SupportsGet = true)]
         public int PageNumber { get; set; } = 1;

@@ -25,41 +25,35 @@
     <!-- Product Items -->
     <h2 class="text-center mb-md-3 product-title">SẢN PHẨM MỚI HÔM NAY</h2>
 
-    <section class="container-fluid">
-        <div class="product-categories d-flex justify-content-center gap-5 mb-md-4">
-            <div class="pb-md-1 border-bottom border-black border-2">
-                <a href="" class="">NAM</a>
-            </div>
-            <div>
-                <a href="">NỮ</a>
-            </div>
-        </div>
+<section class="container-fluid">
 
-    <div id="product-items" class="row row-cols-4 gy-md-4 ">
-            @foreach (var item in Model.Products.Items)
-            {
-            <div class="col gx-md-4">
-                <article class="card h-100 px-0">
-                    <a class="" asp-page="/Products/ProductDetails" asp-route-id="@item.Id">
-                        <div class="product-image">
-                            <img src="@item.Images.FirstOrDefault()?.ImageUrl"
-                                 class="card-img-top image-default"
-                                 alt="@item.Images.FirstOrDefault()?.AltText">
-                            <img src="@item.Images.Skip(1).FirstOrDefault()?.ImageUrl"
-                                 class="card-img-top image-hover"
-                                 alt="@item.Images.Skip(1).FirstOrDefault()?.AltText">
-                        </div>
+    <div class="product-categories d-flex justify-content-center gap-5 mb-md-4">
 
-                        <div class="card-body">
-                            <h5 class="card-title">@item.ProductName</h5>
-                            <p class="card-description">@item.Description</p>
-                            <span class="card-price">@item.UnitPrice?.ToString("N0") đ</span>
-                        </div>
-                    </a>
-                </article>
+        @foreach (var category in Model.Categories)
+        {
+            var isActive = Model.CategoryId == category.Id;
+
+            <div class="pb-md-1 @(isActive ? "border-bottom border-black border-2" : "")">
+
+                <a class="cursor-pointer"
+                    hx-get="/?categoryId=@category.Id"
+                    hx-target="#product-items"
+                    hx-select="#product-items"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
+     
+                    @category.CategoryName
+
+                </a>
+
             </div>
-            }
-        </div>
-    </section>
+        }
+
+    </div>
+
+    <partial name="Products/_ProductListMainPartial"
+             model="Model.Products" />
+
+</section>
 
 

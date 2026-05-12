@@ -12,6 +12,7 @@ export const refreshClient = axios.create({
     headers: { 'Content-Type': 'application/json' },
 });
 
+//auto attach token every request
 httpClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('access_token');
@@ -38,7 +39,7 @@ httpClient.interceptors.response.use(
         const originalRequest = error.config;
 
         if (error.response?.status !== 401 || originalRequest._retry) {
-            return Promise.reject(error);
+            return Promise.reject(error);  //Throw error
         }
 
         if (isRefreshing) {
@@ -53,19 +54,16 @@ httpClient.interceptors.response.use(
         originalRequest._retry = true;
         isRefreshing = true;
 
-        try {
-            // import động để tránh circular dependency
-            const { authApi } = await import('../features/authentications/authApi');
-            const newToken = await authApi.refreshToken();
+        const { authApi } = await import('../features/authentications/authApi');
 
+        try {
+            const newToken = await authApi.refreshToken();
             processPendingRequests(newToken);
             originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
             return httpClient(originalRequest);
 
         } catch (refreshError) {
             pendingRequests = [];
-            const { authApi } = await import('../features/authentications/authApi');
-
             authApi.logout();
             globalThis.location.href = '/login';
             return Promise.reject(refreshError);

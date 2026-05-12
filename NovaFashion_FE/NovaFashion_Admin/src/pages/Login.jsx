@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/authentications/useLogin";
 import styles from "./Login.module.css";
 
@@ -65,24 +64,6 @@ const Login = () => {
                         {loading ? "Logging in..." : "Login"}
                     </button>
 
-                    {/* <div className={styles.divider}>OR</div> */}
-
-                    {/* <div className="d-flex gap-3">
-                        <button type="button" className={`btn flex-fill ${styles.btnFb}`}>
-                            Facebook
-                        </button>
-                        <button type="button" className={`btn flex-fill ${styles.btnGg}`}>
-                            Google
-                        </button>
-                        <button type="button" className={`btn flex-fill ${styles.btnTw}`}>
-                            Twitter
-                        </button>
-                    </div> */}
-
-                    {/* <p className={`text-center mt-3 ${styles.signup}`}>
-                        Don't have an account?{" "}
-                        <Link to="/register" className={styles.signupLink}>Sign up now</Link>
-                    </p> */}
                 </form>
             </div>
         </div>

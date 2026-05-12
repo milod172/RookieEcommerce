@@ -98,7 +98,8 @@ namespace NovaFashion.API.Features.Products
                 .AsNoTracking()
                 .ApplyStatusFilter(req.Status)
                 .ApplySortFilter(req.SortBy)
-                .ApplyPriceFilter(req.MinPrice, req.MaxPrice);
+                .ApplyPriceFilter(req.MinPrice, req.MaxPrice)
+                .ApplySearch(req.Search);
 
             query = await query.ApplyCategoryFilterAsync(db, req.CategoryId, ct);
 
@@ -120,6 +121,23 @@ namespace NovaFashion.API.Features.Products
 
     internal static class GetProductQueryExtensions
     {
+        internal static IQueryable<Product> ApplySearch(
+           this IQueryable<Product> query,
+           string? search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                return query;
+
+            var keyword = search.Trim().ToLower();
+
+            return query.Where(p =>
+                p.ProductName.ToLower().Contains(keyword) ||
+                p.Sku.ToLower().Contains(keyword) ||
+                p.Id.ToString().Contains(keyword)
+            );
+        }
+           
+
         internal static IQueryable<Product> ApplyStatusFilter(
             this IQueryable<Product> query,
             FilterStatus status)

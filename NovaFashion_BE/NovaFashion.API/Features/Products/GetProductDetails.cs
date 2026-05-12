@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
+using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
 using NovaFashion.SharedViewModels.ProductDtos;
 using NovaFashion.SharedViewModels.ProductImageDtos;
@@ -74,11 +75,13 @@ namespace NovaFashion.API.Features.Products
 
         public override async Task HandleAsync(GetProductDetailsRequest req, CancellationToken ct)
         {
+            var isAdmin = User.IsInRole(Role.Admin.ToString());
+
             var product = await db.Products
                 .AsNoTracking()
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
-                .Include(p => p.ProductVariants)
+                .Include(p => p.ProductVariants.Where(v => isAdmin || !v.IsDeleted)) //if is Admin get all, not get Deleted=false
                 .FirstOrDefaultAsync(p => p.Id == req.Id, ct);
 
             if (product == null)

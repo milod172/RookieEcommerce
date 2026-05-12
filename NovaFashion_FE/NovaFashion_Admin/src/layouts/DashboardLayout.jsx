@@ -6,6 +6,7 @@ const routeTitles = {
     '/': 'Dashboard',
     '/products': 'Products',
     '/categories': 'Categories',
+    '/orders': 'Orders'
 };
 
 export default function DashboardLayout() {

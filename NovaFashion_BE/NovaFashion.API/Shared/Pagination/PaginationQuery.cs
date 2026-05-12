@@ -19,5 +19,7 @@ namespace NovaFashion.API.Shared.Pagination
         [QueryParam]
         [DefaultValue(FilterStatus.Active)]
         public FilterStatus Status { get; set; }
+        [QueryParam]
+        public string? Search { get; set; }
     }
 }

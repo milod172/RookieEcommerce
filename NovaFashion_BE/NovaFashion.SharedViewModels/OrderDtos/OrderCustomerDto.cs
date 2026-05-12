@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace NovaFashion.SharedViewModels.OrderDtos
 {
-    public class OrderDto
+    public class OrderCustomerDto
     {
         [JsonPropertyName("id")]
         public Guid Id { get; set; }

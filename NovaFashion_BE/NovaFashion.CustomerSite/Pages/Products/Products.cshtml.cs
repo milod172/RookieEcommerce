@@ -34,6 +34,8 @@ namespace NovaFashion.CustomerSite.Pages.Products
 
         [BindProperty(SupportsGet = true)]
         public Guid? CategoryId { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? Search { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -48,9 +50,11 @@ namespace NovaFashion.CustomerSite.Pages.Products
                 PageSize,
                 SortBy,
                 DefaultStatus,
+                Search,
                 MinPrice,
                 MaxPrice,
                 CategoryId
+                
             );
 
             if (Request.Headers.ContainsKey("HX-Request"))

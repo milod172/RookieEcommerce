@@ -28,6 +28,11 @@ export const useLogin = () => {
             navigate("/");
 
         } catch (err) {
+            if (!err.response || err.response?.status === 500) {
+                setError("Server đang có vấn đề, vui lòng thử lại sau");
+                return;
+            }
+
             setError(
                 err.response?.data?.errors?.[0]?.message
                 ?? "Email hoặc mật khẩu không đúng"

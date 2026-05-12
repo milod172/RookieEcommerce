@@ -1,0 +1,50 @@
+﻿@using NovaFashion.SharedViewModels
+@using NovaFashion.SharedViewModels.ProductDtos
+@model PaginationResponseDto<ProductDto>
+
+
+<div id="product-items">
+    @if (!Model.Items.Any())
+    {
+        <div class="d-flex flex-column align-items-center justify-content-center py-5 text-muted">
+            <span class="fa-stack fa-3x mb-3">
+                <i class="fa-regular fa-file fa-stack-2x"></i>
+                <i class="fa-solid fa-magnifying-glass fa-stack-1x" style="margin-top: 0.4em; margin-left: 0.4em;"></i>
+            </span>
+            <p class="fs-5">Không tìm thấy sản phẩm nào.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-4 gy-md-4 ">
+            @foreach (var item in Model.Items)
+            {
+                <div class="col gx-md-4">
+                    <article class="card h-100 px-0">
+                        <a class="" asp-page="/Products/ProductDetails" asp-route-id="@item.Id">
+                            <div class="product-image">
+                                <img src="@item.Images.FirstOrDefault()?.ImageUrl"
+                                     class="card-img-top image-default"
+                                     alt="@item.Images.FirstOrDefault()?.AltText">
+                                <img src="@item.Images.Skip(1).FirstOrDefault()?.ImageUrl"
+                                     class="card-img-top image-hover"
+                                     alt="@item.Images.Skip(1).FirstOrDefault()?.AltText">
+                            </div>
+
+                            <div class="card-body">
+                                <h5 class="card-title">@item.ProductName</h5>
+                                <p class="card-description">@item.Description</p>
+                                <span class="card-price">@item.UnitPrice?.ToString("N0") đ</span>
+                            </div>
+                        </a>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+
+
+

@@ -14,9 +14,9 @@ using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.OrdersTable
 {
-    public class GetOrdersForCustomerMapper : Mapper<PaginationQuery, PaginationList<OrderDto>, PaginationList<Orders>>
+    public class GetOrdersForCustomerMapper : Mapper<PaginationQuery, PaginationList<OrderCustomerDto>, PaginationList<Orders>>
     {
-        public OrderDto MapToDto(Orders e) => new()
+        public OrderCustomerDto MapToDto(Orders e) => new()
         {
             Id = e.Id,
             OrderStatus = e.OrderStatus.ToString(),
@@ -32,11 +32,11 @@ namespace NovaFashion.API.Features.OrdersTable
             }).ToList()       
         };
 
-        public override PaginationList<OrderDto> FromEntity(PaginationList<Orders> e)
+        public override PaginationList<OrderCustomerDto> FromEntity(PaginationList<Orders> e)
         {
             var dtos = e.Items.Select(x => MapToDto(x)).ToList();
 
-            return new PaginationList<OrderDto>(
+            return new PaginationList<OrderCustomerDto>(
                 dtos,
                 e.TotalCount,
                 e.PageNumber,
@@ -45,7 +45,7 @@ namespace NovaFashion.API.Features.OrdersTable
         }
     }
 
-    public class GetOrdersForCustomer(AppDbContext db) : Endpoint<PaginationQuery, PaginationList<OrderDto>, GetOrdersForCustomerMapper>
+    public class GetOrdersForCustomer(AppDbContext db) : Endpoint<PaginationQuery, PaginationList<OrderCustomerDto>, GetOrdersForCustomerMapper>
     {
         public override void Configure()
         {
@@ -64,7 +64,7 @@ namespace NovaFashion.API.Features.OrdersTable
                 return;
             }
 
-            var orders = db.Orders.AsNoTracking();
+            var orders = db.Orders.AsNoTracking().Where(x => x.CustomerId == currentUserId);
 
             var pageResultEntities = await orders.PaginateAsync(
                 req.PageNumber,

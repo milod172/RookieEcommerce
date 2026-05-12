@@ -1,7 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using NovaFashion.SharedViewModels;
 using NovaFashion.SharedViewModels.AuthenticationDtos;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NovaFashion.CustomerSite.Services.Auth
 {
@@ -35,6 +37,50 @@ namespace NovaFashion.CustomerSite.Services.Auth
             {
                 logger.LogError(ex, "Exception during login for {Email}", email);
                 return null;
+            }
+        }
+
+        public async Task<(RegisterDto? Data, Dictionary<string, string[]>? Errors)> RegisterAsync(RegisterRequest req)
+        {
+            try
+            {
+                var response = await httpClient.PostAsJsonAsync("/api/auth/register", req);
+                var content = await response.Content.ReadAsStringAsync();
+
+               
+                if (response.IsSuccessStatusCode)
+                {
+                    var data = JsonSerializer.Deserialize<RegisterDto>(content, JsonOptions);
+                    return (data, null);
+                }
+
+               
+                var errorResponse = JsonSerializer.Deserialize<ApiErrorResponse>(content, JsonOptions);
+
+                if (errorResponse?.Errors is null or { Count: 0 })
+                {
+                    return (null, new Dictionary<string, string[]>
+                    {
+                        [""] = [errorResponse?.Message ?? "Có lỗi xảy ra, vui lòng thử lại"]
+                    });
+                }
+
+              
+                var dict = errorResponse.Errors
+                    .ToDictionary(
+                        x => x.Key,                              
+                        x => x.Value?.ToArray() ?? []
+                    );
+
+                return (null, dict);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Exception during register");
+                return (null, new Dictionary<string, string[]>
+                {
+                    [""] = ["Có lỗi xảy ra, vui lòng thử lại"]
+                });
             }
         }
 

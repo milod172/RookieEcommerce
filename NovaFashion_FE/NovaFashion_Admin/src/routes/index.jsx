@@ -9,6 +9,9 @@ import CreateProduct from '../pages/CreateProduct';
 import ProductDetails from '../pages/ProductDetails';
 import Users from '../pages/Users';
 import Register from '../pages/Register';
+import Orders from '../pages/Orders';
+import OrderDetails from '../pages/OrderDetails';
+import NotFound from '../pages/NotFound';
 
 
 const ProtectedRoute = ({ children }) => {
@@ -39,10 +42,16 @@ const AppRoutes = () => {
 
                 <Route path="/users" element={<Users />} />
                 <Route path="/categories" element={<Categories />} />
+                <Route path="/orders">
+                    <Route index element={<Orders />} />
+                    <Route path=":id" element={<OrderDetails />} />
+                </Route>
+
             </Route>
 
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="*" element={<NotFound />} />
         </Routes>
     );
 };
