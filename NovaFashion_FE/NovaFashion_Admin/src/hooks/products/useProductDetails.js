@@ -27,6 +27,8 @@ export const useProductDetails = (id) => {
             images: data.images || [],
             variants: data.variants,
             isDeleted: data.is_deleted,
+            createTime: data.created_time,
+            updateTime: data.modified_time
         };
     }, [data]);
 

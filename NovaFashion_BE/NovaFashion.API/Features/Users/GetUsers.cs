@@ -52,7 +52,8 @@ namespace NovaFashion.API.Features.Users
                 .Where(u => u.Id != currentUserId)
                 .AsNoTracking()
                 .ApplyStatusFilter(req.Status)
-                .ApplySortFilter(req.SortBy);
+                .ApplySortFilter(req.SortBy)
+                .ApplySearch(req.Search);
 
             var pageResultEntities = await query.PaginateAsync(req.PageNumber, req.PageSize, ct);
             var pageResultDtos = Map.FromEntity(pageResultEntities);
@@ -62,6 +63,22 @@ namespace NovaFashion.API.Features.Users
 
     internal static class GetUsersQueryExtensions
     {
+        internal static IQueryable<ApplicationUser> ApplySearch(
+         this IQueryable<ApplicationUser> query,
+         string? search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                return query;
+
+            var keyword = search.Trim().ToLower();
+
+            return query.Where(p =>
+               (p.FirstName + " " + p.LastName).ToLower().Contains(keyword) ||
+                p.Id.ToString().Contains(keyword) ||
+                p.Email.ToLower().Contains(keyword)
+            );
+        }
+
         internal static IQueryable<ApplicationUser> ApplyStatusFilter(
             this IQueryable<ApplicationUser> query,
             FilterStatus status)

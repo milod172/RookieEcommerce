@@ -33,6 +33,7 @@ namespace NovaFashion.API.Features.OrdersTable
                 PaymentMethod = e.PaymentMethod.ToString(),
                 OrderStatus = e.OrderStatus.ToString(),
                 TotalAmount = e.TotalAmount,
+                IsRating = e.ProductRating != null,
                 OrderItems = e.OrderItems.Select(oi => new CartItemDto
                 {
                     ProductVariantId = oi.ProductVariantId,

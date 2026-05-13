@@ -263,7 +263,55 @@ namespace NovaFashion.API.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("NovaFashion.API.Entities.Order", b =>
+            modelBuilder.Entity("NovaFashion.API.Entities.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductVariantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductVariantId");
+
+                    b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("NovaFashion.API.Entities.Orders", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -339,54 +387,6 @@ namespace NovaFashion.API.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("NovaFashion.API.Entities.OrderItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductVariantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductVariantId");
-
-                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("NovaFashion.API.Entities.Product", b =>
@@ -490,12 +490,9 @@ namespace NovaFashion.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("AvgRate")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -522,12 +519,21 @@ namespace NovaFashion.API.Migrations
                     b.Property<DateTime?>("ModifiedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rate")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
 
                     b.HasIndex("ProductId");
 
@@ -660,19 +666,9 @@ namespace NovaFashion.API.Migrations
                     b.Navigation("ParentCategory");
                 });
 
-            modelBuilder.Entity("NovaFashion.API.Entities.Order", b =>
-                {
-                    b.HasOne("NovaFashion.API.Entities.ApplicationUser", "Customer")
-                        .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("NovaFashion.API.Entities.OrderItem", b =>
                 {
-                    b.HasOne("NovaFashion.API.Entities.Order", "Order")
+                    b.HasOne("NovaFashion.API.Entities.Orders", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -687,6 +683,16 @@ namespace NovaFashion.API.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("ProductVariant");
+                });
+
+            modelBuilder.Entity("NovaFashion.API.Entities.Orders", b =>
+                {
+                    b.HasOne("NovaFashion.API.Entities.ApplicationUser", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("NovaFashion.API.Entities.Product", b =>
@@ -718,13 +724,21 @@ namespace NovaFashion.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("NovaFashion.API.Entities.Orders", "Orders")
+                        .WithOne()
+                        .HasForeignKey("NovaFashion.API.Entities.ProductRating", "OrderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("NovaFashion.API.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("ProductRatings")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
+
+                    b.Navigation("Orders");
 
                     b.Navigation("Product");
                 });
@@ -761,7 +775,7 @@ namespace NovaFashion.API.Migrations
                     b.Navigation("SubCategories");
                 });
 
-            modelBuilder.Entity("NovaFashion.API.Entities.Order", b =>
+            modelBuilder.Entity("NovaFashion.API.Entities.Orders", b =>
                 {
                     b.Navigation("OrderItems");
                 });
@@ -769,6 +783,8 @@ namespace NovaFashion.API.Migrations
             modelBuilder.Entity("NovaFashion.API.Entities.Product", b =>
                 {
                     b.Navigation("ProductImages");
+
+                    b.Navigation("ProductRatings");
 
                     b.Navigation("ProductVariants");
                 });

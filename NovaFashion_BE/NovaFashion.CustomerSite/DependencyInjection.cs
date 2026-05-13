@@ -26,6 +26,7 @@ namespace NovaFashion.CustomerSite
             services.AddNovaFashionAuthenticatedApiClient<CartApiClient>(baseUrl);
             services.AddNovaFashionAuthenticatedApiClient<OrderApiClient>(baseUrl);
             services.AddNovaFashionAuthenticatedApiClient<VnPayApiClient>(baseUrl);
+            services.AddNovaFashionAuthenticatedApiClient<ProductRatingApiClient>(baseUrl);
 
             return services;
         }

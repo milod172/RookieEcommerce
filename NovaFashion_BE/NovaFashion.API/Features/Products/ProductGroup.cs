@@ -11,8 +11,7 @@ namespace NovaFashion.API.Features.Products
             {
                 ep.Description(x => x
                     .ProducesProblemDetails(500)
-                    .AutoTagOverride("Product")
-                    .WithGroupName("Product"));
+                    .AutoTagOverride("Product"));
             });
         }
     }

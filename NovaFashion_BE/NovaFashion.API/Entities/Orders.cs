@@ -19,6 +19,7 @@ namespace NovaFashion.API.Entities
         public DateTime? PaymentDate { get; set; }
         public string? CustomerId { get; set; }
         public virtual ApplicationUser? Customer { get; set; }
+        public virtual ProductRating? ProductRating { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
 
         public DateTime CreatedTime { get; set; }

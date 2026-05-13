@@ -16,6 +16,8 @@ export const useProductForm = (product, clearFieldError) => {
             totalSell: product.totalSell || 0,
             sku: product.sku || '',
             status: product.status || 'active',
+            createTime: product.createTime,
+            updateTime: product.updateTime,
             isDeleted: product.isDeleted || false,
         };
     };

@@ -132,4 +132,137 @@
 
     </div>
 
+   
+    @if (Model.Rating != null){
+        <div class="order-details__review-card mt-5">
+            <div class="order-details__review-header">
+                <h6 class="order-details__review-title">Đánh giá của bạn</h6>
+                <span class="order-details__review-badge">
+                    <i class="fa-solid fa-circle-check"></i>Đã gửi
+                </span>
+            </div>
+
+            <div class="order-details__review-stars"
+                 aria-label="@Model.Rating.Rate trên 5 sao">
+
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (i <= Model.Rating.Rate)
+                    {
+                        <i class="fa-solid fa-star"></i>
+                    }
+                    else
+                    {
+                        <i class="fa-regular fa-star"></i>
+                    }
+                }
+
+                <span class="order-details__review-score">
+                    @Model.Rating.Rate
+                </span>
+            </div>
+
+            <p class="order-details__review-comment">@Model.Rating.Comment</p>
+
+            <div class="order-details__review-meta">
+                <i class="fa-regular fa-clock"></i>Đánh giá vào @Model.Rating.RatingDate
+            </div>
+        </div>
+    }else{
+        <div class="order-details__rating-section">
+            <h3 class="order-details__rating-title">Đánh giá sản phẩm</h3>
+
+            <form method="post" class="order-details__rating-form" id="orderDetailsRatingForm">
+                <div class="mb-3">
+                    <div class="order-details__rating-stars"
+                         id="orderDetailsRatingStars"
+                         role="radiogroup"
+                         aria-label="Chọn số sao">
+
+                        <i class="fa-solid fa-star order-details__rating-star"
+                           data-value="1"
+                           role="radio"
+                           aria-checked="false"></i>
+
+                        <i class="fa-solid fa-star order-details__rating-star"
+                           data-value="2"
+                           role="radio"
+                           aria-checked="false"></i>
+
+                        <i class="fa-solid fa-star order-details__rating-star"
+                           data-value="3"
+                           role="radio"
+                           aria-checked="false"></i>
+
+                        <i class="fa-solid fa-star order-details__rating-star"
+                           data-value="4"
+                           role="radio"
+                           aria-checked="false"></i>
+
+                        <i class="fa-solid fa-star order-details__rating-star"
+                           data-value="5"
+                           role="radio"
+                           aria-checked="false"></i>
+                    </div>
+
+                    <input type="hidden"
+                           name="rate"
+                           id="orderDetailsRatingValue"
+                           value="0">
+                </div>
+
+                <div class="mb-3">
+                    <label for="orderDetailsRatingComment" class="order-details__rating-label">Nhận xét</label>
+                    <textarea class="form-control order-details__rating-comment"
+                              id="orderDetailsRatingComment"
+                              name="comment"
+                              rows="4"
+                              placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+                </div>
+
+                <input type="hidden"
+                   name="orderId"
+                       value="@Model.Order.Id">
+
+                <button type="submit" class="order-details__rating-submit">Gửi đánh giá</button>
+            </form>
+        </div>
+    }
+
+
 </div>
+
+<script>
+    (() => {
+        const stars = document.querySelectorAll('.order-details__rating-star');
+        const input = document.getElementById('orderDetailsRatingValue');
+
+        let selected = 0;
+
+        function paint(rating) {
+            stars.forEach(star => {
+                const value = Number(star.dataset.value);
+                star.classList.toggle('is-active', value <= rating);
+            });
+        }
+
+        stars.forEach(star => {
+
+            star.addEventListener('mouseenter', () => {
+                paint(Number(star.dataset.value));
+            });
+
+            star.addEventListener('click', () => {
+                selected = Number(star.dataset.value);
+                input.value = selected;
+                paint(selected);
+            });
+        });
+
+        document.getElementById('orderDetailsRatingStars')
+            .addEventListener('mouseleave', () => {
+                paint(selected);
+            });
+
+    })();
+</script>

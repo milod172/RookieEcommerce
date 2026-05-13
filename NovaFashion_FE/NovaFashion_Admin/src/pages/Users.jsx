@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './Users.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Pagination from '../components/Pagination.jsx';
 import { useUsers } from '../hooks/users/useUsers.js';
 
@@ -10,13 +10,28 @@ const Users = () => {
     const [page, setPage] = useState(1);
     const [status, setStatus] = useState("All");
     const [sort, setSort] = useState("Newest");
+    const [searchInput, setSearchInput] = useState("");
+    const [search, setSearch] = useState("");
 
     const { users, totalCount, isLoading } = useUsers({
         PageNumber: page,
         PageSize: PAGE_SIZE,
         SortBy: sort,
         Status: status,
+        Search: search
     });
+
+    //Search
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setSearch(searchInput);
+            setPage(1);
+        }, 1000);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchInput]);
 
     if (isLoading) return <div className="p-3">Loading...</div>;
 
@@ -25,12 +40,22 @@ const Users = () => {
             <div className={`card border-0 shadow-sm ${styles.panel}`}>
 
                 {/* Header */}
-                <div className="d-flex justify-content-between align-items-center mb-3">
+                <div className="d-flex align-items-center gap-5 mb-3">
                     <div>
                         <h5 className="fw-bold mb-0">User Management</h5>
                         <small className="text-muted">
                             Quản lý danh sách người dùng
                         </small>
+                    </div>
+                    <div className={`ms-5 position-relative ${styles.searchBox}`}>
+                        <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input
+                            type="text"
+                            className="form-control rounded-pill ps-5"
+                            placeholder="Search..."
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
                     </div>
 
                 </div>

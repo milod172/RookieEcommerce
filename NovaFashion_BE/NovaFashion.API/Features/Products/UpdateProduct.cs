@@ -93,8 +93,8 @@ namespace NovaFashion.API.Features.Products
                 CategoryName = e.Category != null ? e.Category.CategoryName : string.Empty,
                 Sku = e.Sku,
                 IsDeleted = e.IsDeleted,
-                CreatedTime = e.CreatedTime,
-                ModifiedTime = e.ModifiedTime,
+                CreatedTime = e.CreatedTime.ToString("dd/MM/yyyy"),
+                ModifiedTime = e.ModifiedTime?.ToString("dd/MM/yyyy"),
             };
         }
     }

@@ -86,7 +86,7 @@ namespace NovaFashion.API.Features.Products
                 TotalQuantity = e.TotalQuantity,
                 CategoryId = e.CategoryId != null ? e.CategoryId.Value : Guid.Empty,
                 Sku = e.Sku,
-                CreatedTime = e.CreatedTime
+                CreatedTime = e.CreatedTime.ToString("dd/MM/yyyy")
             };
         }
     }

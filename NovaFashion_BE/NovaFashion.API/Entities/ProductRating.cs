@@ -10,8 +10,10 @@ namespace NovaFashion.API.Entities
         public Guid ProductId { get; set; }
         public virtual Product Product { get; set; }
 
+        public Guid OrderId { get; set;}
+        public virtual Orders Orders { get; set; }
         public string Comment { get; set; } = string.Empty;
-        public decimal AvgRate { get; set; }
+        public int Rate { get; set; }
 
         public DateTime CreatedTime { get; set; }
         public string? CreatedBy { get; set; }

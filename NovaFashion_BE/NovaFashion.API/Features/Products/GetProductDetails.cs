@@ -58,7 +58,8 @@ namespace NovaFashion.API.Features.Products
                         VariantSku = pv.VariantSku
                     })
                     .ToList(),
-                CreatedTime = e.CreatedTime,
+                CreatedTime = e.CreatedTime.ToString("dd/MM/yyyy") ?? "",
+                ModifiedTime = e.ModifiedTime?.ToString("dd/MM/yyyy") ?? "",
                 IsDeleted = e.IsDeleted,
             };
         }

@@ -21,6 +21,8 @@ namespace NovaFashion.SharedViewModels.OrderDtos
         public string OrderStatus { get; set; } = string.Empty;
         [JsonPropertyName("total_amount")]
         public decimal TotalAmount { get; set; }
+        [JsonPropertyName("is_rating")]
+        public bool IsRating { get; set; }
         [JsonPropertyName("order_items")]
         public List<CartItemDto> OrderItems { get; set; } = [];
     }

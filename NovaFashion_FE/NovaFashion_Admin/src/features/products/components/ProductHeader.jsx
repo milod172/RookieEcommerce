@@ -24,8 +24,10 @@ const ProductHeader = ({ form, isDirty, handleDiscard }) => {
                         </span>
                     </div>
                     <small className="text-muted">
-                        ID: <span className="fw-semibold">{form.id}</span> · SKU:{' '}
-                        <span className="fw-semibold">{form.sku}</span>
+                        ID: <span className="fw-semibold">{form.id}</span>
+                        {' '}· SKU: <span className="fw-semibold">{form.sku}</span>
+                        {' '}· Created: <span className="fw-semibold">{form.createTime}</span>
+                        {' '}· Updated: <span className="fw-semibold">{form.updateTime}</span>
                     </small>
                 </div>
 

@@ -32,5 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NovaFashion.SharedViewModels\NovaFashion.SharedViewModels.csproj" />
   </ItemGroup>
-
+	<ItemGroup>
+		<InternalsVisibleTo Include="NovaFashion.Tests" />
+	</ItemGroup>
 </Project>
