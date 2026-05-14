@@ -25,7 +25,6 @@ The project is designed to help trainees understand and apply modern software de
 * Razor Pages
 * Entity Framework Core
 * SQL Server
-* Duende Identity Server
 
 ## 👨‍💻 Author
 
