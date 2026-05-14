@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.ComponentModel;
+using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
@@ -15,6 +16,7 @@ namespace NovaFashion.API.Features.ProductRatings
         [BindFrom("id")]
         [JsonSchemaIgnore]
         public Guid OrderId { get; set; }
+
     }
 
     public class GetProductRatingInOrderMapper : Mapper<GetProductRatingInOrderRequest, ProductRatingDto, ProductRating>
@@ -41,15 +43,16 @@ namespace NovaFashion.API.Features.ProductRatings
 
         public override async Task HandleAsync(GetProductRatingInOrderRequest req, CancellationToken ct)
         {
-            
-            var rating = await db.ProductRatings.SingleOrDefaultAsync(x => x.OrderId == req.OrderId, ct);
-            if(rating == null)
+            var rating = await db.ProductRatings
+                .SingleOrDefaultAsync(x => x.OrderId == req.OrderId, ct);
+
+            if (rating == null)
             {
-                ThrowError("Không tìm thấy đánh giá bên trong đơn hàng", statusCode: 404);
+                await Send.OkAsync(null, ct);
+                return;
             }
 
             await Send.OkAsync(Map.FromEntity(rating), ct);
-        
         }
     }
 }

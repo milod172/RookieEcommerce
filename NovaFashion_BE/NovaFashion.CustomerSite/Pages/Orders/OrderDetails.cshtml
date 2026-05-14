@@ -97,7 +97,10 @@
                     <!-- ITEM -->
                     <div class="order-details-product-row">
 
-                        <img src="@item.ImageUrl" alt="@item.ProductName">
+                        <a asp-page="/Products/ProductDetails" asp-route-id="@item.ProductId">
+                            <img src="@item.ImageUrl" alt="@item.ProductName">
+                        </a>
+                       
 
                         <div>
 
@@ -206,23 +209,27 @@
                     </div>
 
                     <input type="hidden"
-                           name="rate"
+                           asp-for="Request.Rate"
                            id="orderDetailsRatingValue"
                            value="0">
+
+                    <span asp-validation-for="Request.Rate" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
                     <label for="orderDetailsRatingComment" class="order-details__rating-label">Nhận xét</label>
                     <textarea class="form-control order-details__rating-comment"
                               id="orderDetailsRatingComment"
-                              name="comment"
+                              asp-for="Request.Comment"
                               rows="4"
                               placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+
+                    <span asp-validation-for="Request.Comment" class="text-danger"></span>
                 </div>
 
                 <input type="hidden"
-                   name="orderId"
-                       value="@Model.Order.Id">
+                           asp-for="Request.OrderId"
+                           value="@Model.Order.Id">
 
                 <button type="submit" class="order-details__rating-submit">Gửi đánh giá</button>
             </form>

@@ -6,7 +6,8 @@ using NovaFashion.SharedViewModels.CartDtos;
 
 namespace NovaFashion.API.Features.Carts
 {
-   
+
+
     public class GetProductInCartMapper : Mapper<List<CartItemRequest>, List<CartItemDto>, List<(ProductVariant Variant, int Quantity)>> {
         public override List<CartItemDto> FromEntity(List<(ProductVariant Variant, int Quantity)> e)
         {

@@ -46,7 +46,7 @@
                     <a asp-page="/Products/Products" 
                        asp-route-SortBy="Newest"
                        asp-route-PageNumber="1"
-                       asp-route-PageSize="5"                 
+                       asp-route-PageSize="6"                 
                        class="header_nav-link">MUA SẮM</a>
                     <a href="" class="header_nav-link">LIÊN HỆ</a>
                 </nav>
@@ -109,11 +109,11 @@
                     }
                     else
                     {
-                         <li class="list-group-item d-none d-md-block border-0">
+                         @* <li class="list-group-item d-none d-md-block border-0">
                             <a href="#" title="Search">
                                 <i class="fa-brands fa-sistrix text-black"></i>
                             </a>
-                        </li>
+                        </li> *@
 
                         <li class="list-group-item d-none d-md-block border-0">
                             <a asp-page="/Auths/Login" title="Account">

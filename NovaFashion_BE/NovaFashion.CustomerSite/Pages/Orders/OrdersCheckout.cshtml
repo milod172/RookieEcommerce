@@ -43,7 +43,7 @@
                     Phương thức thanh toán
                 </h2>
 
-                <label class="checkout-payment-option">
+                @* <label class="checkout-payment-option">
                     <input type="radio" name="payment" value="cod" checked>
                     <div>
                         <div class="checkout-payment-label">COD - Thanh toán khi nhận hàng</div>
@@ -51,7 +51,7 @@
                             Trả tiền mặt khi nhận sản phẩm.
                         </div>
                     </div>
-                </label>
+                </label> *@
 
                 <label class="checkout-payment-option">
                     <input type="radio" name="payment" value="vnpay">
@@ -219,7 +219,7 @@
                 }))
             };
 
-            console.log("Payload:", JSON.stringify(payload, null, 2));
+            // console.log("Payload:", JSON.stringify(payload, null, 2));
 
             // Validate form
             if (!payload.last_name || !payload.first_name || !payload.address || !payload.phone_number) {

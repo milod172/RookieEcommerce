@@ -46,9 +46,46 @@
     <a asp-page="/Auths/Register" class="btn-create">Đăng ký</a>
 </div>
 
+@if (TempData["SuccessMessage"] is string msg)
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3"
+         style="z-index: 9999">
+
+        <div id="successToast"
+             class="toast align-items-center text-bg-success border-0"
+             role="alert">
+
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @msg
+                </div>
+
+                <button type="button"
+                        class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast">
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 <script>
     function togglePwd() {
       const i = document.getElementById('password');
       i.type = i.type === 'password' ? 'text' : 'password';
     }
+
+        document.addEventListener('DOMContentLoaded', () => {
+        const toastEl = document.getElementById('successToast');
+
+        if (!toastEl) return;
+
+        const toast = new bootstrap.Toast(toastEl, {
+            delay: 4000,
+            autohide: true
+        });
+
+        toast.show();
+    });
 </script>

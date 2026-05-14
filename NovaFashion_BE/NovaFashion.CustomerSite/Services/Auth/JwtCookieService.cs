@@ -22,26 +22,24 @@ namespace NovaFashion.CustomerSite.Services.Auth
             var principal = new ClaimsPrincipal(identity);
 
             var authProperties = new AuthenticationProperties
-            {
-                //Save cookie while Browser close
-                IsPersistent = true,
+            {    
+                IsPersistent = true,        //Save cookie while Browser close
                 ExpiresUtc = jwt.ValidTo,
-                //Allow refresh cookie
-                AllowRefresh = true,
+                AllowRefresh = true,        //Allow refresh cookie
             };
 
-            //  Sign in Cookie Authentication (browser session)
+            //  Sign in Cookie Authentication 
             await context.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal,
                 authProperties
             );
 
-            // 2. Lưu JWT access token vào HttpOnly cookie để attach vào API calls
+            // Lưu JWT access token vào HttpOnly cookie để attach vào API calls
             SetSecureCookie(context, AccessTokenCookie, token.AccessToken,
                  jwt.ValidTo);
 
-            // 3. Lưu refresh token + userId để auto-refresh sau
+        
             SetSecureCookie(context, RefreshTokenCookie, token.RefreshToken,
                 DateTime.UtcNow.AddDays(7));
 
@@ -49,19 +47,19 @@ namespace NovaFashion.CustomerSite.Services.Auth
             logger.LogInformation("User {UserId} signed in successfully", token.UserId);
         }
 
-        
+
         public async Task SignOutAsync(HttpContext context)
         {
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             DeleteCookie(context, AccessTokenCookie);
             DeleteCookie(context, RefreshTokenCookie);
-       
+
 
             logger.LogInformation("User signed out");
         }
 
-       
+
 
         // Read JWT access token from cookie when call API
         public string? GetAccessToken(HttpContext context)
@@ -101,8 +99,18 @@ namespace NovaFashion.CustomerSite.Services.Auth
             }
         }
 
+        private static ClaimsIdentity BuildClaimsIdentity(JwtSecurityToken jwt)
+        {
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value ?? ""),
+                new(ClaimTypes.Name,           jwt.Claims.FirstOrDefault(c => c.Type == "userName")?.Value ?? ""),
+                new(ClaimTypes.Role,           jwt.Claims.FirstOrDefault(c => c.Type == "role")?.Value ?? ""),
+            };
 
-  
+            return new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
         // Helpers
         private static void SetSecureCookie(
             HttpContext context,
@@ -118,18 +126,6 @@ namespace NovaFashion.CustomerSite.Services.Auth
                 Expires = expires,
                 IsEssential = true              // GDPR: không bị chặn bởi consent
             });
-        }
-
-        private static ClaimsIdentity BuildClaimsIdentity(JwtSecurityToken jwt)
-        {
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value ?? ""),
-                new(ClaimTypes.Name,           jwt.Claims.FirstOrDefault(c => c.Type == "userName")?.Value ?? ""),
-                new(ClaimTypes.Role,           jwt.Claims.FirstOrDefault(c => c.Type == "role")?.Value ?? ""),
-            };
-
-            return new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
         private static void DeleteCookie(HttpContext context, string name)

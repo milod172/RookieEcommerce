@@ -352,6 +352,92 @@ footer {
     margin-top: 10px;
 }
 
+.pd-section__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.5rem;
+}
+
+.pd-page {
+    background: #f8f9fa;
+}
+
+.pd-section__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #111;
+}
+
+.pd-reviews__stars {
+    color: #f59e0b; 
+    font-size: 0.9rem;
+}
+
+    .pd-reviews__stars .far {
+        color: #e5e7eb;
+    }
+
+.pd-review-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    transition: all 0.25s ease;
+}
+
+    .pd-review-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+.pd-review-card__avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pd-review-card__name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #111;
+}
+
+.pd-review-card__meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.pd-review-card__text {
+    margin-top: 10px;
+    color: #374151;
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+.pd-review-card .d-flex {
+    align-items: flex-start;
+}
+
+.pd-review-card__stars {
+    margin-top: 4px;
+    display: flex;
+    gap: 3px;
+}
+
 /*End Product Details*/
 
 

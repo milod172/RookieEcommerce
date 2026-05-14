@@ -5,6 +5,7 @@ using NJsonSchema.Annotations;
 using NovaFashion.API.Entities;
 using NovaFashion.API.Entities.Enum;
 using NovaFashion.API.Infrastructure.Persistence;
+using NovaFashion.API.Shared.Extensions;
 using NovaFashion.SharedViewModels.ProductDtos;
 
 namespace NovaFashion.API.Features.Products
@@ -112,6 +113,7 @@ namespace NovaFashion.API.Features.Products
         public override async Task HandleAsync(UpdateProductRequest req, CancellationToken ct)
         {
             var product = await db.Products
+                .Include(p => p.ProductVariants)
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == req.Id, ct);
 
@@ -119,7 +121,7 @@ namespace NovaFashion.API.Features.Products
             {
                 ThrowError("Không tìm thấy sản phẩm", statusCode: 404);
             }
-
+           
             var stockVarQuantity = await db.ProductVariants
                 .Where(pv => pv.ProductId == req.Id)
                 .SumAsync(pv => pv.StockQuantity, ct);
@@ -132,7 +134,20 @@ namespace NovaFashion.API.Features.Products
             }
             ThrowIfAnyErrors();
 
+            var lastestName = product.ProductName;
+
             Map.UpdateEntity(req, product);
+            product.Sku = product.GenerateSku();
+
+            if (product.ProductVariants.Any() && req.ProductName != lastestName)
+            {
+                foreach (var variant in product.ProductVariants)
+                {
+                    variant.VariantSku = variant.GenerateVariantSku(product.ProductName, product.Id);
+                }
+            }
+
+
             db.Products.Update(product);
             await db.SaveChangesAsync(ct);
 

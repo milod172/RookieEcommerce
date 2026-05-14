@@ -41,7 +41,6 @@ namespace NovaFashion.CustomerSite.Pages
                 DefaultStatus,
                 null,
                 null,
-                null,
                 CategoryId
             );
 

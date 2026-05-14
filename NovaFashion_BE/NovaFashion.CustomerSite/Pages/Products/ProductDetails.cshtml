@@ -58,7 +58,75 @@
     <div id="toast-success" class="toast-success d-none">
         Thêm sản phẩm vào giỏ hàng thành công
     </div>
+
+    <div class="py-5">
+        
+        <section class="pd-reviews mb-5">
+            <h2 class="pd-section__title">Đánh giá sản phẩm</h2>
+
+            <div class="d-flex flex-column gap-3">
+                @if (Model.Rating.Items.Any())
+                {
+                    @foreach(var item in Model.Rating.Items)
+                    {
+                        <article class="pd-review-card">
+                            <div class="d-flex gap-3">            
+                         
+                                <img class ="pd-review-card__avatar"  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtuphMb4mq-EcVWhMVT8FCkv5dqZGgvn_QiA&s" />
+
+                                <div class="flex-grow-1">
+                        
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap w-100">
+                            
+                                        <div>
+                                            <div class="pd-review-card__name">
+                                                @item.RatingBy
+                                            </div>
+
+                                            @for (int i = 1; i <= 5; i++) 
+                                            { 
+                                                <i class="@(i <= item.Rate ? "fas" : "far") fa-star"></i>
+                                            }
+                                      
+                                        </div>
+
+                               
+                                        <div class="pd-review-card__meta">
+                                            <i class="far fa-clock"></i>
+                                            <span>Đánh giá vào @item.RatingDate</span>
+                                        </div>
+
+                                    </div>
+
+                           
+                                    <p class="pd-review-card__text">
+                                        @item.Comment
+                                    </p>
+
+                                </div>
+                            </div>
+                        </article>
+                    }
+
+                    @* <div class="text-center mt-4">
+                        <button class="btn btn-outline-dark px-4">
+                            Xem thêm đánh giá
+                        </button>
+                    </div> *@
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="far fa-comment-dots fs-1 mb-3 d-block"></i>
+                        <p class="mb-0">Sản phẩm hiện chưa có đánh giá nào.</p>
+                    </div>
+                }
+
+            </div>
+        </section>
+    </div>
 </div>
+
 
 @section Scripts {
     <script>

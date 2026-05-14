@@ -5,6 +5,7 @@ export const useProductImages = (productId = null, mutateProduct) => {
     const [images, setImages] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [uploadErrors, setUploadErrors] = useState([]);
     const fileInputRef = useRef(null);
 
     // Cleanup blob
@@ -39,6 +40,7 @@ export const useProductImages = (productId = null, mutateProduct) => {
         }
 
         setIsUploading(true);
+        setUploadErrors([]);
 
         try {
             const formData = new FormData();
@@ -60,6 +62,16 @@ export const useProductImages = (productId = null, mutateProduct) => {
 
         } catch (err) {
             console.error("Upload failed", err);
+            const data = err?.response?.data;
+
+            if (data?.errors) {
+                // Parse "files[0]", "files[1]" → flat list thông báo lỗi
+                const messages = Object.values(data.errors).flat();
+                setUploadErrors(messages);
+            } else {
+                setUploadErrors(["Upload thất bại, vui lòng thử lại."]);
+            }
+
         } finally {
             setIsUploading(false);
         }
@@ -68,7 +80,6 @@ export const useProductImages = (productId = null, mutateProduct) => {
 
     const handleRemoveImage = async (id) => {
         const target = images.find((i) => i.id === id);
-        console.log("CLICK DELETE", id);
         if (!target) return;
 
 
@@ -151,5 +162,7 @@ export const useProductImages = (productId = null, mutateProduct) => {
         handleDragOver,
         fileInputRef,
         clearImages,
+        uploadErrors,
+        setUploadErrors
     };
 };

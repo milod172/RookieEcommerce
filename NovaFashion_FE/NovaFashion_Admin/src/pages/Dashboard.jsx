@@ -1,46 +1,28 @@
-import StatCard from '../components/StatCard.jsx';
-import OrderTable from '../components/OrderTable.jsx';
-
+import "./Dashboard.css";
 const Dashboard = () => {
     return (
-        <>
-            <div className="row g-3 mb-4">
-                <div className="col-12 col-sm-6 col-xl-3">
-                    <StatCard title="Total Sales" value="2680" icon="💰" />
-                </div>
-                <div className="col-12 col-sm-6 col-xl-3">
-                    <StatCard title="New Customers" value="537" icon="👤" />
-                </div>
-                <div className="col-12 col-sm-6 col-xl-3">
-                    <StatCard title="Product Sold" value="846" icon="📦" />
-                </div>
-                <div className="col-12 col-sm-6 col-xl-3">
-                    <StatCard title="Total Revenue" value="$783.83" icon="💵" />
+        <div class="dsb-page">
+            <div className="dsb-welcome">
+                <span className="dsb-welcome__bubble dsb-welcome__bubble--1"></span>
+                <span className="dsb-welcome__bubble dsb-welcome__bubble--2"></span>
+                <span className="dsb-welcome__bubble dsb-welcome__bubble--3"></span>
+
+                <div className="dsb-welcome__content">
+                    <span className="dsb-welcome__badge">
+                        <i className="fa-solid fa-hand-sparkles"></i> Xin chào lần nữa
+                    </span>
+                    <h2 className="dsb-welcome__title">
+                        Chào mừng bạn <span className="dsb-welcome__title-accent">quay trở lại!</span>
+                    </h2>
+                    <p className="dsb-welcome__subtitle">
+                        Đây là không gian làm việc của bạn. Hiện chưa có dữ liệu để hiển thị —
+                        hãy bắt đầu bằng cách thêm sản phẩm hoặc kết nối nguồn dữ liệu để xem
+                        các chỉ số hấp dẫn xuất hiện ở đây.
+                    </p>
                 </div>
             </div>
+        </div>
 
-
-            <div className="row g-3 mb-4">
-                <div className="col-12 col-xl-8">
-                    <div className="card border-0 shadow-sm p-3">
-                        <h5>Revenue analytics</h5>
-                        {/* Chart component here */}
-                    </div>
-                </div>
-                <div className="col-12 col-xl-4">
-                    <div className="card border-0 shadow-sm p-3">
-                        <h5>Sales by traffic source</h5>
-                        {/* Traffic component here */}
-                    </div>
-                </div>
-            </div>
-
-            <div className="row">
-                <div className="col-12">
-                    <OrderTable />
-                </div>
-            </div>
-        </>
     );
 };
 

@@ -19,7 +19,7 @@ namespace NovaFashion.CustomerSite.Pages.Products
         public int PageNumber { get; set; } = 1;
 
         [BindProperty(SupportsGet = true)]
-        public int PageSize { get; set; } = 5;
+        public int PageSize { get; set; } = 6;
 
         [BindProperty(SupportsGet = true)]
         public string SortBy { get; set; } = "Newest";
@@ -34,8 +34,6 @@ namespace NovaFashion.CustomerSite.Pages.Products
 
         [BindProperty(SupportsGet = true)]
         public Guid? CategoryId { get; set; }
-        [BindProperty(SupportsGet = true)]
-        public string? Search { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -50,11 +48,9 @@ namespace NovaFashion.CustomerSite.Pages.Products
                 PageSize,
                 SortBy,
                 DefaultStatus,
-                Search,
                 MinPrice,
                 MaxPrice,
                 CategoryId
-                
             );
 
             if (Request.Headers.ContainsKey("HX-Request"))

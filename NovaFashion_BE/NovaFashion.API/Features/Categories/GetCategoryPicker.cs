@@ -27,7 +27,15 @@ namespace NovaFashion.API.Features.Categories
                 })
                 .ToListAsync(ct);
 
-            await Send.OkAsync(lookups, ct);
+            var ordered = lookups
+                .Where(c => c.ParentCategoryId == null)
+                .SelectMany(parent => new[] { parent }
+                    .Concat(lookups
+                        .Where(c => c.ParentCategoryId == parent.Id)
+                        .OrderBy(c => c.CategoryName)))
+                .ToList();
+
+            await Send.OkAsync(ordered, ct);
         }
     }
 }

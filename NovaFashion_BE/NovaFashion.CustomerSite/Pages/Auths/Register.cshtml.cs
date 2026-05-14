@@ -41,7 +41,12 @@ namespace NovaFashion.CustomerSite.Pages.Auths
             }
 
             if (data is not null)
+            {
+                TempData["SuccessMessage"] = "Đăng ký thành công!";
                 return RedirectToPage("/Auths/Login");
+            }
+
+                
 
             ModelState.AddModelError("", "Đăng ký thất bại");
             return Page();

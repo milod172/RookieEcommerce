@@ -1,0 +1,89 @@
+ .dsb-page {
+     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+     min-height: 100vh;
+     background: #f5f6fa;
+     padding: 32px 24px;
+     color: #1a1d29;
+ }
+
+ .dsb-page .dsb-welcome {
+     position: relative;
+     overflow: hidden;
+     border-radius: 24px;
+     padding: 56px 48px;
+     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+     color: #fff;
+     box-shadow: 0 20px 50px -20px rgba(99, 102, 241, 0.5);
+     margin-bottom: 28px;
+ }
+
+ .dsb-page .dsb-welcome__bubble {
+     position: absolute;
+     border-radius: 50%;
+     background: rgba(255, 255, 255, 0.12);
+     pointer-events: none;
+ }
+
+ .dsb-page .dsb-welcome__bubble--1 {
+     width: 280px;
+     height: 280px;
+     top: -80px;
+     right: -60px;
+ }
+
+ .dsb-page .dsb-welcome__bubble--2 {
+     width: 160px;
+     height: 160px;
+     bottom: -50px;
+     right: 220px;
+     background: rgba(255, 255, 255, 0.08);
+ }
+
+ .dsb-page .dsb-welcome__bubble--3 {
+     width: 90px;
+     height: 90px;
+     top: 30px;
+     right: 320px;
+     background: rgba(255, 255, 255, 0.15);
+ }
+
+ .dsb-page .dsb-welcome__content {
+     position: relative;
+     z-index: 2;
+     max-width: 620px;
+ }
+
+ .dsb-page .dsb-welcome__badge {
+     display: inline-flex;
+     align-items: center;
+     gap: 8px;
+     background: rgba(255, 255, 255, 0.2);
+     backdrop-filter: blur(10px);
+     padding: 6px 14px;
+     border-radius: 999px;
+     font-size: 13px;
+     font-weight: 600;
+     margin-bottom: 18px;
+ }
+
+ .dsb-page .dsb-welcome__title {
+     font-size: 42px;
+     font-weight: 800;
+     line-height: 1.15;
+     margin-bottom: 14px;
+     letter-spacing: -1px;
+ }
+
+ .dsb-page .dsb-welcome__title-accent {
+     background: linear-gradient(90deg, #fde68a, #fbcfe8);
+     -webkit-background-clip: text;
+     background-clip: text;
+     color: transparent;
+ }
+
+ .dsb-page .dsb-welcome__subtitle {
+     font-size: 16px;
+     opacity: 0.9;
+     margin-bottom: 26px;
+     line-height: 1.6;
+ }

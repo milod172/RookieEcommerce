@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text.Json;
 using NovaFashion.SharedViewModels.OrderDtos;
 using NovaFashion.SharedViewModels.ProductRatingDtos;
 
@@ -11,13 +12,12 @@ namespace NovaFashion.CustomerSite.Services
             var query = $"api/orders/{id}/rating";
 
             var response = await httpClient.GetAsync(query);
+            var content = await response.Content.ReadAsStringAsync();
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
+            if (!response.IsSuccessStatusCode || string.IsNullOrWhiteSpace(content))
                 return null;
 
-            response.EnsureSuccessStatusCode();
-
-            return await response.Content.ReadFromJsonAsync<ProductRatingDto>();
+            return JsonSerializer.Deserialize<ProductRatingDto>(content);
         }
 
         public async Task<ProductRatingDto> CreateRatingAsync(ProductRatingRequest request)

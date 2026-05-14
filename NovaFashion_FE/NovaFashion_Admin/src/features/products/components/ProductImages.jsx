@@ -1,6 +1,6 @@
 import styles from '../../../pages/ProductDetails.module.css';
 
-const ProductImages = ({ images, handleSetCover, handleRemoveImage, handleDrop, handleDragOver, fileInputRef, handleFiles, isUploading, isDeleting }) => {
+const ProductImages = ({ images, handleSetCover, handleRemoveImage, handleDrop, handleDragOver, fileInputRef, handleFiles, isUploading, isDeleting, uploadErrors }) => {
     return (
         <div className={`card border-0 shadow-sm ${styles.panel} mb-3`}>
             {/* Header */}
@@ -98,6 +98,13 @@ const ProductImages = ({ images, handleSetCover, handleRemoveImage, handleDrop, 
                 />
             </div>
 
+            {uploadErrors.length > 0 && (
+                <ul className="text-red-500 text-sm mt-2 space-y-1">
+                    {uploadErrors.map((msg, i) => (
+                        <li key={i}>⚠ {msg}</li>
+                    ))}
+                </ul>
+            )}
             {/* Loading state */}
             {(isUploading || isDeleting) && (
                 <div className="text-muted small mt-2">

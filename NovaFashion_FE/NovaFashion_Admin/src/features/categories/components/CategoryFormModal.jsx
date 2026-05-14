@@ -85,7 +85,7 @@ const CategoryFormModal = ({
                     parent_category_id: parentId || null,
                     is_deleted: !isActive,
                 };
-                console.log('Update payload:', payload);
+                // console.log('Update payload:', payload);
                 await updateCategory(payload);
             }
 

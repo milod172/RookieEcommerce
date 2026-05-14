@@ -15,9 +15,9 @@
                 hx-vals='{"PageNumber": "1"}'
                 hx-trigger="change">
                             
-            <option value="5" selected="@(Model.PageSize == 5 ? "selected" : null)">5</option>
-            <option value="10" selected="@(Model.PageSize == 10 ? "selected" : null)">10</option>
-            <option value="20" selected="@(Model.PageSize == 20 ? "selected" : null)">20</option>
+            <option value="6" selected="@(Model.PageSize == 6 ? "selected" : null)">6</option>
+            <option value="12" selected="@(Model.PageSize == 12 ? "selected" : null)">12</option>
+            <option value="18" selected="@(Model.PageSize == 18 ? "selected" : null)">18</option>
         </select>
     </div>
 
@@ -37,24 +37,6 @@
             <option value="NameAsc" selected="@(Model.SortBy == "NameAsc" ? "selected" : null)">Tên A → Z</option>
             <option value="NameDesc" selected="@(Model.SortBy == "NameDesc" ? "selected" : null)">Tên Z → A</option>
         </select>
-    </div>
-
-
-    <div class="search-box">
-        <label class="form-label mb-1">Tìm kiếm:</label>
-
-        <input type="text"
-               id="Search"
-               name="Search"
-               class="form-control form-control-sm rounded-pill search-input"
-               placeholder="Nhập tên sản phẩm..."
-               hx-get="/shop"
-               hx-target="#product-container"
-               hx-swap="innerHTML"
-               hx-push-url="true"
-               hx-include="#SortBy, #MinPrice, #MaxPrice, #PageSize"
-               hx-trigger="keyup changed delay:500ms"
-               hx-vals='{"PageNumber": "1"}' />
     </div>
 
 </div>

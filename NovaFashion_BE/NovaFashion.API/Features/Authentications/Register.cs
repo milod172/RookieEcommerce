@@ -65,7 +65,7 @@ namespace NovaFashion.API.Features.Authentications
                 LastName = req.LastName,
                 Email = req.Email,
                 UserName = req.Email, 
-
+                CreatedDate = DateTime.UtcNow,
             };
 
             var result = await userManager.CreateAsync(user, req.Password);

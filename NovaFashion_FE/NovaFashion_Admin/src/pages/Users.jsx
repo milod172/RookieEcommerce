@@ -100,9 +100,8 @@ const Users = () => {
                                 <th>User name</th>
                                 <th>Full name</th>
                                 <th className="text-start">Email</th>
-                                <th className="text-end">Phone</th>
-                                <th className="text-center">Status</th>
-                                <th className="text-end">Actions</th>
+                                {/* <th className="text-end">Phone</th> */}
+                                <th className="text-start">Status</th>
                             </tr>
                         </thead>
 
@@ -126,9 +125,9 @@ const Users = () => {
                                         <span>{p.email}</span>
                                     </td>
 
-                                    <td className="text-end">{p.phone_number}</td>
+                                    {/* <td className="text-end">{p.phone_number}</td> */}
 
-                                    <td className="text-center">
+                                    <td className="text-start">
                                         <span
                                             className={`${styles.status} ${p.is_active ? styles.active : styles.inactive}`}
                                         >
@@ -136,7 +135,7 @@ const Users = () => {
                                         </span>
                                     </td>
 
-                                    <td className="text-end">
+                                    {/* <td className="text-end">
                                         <Link
                                             to={`/products/${p.id}`}
 
@@ -144,7 +143,7 @@ const Users = () => {
                                         >
                                             <i className="bi bi-eye"></i>
                                         </Link>
-                                    </td>
+                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>

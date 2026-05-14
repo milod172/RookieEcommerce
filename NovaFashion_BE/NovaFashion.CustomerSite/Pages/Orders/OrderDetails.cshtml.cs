@@ -15,16 +15,26 @@ namespace NovaFashion.CustomerSite.Pages.Orders
         public OrderDetailsDto Order { get; set; } = new();
         public ProductRatingDto? Rating { get; set; } = new();
 
+        [BindProperty]
+        public ProductRatingRequest Request { get; set; } = new();
+
         public async Task OnGetAsync(Guid id)
         {
             Order = await orderApi.GetOrderDetailsAsync(id);
             Rating = await ratingApi.GetRatingByOrderAsync(id);
         }
 
-        public async Task<IActionResult> OnPostAsync(ProductRatingRequest request)
+        public async Task<IActionResult> OnPostAsync()
         {
-            var ratingResponse = await ratingApi.CreateRatingAsync(request);
-            return RedirectToPage(new { id = request.OrderId });
+            if (!ModelState.IsValid)
+            {
+                Order = await orderApi.GetOrderDetailsAsync(Request.OrderId);
+                Rating = await ratingApi.GetRatingByOrderAsync(Request.OrderId);
+
+                return Page();
+            }
+            var ratingResponse = await ratingApi.CreateRatingAsync(Request);
+            return RedirectToPage(new { id = Request.OrderId });
         }
     }
 }

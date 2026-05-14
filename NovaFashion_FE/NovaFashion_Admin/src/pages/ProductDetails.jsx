@@ -144,6 +144,7 @@ const ProductDetails = () => {
                             handleFiles={imageLogic.handleFiles}
                             isUploading={imageLogic.isUploading}
                             isDeleting={imageLogic.isDeleting}
+                            uploadErrors={imageLogic.uploadErrors}
                         />
                         <ProductVariants
                             isLoadingVariants={variantLogic.isLoadingVariants}
